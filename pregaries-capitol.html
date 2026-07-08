@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pregàries del Capítol · Província Sant Pau</title>
+<meta name="description" content="Oracions inspirades en el I Capítol Provincial de la Província Sant Pau — cicle de quatre setmanes.">
+<style>
+  :root{
+    --paper:#faf6ee;
+    --paper-deep:#f2ecdf;
+    --ink:#2b241d;
+    --ink-soft:#6f655a;
+    --rubric:#8e1b2b;          /* vermell de rúbrica litúrgica */
+    --hairline:#ddd3c2;
+    --ribbon-1:#8e1b2b;        /* cintes del breviari: colors litúrgics */
+    --ribbon-2:#2f6b46;
+    --ribbon-3:#5b3a7e;
+    --ribbon-4:#b9862c;
+    --card:#fffdf7;
+    --shadow:0 1px 2px rgba(43,36,29,.08), 0 6px 24px rgba(43,36,29,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#191510;
+      --paper-deep:#12100c;
+      --ink:#e8e0d2;
+      --ink-soft:#a2967f;
+      --rubric:#d4737f;
+      --hairline:#3a332a;
+      --card:#221d16;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.55;
+    min-height:100vh;
+    padding-bottom:max(24px, env(safe-area-inset-bottom));
+  }
+  /* ── Capçalera amb cintes ─────────────────────────── */
+  header{
+    background:var(--paper-deep);
+    border-bottom:1px solid var(--hairline);
+    padding:calc(14px + env(safe-area-inset-top)) 18px 0;
+    text-align:center;
+    position:relative;
+  }
+  h1{
+    font-size:1.15rem;
+    font-weight:600;
+    letter-spacing:.04em;
+  }
+  .subtitle{
+    font-size:.72rem;
+    color:var(--ink-soft);
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    font-family:system-ui,-apple-system,sans-serif;
+    margin-top:2px;
+  }
+  /* cintes de punt de llibre = selector de setmana */
+  .ribbons{
+    display:flex;
+    justify-content:center;
+    gap:22px;
+    margin-top:12px;
+  }
+  .ribbon{
+    -webkit-appearance:none;
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    width:44px;
+    height:52px;
+    color:#fff;
+    font-family:"Iowan Old Style",Palatino,Georgia,serif;
+    font-size:1rem;
+    font-weight:600;
+    letter-spacing:.05em;
+    padding-top:8px;
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 10px), 0 100%);
+    transition:height .25s ease, filter .2s ease;
+    filter:saturate(.55) brightness(1.05);
+    box-shadow:var(--shadow);
+  }
+  .ribbon:nth-child(1){background:var(--ribbon-1)}
+  .ribbon:nth-child(2){background:var(--ribbon-2)}
+  .ribbon:nth-child(3){background:var(--ribbon-3)}
+  .ribbon:nth-child(4){background:var(--ribbon-4)}
+  .ribbon[aria-pressed="true"]{
+    height:74px;
+    filter:none;
+  }
+  .ribbon:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .ribbon small{
+    display:block;
+    font-size:.55rem;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-family:system-ui,sans-serif;
+    opacity:.85;
+  }
+  /* ── Selector de dia ──────────────────────────────── */
+  .days{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    padding:14px 12px 6px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .day{
+    -webkit-appearance:none;
+    appearance:none;
+    border:1px solid var(--hairline);
+    background:transparent;
+    color:var(--ink-soft);
+    border-radius:50%;
+    width:42px;
+    height:42px;
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:.78rem;
+    font-weight:600;
+    cursor:pointer;
+    position:relative;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .day[aria-pressed="true"]{
+    background:var(--rubric);
+    border-color:var(--rubric);
+    color:#fff;
+  }
+  .day.today::after{
+    content:"";
+    position:absolute;
+    bottom:3px;left:50%;
+    transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;
+    background:currentColor;
+  }
+  .day:focus-visible{outline:2px solid var(--rubric);outline-offset:2px}
+  /* ── Targeta de la pregària ───────────────────────── */
+  main{
+    max-width:560px;
+    margin:0 auto;
+    padding:10px 16px 0;
+  }
+  .prayer{
+    background:var(--card);
+    border:1px solid var(--hairline);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    padding:26px 22px 22px;
+    touch-action:pan-y;
+  }
+  .rubric-label{
+    color:var(--rubric);
+    font-variant:small-caps;
+    letter-spacing:.14em;
+    font-size:.95rem;
+    text-align:center;
+    margin-bottom:4px;
+  }
+  .rubric-label::after{
+    content:"";
+    display:block;
+    width:46px;height:1px;
+    background:var(--rubric);
+    opacity:.5;
+    margin:10px auto 0;
+  }
+  .invocation{
+    font-size:1.08rem;
+    margin-top:16px;
+    hyphens:auto;
+  }
+  .invocation::first-letter{
+    color:var(--rubric);
+    font-size:1.6em;
+    line-height:1;
+    padding-right:1px;
+  }
+  .petition{
+    font-style:italic;
+    font-size:1.08rem;
+    margin-top:14px;
+    padding-left:14px;
+    border-left:2px solid var(--rubric);
+    hyphens:auto;
+  }
+  .refs{
+    margin-top:16px;
+    font-size:.72rem;
+    color:var(--ink-soft);
+    font-family:system-ui,-apple-system,sans-serif;
+    text-align:right;
+  }
+  /* ── Accions ──────────────────────────────────────── */
+  .actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:16px 0 8px;
+  }
+  .btn{
+    -webkit-appearance:none;
+    appearance:none;
+    border:1px solid var(--hairline);
+    background:var(--card);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:.85rem;
+    padding:9px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--rubric);outline-offset:2px}
+  .btn.primary{background:var(--rubric);border-color:var(--rubric);color:#fff}
+  footer{
+    text-align:center;
+    font-size:.68rem;
+    color:var(--ink-soft);
+    font-family:system-ui,-apple-system,sans-serif;
+    padding:14px 24px 4px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .toast{
+    position:fixed;
+    left:50%;bottom:28px;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:var(--paper);
+    font-family:system-ui,sans-serif;
+    font-size:.8rem;
+    padding:8px 16px;
+    border-radius:999px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Pregàries del Capítol</h1>
+  <p class="subtitle">I Capítol Provincial · Província Sant Pau</p>
+  <nav class="ribbons" aria-label="Setmana del cicle" id="ribbons"></nav>
+</header>
+
+<nav class="days" aria-label="Dia de la setmana" id="days"></nav>
+
+<main>
+  <article class="prayer" id="prayer" aria-live="polite">
+    <h2 class="rubric-label" id="pLabel"></h2>
+    <p class="invocation" id="pInv"></p>
+    <p class="petition" id="pPet"></p>
+    <p class="refs" id="pRefs"></p>
+  </article>
+  <div class="actions">
+    <button class="btn" id="btnToday">Avui</button>
+    <button class="btn primary" id="btnShare">Comparteix</button>
+  </div>
+</main>
+
+<footer>
+  La setmana s’assenyala automàticament segons el cicle de quatre setmanes; si la comunitat va per una altra setmana, toca la cinta corresponent.
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+// ── Dades ─────────────────────────────────────────────
+// prayers[setmana 0-3][dia 0-6]  (0 = Diumenge)
+const DIES = ["Diumenge","Dilluns","Dimarts","Dimecres","Dijous","Divendres","Dissabte"];
+const DIES_CURT = ["Dg","Dl","Dt","Dc","Dj","Dv","Ds"];
+const ROMANS = ["I","II","III","IV"];
+
+const prayers = [
+[ // Setmana I
+ {i:"Senyor, Tu vols de nosaltres que siguem una Província audaç en la missió…",
+  p:"Que el teu Esperit ens ajudi a discernir conjuntament els àmbits en què desenvolupar la nostra missió i a dur a terme la consegüent revisió de posicions.",
+  r:"14, 15.b, 16.a"},
+ {i:"Senyor, tu ens convides a conservar i actualitzar el carisma del Pare Claret…",
+  p:"Que, ajudats pel nostre ric patrimoni, aprofundim en la nostra espiritualitat claretiana.",
+  r:"11, 13.b"},
+ {i:"Senyor, ens crides a ser profecia d’unitat en la diversitat…",
+  p:"Ajuda’ns a integrar la diversitat personal i cultural i els dons de gràcia de cadascun dels membres de la nostra província.",
+  r:"5, 6.a"},
+ {i:"Senyor, les nostres relacions comunitàries no estan exemptes del risc de l’individualisme…",
+  p:"Que a les nostres comunitats ens cuidem mútuament, ens acollim i acompanyem en les nostres fragilitats.",
+  r:"9.a"},
+ {i:"Senyor, fer present l’Evangeli en la nostra societat ens exigeix solidaritat amb les persones més necessitades i excloses…",
+  p:"Que, en totes les nostres posicions, ens mostrem propers a les persones empobrides i treballem en defensa de la dignitat humana, de la justícia social i de la cura de la creació.",
+  r:"17, 19.b"},
+ {i:"Senyor, tu ens convides a fer realitat la sinodalitat també en el si de la nostra província…",
+  p:"Il·lumina el Govern Provincial perquè sigui proper a les persones, comunitats i activitats pastorals, les acompanyi i promogui la corresponsabilitat, el treball en equip, el discerniment i processos participats de presa de decisions.",
+  r:"4, 6.b"},
+ {i:"Senyor, ens anomenem i som Fills de l’Immaculat Cor de Maria…",
+  p:"Que intensifiquem la dimensió cordimariana de la nostra espiritualitat.",
+  r:"13.c"}
+],
+[ // Setmana II
+ {i:"Senyor, són molts els desafiaments que la cultura actual i els canvis en l’Església plantegen a la nostra acció missionera…",
+  p:"Que actualitzem contínuament els projectes i les pràctiques pastorals de les nostres plataformes buscant respondre des de l’Evangeli a les necessitats dels homes i dones d’avui.",
+  r:"4, 6.d, 14, 15.a, 15.c, 16.b"},
+ {i:"Senyor, tu ens suscites el desig de viure una espiritualitat forta fonamentada en Crist…",
+  p:"Que aprofundim en la nostra experiència de Jesucrist per ser configurats cada dia més amb Ell.",
+  r:"12.a"},
+ {i:"Senyor, estem creixent en un «nosaltres provincial»…",
+  p:"Guia’ns en la construcció d’un projecte compartit de vida i missió a la nostra província.",
+  r:"6.a"},
+ {i:"Senyor, tu ens convides al goig de la fraternitat en comunitats pobres, senzilles, alegres…",
+  p:"Que visquem la fraternitat com a do i tasca permanent a través de l’escolta, el perdó i la col·laboració com a germans, i això sigui font de goig i testimoni.",
+  r:"8, 9.b"},
+ {i:"Senyor, la transformació del món segons el teu designi és part essencial de la missió a la qual ens envies…",
+  p:"Que, en col·laboració amb altres organitzacions eclesials i socials i amb altres tradicions religioses, promoguem i recolzem presències, posicions i programes que afavoreixin aquesta transformació.",
+  r:"17, 18.a, 19.b"},
+ {i:"Senyor, la nostra comunitat provincial és intercultural i intergeneracional; cadascuna de les persones amb les quals vivim en comunitat és un regal que tu ens fas…",
+  p:"Que apreciem, acceptem i celebrem la singularitat de cada persona i compartim la riquesa que els germans grans, per la seva experiència de vida, ens aporten.",
+  r:"8, 10.a"},
+ {i:"Senyor, a exemple de Maria, i seguint les petjades de Claret, som oients de la Paraula de Déu…",
+  p:"Que l’acollim al cor, i es converteixi en font de transformació personal i comunitària i en impuls en la nostra vida missionera.",
+  r:"11, 12.a, 13.a"}
+],
+[ // Setmana III
+ {i:"Senyor, sentim una imperiosa crida a impulsar la missió compartida en les nostres posicions…",
+  p:"Que ens comprometem en la promoció i formació de persones que s’impliquin en la missió evangelitzadora que compartim.",
+  r:"14, 15.b, 16.a"},
+ {i:"Senyor, malgrat el pessimisme respecte al futur vocacional i a l’actual manca de relleu generacional, volem viure amb il·lusió i plens d’esperança…",
+  p:"Desperta en tots nosaltres la responsabilitat de promoure la cultura vocacional i de proposar la vocació claretiana.",
+  r:"4, 6.c"},
+ {i:"Senyor, et donem gràcies per la incorporació a la nostra província de missioners d’altres parts de la congregació…",
+  p:"Que ens preocupem per acompanyar-los i tots treballem per una plena integració.",
+  r:"5, 7.d"},
+ {i:"Senyor, en ocasions la nostra vida comunitària és feble…",
+  p:"Que en les nostres comunitats promoguem moments i dinàmiques que propiciïn la convivència, les relacions autèntiques i la vida fraterna.",
+  r:"10.a"},
+ {i:"Senyor, la Doctrina Social de l’Església i els Objectius de Desenvolupament Sostenible proposats per Nacions Unides són una interpel·lació per a nosaltres…",
+  p:"Que consolidem a la nostra Província l’àmbit de Solidaritat i Missió en tots els seus vessants i impulsem el treball en aquesta línia.",
+  r:"19.b, 19.c"},
+ {i:"Senyor, els col·legis són una plataforma privilegiada per sortir a la trobada dels joves…",
+  p:"Que vetllem perquè siguin àmbit d’evangelització de la infància, la joventut i les seves famílies.",
+  r:"16.c"},
+ {i:"Senyor, Tu coneixes les dificultats que trobem per a la nostra formació permanent…",
+  p:"Que, a l’empara de Maria, mestra i formadora d’apòstols, cuidem amb cura i dedicació aquesta faceta de la nostra vida aprofitant els diferents recursos que se’ns ofereixen.",
+  r:"7.b"}
+],
+[ // Setmana IV
+ {i:"Senyor, són moltes les persones de bona voluntat que, de diferents maneres, fan present el Regne de Déu…",
+  p:"Que en els nostres projectes missioners busquem la col·laboració amb altres instàncies eclesials i altres persones i entitats.",
+  r:"14, 15.a, 15.b, 16.a"},
+ {i:"Senyor, ser servidors de la Paraula forma part de la nostra identitat missionera…",
+  p:"Que en els nostres serveis pastorals proclamem amb passió aquesta Paraula de Déu i la compartim en comunitat i amb el poble de Déu.",
+  r:"13.a"},
+ {i:"Senyor, encara ens queda molt camí per recórrer en la cohesió de la Província i en la interrelació amb la resta de Províncies d’Europa…",
+  p:"Que tots ens preocupem de fomentar la trobada entre nosaltres i de coordinar-nos en els diferents àmbits d’apostolat, tant dins de la Província com respecte de les Províncies d’Europa.",
+  r:"7.e, 19.a"},
+ {i:"Senyor, el projecte comunitari és una eina molt important per a la nostra vida.",
+  p:"Que tots ens impliquem activament i ens comprometem en la seva elaboració, compliment i revisió.",
+  r:"10.b"},
+ {i:"Senyor, volem atendre i cuidar de la millor manera possible els germans de comunitat i de Província més necessitats, en especial els més grans i malalts…",
+  p:"Ajuda’ns a trobar i discernir els millors mitjans per fer-ho.",
+  r:"8, 10.c"},
+ {i:"Senyor, el continent digital ofereix moltes possibilitats i, alhora, presenta molts reptes a la nostra acció…",
+  p:"Il·lumina’ns perquè siguem capaços d’oferir un servei de comunicació i evangelització digital de qualitat.",
+  r:"16.e"},
+ {i:"Senyor, el Papa ens va convidar a fer nostre l’estil de Déu, que és proximitat, compassió i tendresa…",
+  p:"Que el Cor de Maria ens infongui la seva cordialitat i desenvolupem un estil cordial, tendre i compassiu, i acollim i escoltem les persones amb proximitat, respecte i absència de prejudicis.",
+  r:"17, 18.b, 19.e"}
+]];
+
+// ── Càlcul automàtic de la setmana ────────────────────
+// Àncora: el diumenge 5 de juliol de 2026 comença la Setmana II
+// (coincidint amb el salteri de la Litúrgia de les Hores en aquella data).
+// El cicle continua en rotació de 4 setmanes. Es pot canviar tocant les cintes.
+const ANCORA = { data: new Date(2026, 6, 5), setmana: 1 }; // 0-indexat: 1 = Setmana II
+
+function setmanaAutomatica(avui){
+  const diumenge = new Date(avui);
+  diumenge.setHours(0,0,0,0);
+  diumenge.setDate(diumenge.getDate() - diumenge.getDay()); // diumenge d'aquesta setmana
+  const dies = Math.round((diumenge - ANCORA.data) / 86400000);
+  const setmanes = Math.floor(dies / 7);
+  return ((ANCORA.setmana + setmanes) % 4 + 4) % 4;
+}
+
+// ── Estat ─────────────────────────────────────────────
+const avui = new Date();
+let selSetmana = setmanaAutomatica(avui);
+let selDia = avui.getDay();
+
+// ── Construcció de la interfície ──────────────────────
+const ribbons = document.getElementById("ribbons");
+ROMANS.forEach((r, idx) => {
+  const b = document.createElement("button");
+  b.className = "ribbon";
+  b.innerHTML = r + "<small>setm.</small>";
+  b.setAttribute("aria-label", "Setmana " + r);
+  b.addEventListener("click", () => { selSetmana = idx; render(); });
+  ribbons.appendChild(b);
+});
+
+const daysNav = document.getElementById("days");
+DIES_CURT.forEach((d, idx) => {
+  const b = document.createElement("button");
+  b.className = "day" + (idx === avui.getDay() ? " today" : "");
+  b.textContent = d;
+  b.setAttribute("aria-label", DIES[idx]);
+  b.addEventListener("click", () => { selDia = idx; render(); });
+  daysNav.appendChild(b);
+});
+
+function render(){
+  [...ribbons.children].forEach((b,i)=>b.setAttribute("aria-pressed", i===selSetmana));
+  [...daysNav.children].forEach((b,i)=>b.setAttribute("aria-pressed", i===selDia));
+  const o = prayers[selSetmana][selDia];
+  document.getElementById("pLabel").textContent = DIES[selDia] + " " + ROMANS[selSetmana];
+  document.getElementById("pInv").textContent = o.i;
+  document.getElementById("pPet").textContent = o.p;
+  document.getElementById("pRefs").textContent = "(" + o.r + ")";
+}
+
+// ── Botons ────────────────────────────────────────────
+document.getElementById("btnToday").addEventListener("click", () => {
+  selSetmana = setmanaAutomatica(new Date());
+  selDia = new Date().getDay();
+  render();
+});
+
+document.getElementById("btnShare").addEventListener("click", async () => {
+  const o = prayers[selSetmana][selDia];
+  const text = DIES[selDia] + " " + ROMANS[selSetmana] + "\n\n" + o.i + "\n\n" + o.p +
+    "\n\n— Oracions inspirades en el I Capítol Provincial de la Província Sant Pau";
+  if (navigator.share) {
+    try { await navigator.share({ title: "Pregària del dia", text }); } catch(e){}
+  } else if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("Pregària copiada al porta-retalls");
+    } catch(e){ toast("No s’ha pogut copiar"); }
+  }
+});
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+// ── Lliscar per canviar de dia ────────────────────────
+let x0 = null;
+const card = document.getElementById("prayer");
+card.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, {passive:true});
+card.addEventListener("touchend", e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0;
+  x0 = null;
+  if (Math.abs(dx) < 50) return;
+  if (dx < 0) { // següent dia
+    selDia++;
+    if (selDia > 6) { selDia = 0; selSetmana = (selSetmana + 1) % 4; }
+  } else {      // dia anterior
+    selDia--;
+    if (selDia < 0) { selDia = 6; selSetmana = (selSetmana + 3) % 4; }
+  }
+  render();
+}, {passive:true});
+
+render();
+</script>
+</body>
+</html>
