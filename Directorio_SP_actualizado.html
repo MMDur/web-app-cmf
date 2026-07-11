@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Directorio consultable de miembros SP por edad, comunidad, cumpleaños, onomásticas y aniversarios.">
+  <title>Directorio SP</title>
+  <style>
+    :root {
+      --bg: #f3f5f8;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #172033;
+      --muted: #657086;
+      --line: #dbe1ea;
+      --brand: #153e75;
+      --brand-2: #225ea8;
+      --accent: #c9972f;
+      --danger: #a93b3b;
+      --success: #26734d;
+      --shadow: 0 12px 32px rgba(21, 62, 117, .09);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .app-header {
+      background: linear-gradient(120deg, #102f58, #1e5b99);
+      color: white;
+      padding: 28px 24px 24px;
+      box-shadow: var(--shadow);
+    }
+    .header-inner, main { max-width: 1400px; margin: 0 auto; }
+    .header-top {
+      display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    }
+    h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.65rem); letter-spacing: -.035em; }
+    .subtitle { margin: 6px 0 0; color: #d9e8f7; }
+    .today-button {
+      border: 1px solid rgba(255,255,255,.45);
+      background: white;
+      color: var(--brand);
+      font-weight: 800;
+      padding: 12px 19px;
+      border-radius: 999px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.15);
+      display: inline-flex; align-items: center; gap: 9px;
+    }
+    .today-button:hover { transform: translateY(-1px); }
+    .date-line { margin-top: 17px; font-size: .92rem; color: #d9e8f7; }
+    main { padding: 24px; }
+    .tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 15px;
+      font-weight: 700;
+    }
+    .tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 17px;
+      box-shadow: 0 5px 20px rgba(15, 23, 42, .035);
+    }
+    .stat-number { font-size: 1.8rem; font-weight: 850; letter-spacing: -.04em; color: var(--brand); }
+    .stat-label { color: var(--muted); font-size: .9rem; }
+    .filters {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 2fr repeat(4, minmax(150px, 1fr)) auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 16px;
+      box-shadow: 0 5px 20px rgba(15, 23, 42, .035);
+    }
+    label { display: block; font-size: .78rem; font-weight: 800; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .045em; }
+    input, select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+      color: var(--text);
+      padding: 9px 11px;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--brand-2); box-shadow: 0 0 0 3px rgba(34,94,168,.12); }
+    .secondary-button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 8px 13px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .table-shell {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(15, 23, 42, .035);
+    }
+    .results-bar {
+      padding: 13px 16px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .results-actions { display: flex; gap: 8px; }
+    .text-button {
+      border: 0; background: transparent; color: var(--brand-2); font-weight: 750; padding: 5px;
+    }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th {
+      background: var(--surface-2);
+      text-align: left;
+      color: var(--muted);
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+      padding: 11px 13px;
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0;
+    }
+    td { padding: 12px 13px; border-bottom: 1px solid #edf0f4; vertical-align: top; }
+    tbody tr:hover { background: #f8fbff; }
+    .name-button {
+      border: 0; padding: 0; background: transparent; color: var(--brand); text-align: left; font-weight: 820;
+    }
+    .muted { color: var(--muted); }
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 4px 8px; border-radius: 999px;
+      background: #edf3f9; color: var(--brand);
+      font-size: .78rem; font-weight: 750;
+    }
+    .event-stack { display: grid; gap: 5px; }
+    .event-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 1px solid var(--line); background: white; border-radius: 10px;
+      padding: 7px 9px; font-size: .87rem;
+    }
+    .event-chip strong { color: var(--brand); }
+    .empty {
+      padding: 44px 20px; text-align: center; color: var(--muted);
+      background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius);
+    }
+    .section-card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: 0 5px 20px rgba(15,23,42,.035); margin-bottom: 16px; overflow: hidden;
+    }
+    .section-heading {
+      padding: 16px 18px; border-bottom: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .section-heading h2, .section-heading h3 { margin: 0; }
+    .today-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .today-group {
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+    }
+    .today-group h3 { margin: 0; padding: 13px 15px; background: var(--surface-2); border-bottom: 1px solid var(--line); font-size: 1rem; }
+    .event-list { list-style: none; margin: 0; padding: 0; }
+    .event-list li { padding: 12px 15px; border-bottom: 1px solid #edf0f4; }
+    .event-list li:last-child { border-bottom: 0; }
+    .event-title { font-weight: 800; color: var(--brand); }
+    .event-meta { color: var(--muted); font-size: .88rem; margin-top: 3px; }
+    .calendar-controls {
+      display: flex; gap: 10px; align-items: end; flex-wrap: wrap;
+    }
+    .calendar-controls > div { min-width: 170px; }
+    .calendar-days { display: grid; gap: 12px; padding: 16px; }
+    .calendar-day {
+      display: grid; grid-template-columns: 80px 1fr; gap: 14px;
+      padding: 13px; border: 1px solid var(--line); border-radius: 13px;
+    }
+    .day-number { font-size: 1.55rem; font-weight: 850; color: var(--brand); }
+    .day-name { color: var(--muted); font-size: .8rem; }
+    dialog {
+      width: min(720px, calc(100% - 28px)); border: 0; border-radius: 18px; padding: 0;
+      box-shadow: 0 30px 80px rgba(0,0,0,.28);
+    }
+    dialog::backdrop { background: rgba(15,23,42,.58); backdrop-filter: blur(3px); }
+    .modal-head { padding: 20px 22px; background: var(--brand); color: white; display: flex; justify-content: space-between; gap: 14px; }
+    .modal-head h2 { margin: 0; font-size: 1.25rem; }
+    .close-button { border: 0; background: rgba(255,255,255,.14); color: white; border-radius: 999px; width: 34px; height: 34px; font-weight: 900; }
+    .modal-body { padding: 20px 22px 24px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .detail {
+      border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+    }
+    .detail-label { color: var(--muted); font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .detail-value { margin-top: 4px; font-weight: 700; }
+    .footer-note { color: var(--muted); font-size: .8rem; margin: 18px 2px 4px; }
+    @media (max-width: 1100px) {
+      .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .app-header { padding: 22px 16px; }
+      main { padding: 16px; }
+      .filters, .stats, .today-grid, .detail-grid { grid-template-columns: 1fr; }
+      .calendar-day { grid-template-columns: 58px 1fr; }
+      .today-button { width: 100%; justify-content: center; }
+    }
+
+    /* Mejora visual 2026: misma estructura, mayor claridad y respuesta táctil */
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(34, 94, 168, .09), transparent 28rem),
+        radial-gradient(circle at 94% 18%, rgba(201, 151, 47, .08), transparent 24rem),
+        var(--bg);
+    }
+    button, .stat, .event-chip, .today-group, .calendar-day, .detail {
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+    }
+    button:focus-visible, input:focus-visible, select:focus-visible, .name-button:focus-visible {
+      outline: 3px solid rgba(201, 151, 47, .55);
+      outline-offset: 3px;
+    }
+    .app-header {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 85% -35%, rgba(255,255,255,.20), transparent 24rem),
+        linear-gradient(120deg, #0d2b52, #1e5b99 72%, #2869aa);
+    }
+    .app-header::after {
+      content: "";
+      position: absolute;
+      inset: auto -5% -72px 38%;
+      height: 145px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.055);
+      transform: rotate(-6deg);
+      pointer-events: none;
+    }
+    .header-inner { position: relative; z-index: 1; }
+    .today-button { border-color: rgba(255,255,255,.72); }
+    .today-button:hover { transform: translateY(-2px); box-shadow: 0 11px 24px rgba(0,0,0,.19); }
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 10px 0;
+      background: rgba(243,245,248,.88);
+      backdrop-filter: blur(12px);
+    }
+    .tab:hover:not(.active), .secondary-button:hover { border-color: #b8c5d8; background: #fff; transform: translateY(-1px); }
+    .tab.active { box-shadow: 0 7px 18px rgba(21,62,117,.18); }
+    .stat:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(15,23,42,.075); border-color: #c8d3e1; }
+    .stat-number { font-variant-numeric: tabular-nums; }
+    .table-shell, .filters, .section-card { box-shadow: 0 8px 28px rgba(15,23,42,.055); }
+    tbody tr:nth-child(even) { background: rgba(248,250,252,.52); }
+    tbody tr:hover { background: #f2f7fd; }
+    .name-button:hover { color: var(--brand-2); text-decoration: underline; text-underline-offset: 3px; }
+    .event-chip:hover, .calendar-day:hover, .detail:hover { border-color: #c5d3e4; box-shadow: 0 7px 20px rgba(21,62,117,.07); }
+    .event-chip:hover { transform: translateY(-1px); }
+    .badge { border: 1px solid #d8e5f2; }
+    dialog[open] { animation: dialogIn .18s ease-out; }
+    @keyframes dialogIn { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+
+    @media print {
+      .app-header, .tabs, .filters, .results-actions, .footer-note { display: none !important; }
+      main { padding: 0; }
+      .panel { display: none !important; }
+      #directoryPanel.active { display: block !important; }
+      .table-shell { box-shadow: none; border: 0; }
+      table { min-width: 0; font-size: 9pt; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div>
+          <h1>Directorio SP</h1>
+          <p class="subtitle">Consulta por nombre, edad, comunidad, cumpleaños, onomásticas y aniversarios</p>
+        </div>
+        <button class="today-button" id="todayButton" type="button" aria-label="Ver celebraciones de hoy">
+          <span aria-hidden="true">◉</span> Hoy <span id="todayCount"></span>
+        </button>
+      </div>
+      <div class="date-line" id="currentDate"></div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab active" data-tab="directoryPanel">Directorio</button>
+      <button class="tab" data-tab="todayPanel">Hoy</button>
+      <button class="tab" data-tab="calendarPanel">Calendario</button>
+    </nav>
+
+    <section class="panel active" id="directoryPanel">
+      <div class="stats">
+        <article class="stat"><div class="stat-number" id="statVisible">0</div><div class="stat-label">Personas visibles</div></article>
+        <article class="stat"><div class="stat-number" id="statCommunities">0</div><div class="stat-label">Comunidades</div></article>
+        <article class="stat"><div class="stat-number" id="statBirthMonth">0</div><div class="stat-label">Cumpleaños este mes</div></article>
+        <article class="stat"><div class="stat-number" id="statOnomMonth">0</div><div class="stat-label">Onomásticas este mes</div></article>
+      </div>
+
+      <div class="filters">
+        <div>
+          <label for="search">Buscar</label>
+          <input id="search" type="search" placeholder="Nombre, comunidad, fecha…">
+        </div>
+        <div>
+          <label for="ageFilter">Edad</label>
+          <select id="ageFilter">
+            <option value="">Todas las edades</option>
+            <option value="lt40">Menos de 40</option>
+            <option value="40-59">40–59</option>
+            <option value="60-74">60–74</option>
+            <option value="75-89">75–89</option>
+            <option value="90plus">90 o más</option>
+          </select>
+        </div>
+        <div>
+          <label for="communityFilter">Comunidad</label>
+          <select id="communityFilter"><option value="">Todas las comunidades</option></select>
+        </div>
+        <div>
+          <label for="eventFilter">Tipo de fecha</label>
+          <select id="eventFilter">
+            <option value="">Cualquier fecha</option>
+            <option value="birth">Cumpleaños</option>
+            <option value="onomastic">Onomástica</option>
+            <option value="firstProfession">1.ª profesión</option>
+            <option value="perpetualProfession">Profesión perpetua</option>
+            <option value="ordination">Ordenación presbiteral</option>
+          </select>
+        </div>
+        <div>
+          <label for="monthFilter">Mes de la fecha</label>
+          <select id="monthFilter"><option value="">Cualquier mes</option></select>
+        </div>
+        <button class="secondary-button" id="clearFilters" type="button">Limpiar</button>
+      </div>
+
+      <div class="table-shell">
+        <div class="results-bar">
+          <span id="resultsText"></span>
+          <div class="results-actions">
+            <button class="text-button" id="exportCsv" type="button">Exportar CSV</button>
+            <button class="text-button" type="button" onclick="window.print()">Imprimir</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Edad</th>
+                <th>Nacimiento</th>
+                <th>Onomástica</th>
+                <th>Comunidad</th>
+                <th>Próxima celebración</th>
+              </tr>
+            </thead>
+            <tbody id="directoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="todayPanel">
+      <div class="section-card">
+        <div class="section-heading">
+          <div>
+            <h2>Celebraciones de hoy</h2>
+            <div class="muted" id="todayHeadingDate"></div>
+          </div>
+          <button class="secondary-button" id="backDirectory" type="button">Volver al directorio</button>
+        </div>
+      </div>
+      <div id="todayContent"></div>
+    </section>
+
+    <section class="panel" id="calendarPanel">
+      <div class="section-card">
+        <div class="section-heading">
+          <div>
+            <h2>Calendario anual</h2>
+            <div class="muted">Todas las celebraciones agrupadas por día</div>
+          </div>
+          <div class="calendar-controls">
+            <div>
+              <label for="calendarMonth">Mes</label>
+              <select id="calendarMonth"></select>
+            </div>
+            <div>
+              <label for="calendarEvent">Tipo</label>
+              <select id="calendarEvent">
+                <option value="">Todos los tipos</option>
+                <option value="birth">Cumpleaños</option>
+                <option value="onomastic">Onomástica</option>
+                <option value="firstProfession">1.ª profesión</option>
+                <option value="perpetualProfession">Profesión perpetua</option>
+                <option value="ordination">Ordenación presbiteral</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="calendar-days" id="calendarDays"></div>
+      </div>
+    </section>
+
+    <p class="footer-note">Datos actualizados con la lista corregida. Los cálculos de edad y aniversarios se actualizan automáticamente según la fecha del dispositivo. La aplicación funciona sin conexión y no envía datos a Internet.</p>
+  </main>
+
+  <dialog id="memberDialog">
+    <div class="modal-head">
+      <h2 id="dialogName"></h2>
+      <button class="close-button" id="dialogClose" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body" id="dialogBody"></div>
+  </dialog>
+
+<script>
+const MEMBERS = [{"id":1,"name":"ADORMEO SERDON, RAYMUNDO","birth":"1979-10-25","birthText":"25/10/1979","onomastic":{"day":7,"month":1},"onomasticText":"07/01 (ST RAYMUNDO)","firstProfession":"2002-05-05","firstProfessionText":"05/05/2002","perpetualProfession":"2007-05-15","perpetualProfessionText":"15/05/2007","ordination":"2008-12-06","ordinationText":"06/12/2008","community":"Muret","communityGroup":"Muret"},{"id":2,"name":"ARMENGOL TORRENT, JOSEP","birth":"1938-10-28","birthText":"28/10/1938","onomastic":{"day":19,"month":3},"onomasticText":"19 de marzo (ST JOSEP: ARMENGOL)","firstProfession":"1958-07-16","firstProfessionText":"16/07/1958","perpetualProfession":"1964-07-16","perpetualProfessionText":"16/07/1964","ordination":"1967-06-29","ordinationText":"29/06/1967","community":"Vic","communityGroup":"Vic"},{"id":3,"name":"ASKAITURRIETA EZKURDIA, JUAN MARTÍN","birth":"1976-06-10","birthText":"10/06/1976","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JUAN)","firstProfession":"1996-09-14","firstProfessionText":"14/09/1996","perpetualProfession":"2003-06-07","perpetualProfessionText":"07/06/2003","ordination":"2006-10-21","ordinationText":"21/10/2006","community":"Bcn Cúria-Assistencial","communityGroup":"Bcn Cúria-Assistencial"},{"id":4,"name":"AUGÉ BENET, MATIAS","birth":"1936-05-27","birthText":"27/05/1936","onomastic":{"day":14,"month":5},"onomasticText":"14 de mayo (ST MATIES)","firstProfession":"1953-07-16","firstProfessionText":"16/07/1953","perpetualProfession":"1957-08-15","perpetualProfessionText":"15/08/1957","ordination":"1961-07-23","ordinationText":"23/07/1961","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":5,"name":"BARRENECHEA BELIO, LUIS Mª","birth":"1943-12-08","birthText":"08/12/1943","onomastic":{"day":21,"month":6},"onomasticText":"21/06 (ST LUIS)","firstProfession":"1961-07-16","firstProfessionText":"16/07/1961","perpetualProfession":"1967-07-16","perpetualProfessionText":"16/07/1967","ordination":"1970-04-05","ordinationText":"05/04/1970","community":"Agurain-Salvatierra","communityGroup":"Agurain-Salvatierra"},{"id":6,"name":"BARRETO, YOHANES BENJITO","birth":"1983-08-07","birthText":"07/08/1983","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST YOHANES/JOAN)","firstProfession":"2005-08-15","firstProfessionText":"15/08/2005","perpetualProfession":"2011-10-23","perpetualProfessionText":"23/10/2011","ordination":"2013-06-29","ordinationText":"29/06/2013","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":7,"name":"BEVILACQUA, MAURIZIO","birth":"1960-02-13","birthText":"13/02/1960","onomastic":{"day":22,"month":9},"onomasticText":"22/09 (ST MAURIZIO)","firstProfession":"1981-10-25","firstProfessionText":"25/10/1981","perpetualProfession":"1984-10-22","perpetualProfessionText":"22/10/1984","ordination":"1986-10-11","ordinationText":"11/10/1986","community":"Casa General-Claretianum","communityGroup":"Casa General-Claretianum"},{"id":8,"name":"BONMATÍ PUJADAS, JOAQUIM","birth":"1937-04-05","birthText":"05/04/1937","onomastic":{"day":26,"month":7},"onomasticText":"26/07 (ST JOAQUIM)","firstProfession":"1955-07-16","firstProfessionText":"16/07/1955","perpetualProfession":"1958-07-15","perpetualProfessionText":"15/07/1958","ordination":"1963-05-23","ordinationText":"23/05/1963","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":9,"name":"BOVÉ DURAN, JOAN","birth":"1979-11-25","birthText":"25/11/1979","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JOAN)","firstProfession":"2007-10-24","firstProfessionText":"24/10/2007","perpetualProfession":"2012-10-20","perpetualProfessionText":"20/10/2012","ordination":"2014-09-06","ordinationText":"06/09/2014","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":10,"name":"BRIGHI, LUCIANO","birth":"1947-01-10","birthText":"10/01/1947","onomastic":{"day":7,"month":1},"onomasticText":"07/01 (ST LUCIANO)","firstProfession":"1983-12-08","firstProfessionText":"08/12/1983","perpetualProfession":"1983-12-08","perpetualProfessionText":"08/12/1983","ordination":"1986-10-18","ordinationText":"18/10/1986","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":11,"name":"BURGOS CÁMARA, MIGUEL","birth":"1954-05-08","birthText":"08/05/1954","onomastic":{"day":29,"month":9},"onomasticText":"29/09 (ST MIGUEL)","firstProfession":"1974-09-29","firstProfessionText":"29/09/1974","perpetualProfession":"1980-02-24","perpetualProfessionText":"24/02/1980","ordination":"1981-06-13","ordinationText":"13/06/1981","community":"En servicio Perú-Bolivia/Bolivia","communityGroup":"En servicio Perú-Bolivia/Bolivia"},{"id":12,"name":"BUTTI, GIUSEPPE","birth":"1946-05-25","birthText":"25/05/1946","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST GIUSEPPE)","firstProfession":"1963-07-16","firstProfessionText":"16/07/1963","perpetualProfession":"1968-07-16","perpetualProfessionText":"16/07/1968","ordination":"1975-12-21","ordinationText":"21/12/1975","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":13,"name":"CAPRIOLI, RENATO","birth":"1943-02-20","birthText":"20/02/1943","onomastic":{"day":12,"month":11},"onomasticText":"12/11 (ST RENATO)","firstProfession":"1961-09-29","firstProfessionText":"29/09/1961","perpetualProfession":"1967-09-29","perpetualProfessionText":"29/09/1967","ordination":"1974-06-29","ordinationText":"29/06/1974","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":14,"name":"CASAL RUBIO, MANUEL","birth":"1942-09-09","birthText":"09/09/1942","onomastic":{"day":1,"month":1},"onomasticText":"01 de enero (ST MANUEL)","firstProfession":"1961-07-16","firstProfessionText":"16/07/1961","perpetualProfession":"1966-07-16","perpetualProfessionText":"16/07/1966","ordination":"1970-05-17","ordinationText":"17/05/1970","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":15,"name":"CENCIARELLI, PASQUALE","birth":"1944-10-17","birthText":"17/10/1944","onomastic":{"day":17,"month":5},"onomasticText":"17/05 (ST PASQUALE)","firstProfession":"1962-07-16","firstProfessionText":"16/07/1962","perpetualProfession":"1967-07-16","perpetualProfessionText":"16/07/1967","ordination":"1974-12-21","ordinationText":"21/12/1974","community":"Altamura","communityGroup":"Altamura"},{"id":16,"name":"CESTNIK, BRANKO","birth":"1965-09-19","birthText":"19/09/1965","onomastic":{"day":1,"month":11},"onomasticText":"01/11 (SIN SANTO PROPIO)","firstProfession":"1990-08-15","firstProfessionText":"15/08/1990","perpetualProfession":"1994-10-24","perpetualProfessionText":"24/10/1994","ordination":"1995-06-29","ordinationText":"29/06/1995","community":"Roma Banchi Vecchi-Eslovenia","communityGroup":"Roma Banchi Vecchi-Eslovenia"},{"id":17,"name":"CILLERO DÍAZ, ROBERTO","birth":"1974-08-10","birthText":"10/08/1974","onomastic":{"day":17,"month":9},"onomasticText":"17/09 (ST ROBERTO)","firstProfession":"2001-10-27","firstProfessionText":"27/10/2001","perpetualProfession":"2005-10-02","perpetualProfessionText":"02/10/2005","ordination":"2008-10-25","ordinationText":"25/10/2008","community":"Pamplona- Villava","communityGroup":"Pamplona- Villava"},{"id":18,"name":"CODINA MAS, PERE","birth":"1940-07-30","birthText":"30/07/1940","onomastic":{"day":29,"month":6},"onomasticText":"29/06 (ST PERE)","firstProfession":"1957-07-16","firstProfessionText":"16/07/1957","perpetualProfession":"1963-07-16","perpetualProfessionText":"16/07/1963","ordination":"1966-07-10","ordinationText":"10/07/1966","community":"Girona","communityGroup":"Girona"},{"id":19,"name":"CODINA PLANA, JOSEP","birth":"1967-08-18","birthText":"18/08/1967","onomastic":{"day":19,"month":3},"onomasticText":"19/03","firstProfession":"2006-10-21","firstProfessionText":"21/10/2006","perpetualProfession":"2011-10-23","perpetualProfessionText":"23/10/2011","ordination":null,"ordinationText":"No disponible en la fuente","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":20,"name":"COSTA VALL-LLOVERA, ANTONI","birth":"1943-09-13","birthText":"13/09/1943","onomastic":{"day":13,"month":6},"onomasticText":"13 de junio (ST ANTONI DE PÀDUA)","firstProfession":"1962-07-16","firstProfessionText":"16/07/1962","perpetualProfession":"1969-09-22","perpetualProfessionText":"22/09/1969","ordination":"1972-01-01","ordinationText":"01/01/1972","community":"Girona","communityGroup":"Girona"},{"id":21,"name":"COSTA-JUSSÀ BORDAS, RICARD","birth":"1967-09-05","birthText":"05/09/1967","onomastic":{"day":3,"month":4},"onomasticText":"03/04 (ST RICARD)","firstProfession":"1988-09-08","firstProfessionText":"08/09/1988","perpetualProfession":"1992-06-27","perpetualProfessionText":"27/06/1992","ordination":"1995-09-03","ordinationText":"03/09/1995","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":22,"name":"CULLELL RIPOLL, FRANCESC X.","birth":"1937-05-08","birthText":"08/05/1937","onomastic":{"day":3,"month":12},"onomasticText":"03/12 (ST FRANCESC XAVIER)","firstProfession":"1956-03-19","firstProfessionText":"19/03/1956","perpetualProfession":"1962-03-19","perpetualProfessionText":"19/03/1962","ordination":null,"ordinationText":"No disponible en la fuente","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":23,"name":"CUPINI, ANGELO","birth":"1939-01-25","birthText":"25/01/1939","onomastic":{"day":5,"month":5},"onomasticText":"05/05 (ST ANGELO)","firstProfession":"1956-09-24","firstProfessionText":"24/09/1956","perpetualProfession":"1960-07-16","perpetualProfessionText":"16/07/1960","ordination":"1966-09-24","ordinationText":"24/09/1966","community":"Segrate-Lecco","communityGroup":"Segrate-Lecco"},{"id":24,"name":"DAUFÍ MORESO, ANTONI","birth":"1929-05-15","birthText":"15/05/1929","onomastic":{"day":13,"month":6},"onomasticText":"13/06 (ST ANTONI DE PÀDUA)","firstProfession":"1947-10-23","firstProfessionText":"23/10/1947","perpetualProfession":"1953-10-23","perpetualProfessionText":"23/10/1953","ordination":null,"ordinationText":"No disponible en la fuente","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":25,"name":"DI CESARE, CESARE","birth":"1934-05-06","birthText":"06/05/1934","onomastic":{"day":10,"month":12},"onomasticText":"10/12 (ST CESARE)","firstProfession":"1955-07-16","firstProfessionText":"16/07/1955","perpetualProfession":"1960-03-19","perpetualProfessionText":"19/03/1960","ordination":"1963-09-21","ordinationText":"21/09/1963","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":26,"name":"ELGUEA DÍAZ DE OTALORA, VICTORINO","birth":"1934-09-03","birthText":"03/09/1934","onomastic":{"day":2,"month":11},"onomasticText":"02/11 (ST VICTORINO)","firstProfession":"1953-07-16","firstProfessionText":"16/07/1953","perpetualProfession":"1956-07-16","perpetualProfessionText":"16/07/1956","ordination":null,"ordinationText":"No disponible en la fuente","community":"Larraona-Villava","communityGroup":"Larraona-Villava"},{"id":27,"name":"ELIZALDE OCHOA, LUIS","birth":"1940-01-03","birthText":"03/01/1940","onomastic":{"day":21,"month":6},"onomasticText":"21/06 (ST LUIS)","firstProfession":"1957-07-16","firstProfessionText":"16/07/1957","perpetualProfession":"1961-07-16","perpetualProfessionText":"16/07/1961","ordination":"1965-07-11","ordinationText":"11/07/1965","community":"Rentería","communityGroup":"Rentería"},{"id":28,"name":"ESCUDERO MEDINA, FRUCTUOSO","birth":"1946-02-26","birthText":"26/02/1946","onomastic":{"day":21,"month":1},"onomasticText":"21/01 (ST FRUCTUOSO)","firstProfession":"1963-07-16","firstProfessionText":"16/07/1963","perpetualProfession":"1974-03-19","perpetualProfessionText":"19/03/1974","ordination":"1974-05-23","ordinationText":"23/05/1974","community":"Agurain-Salvatierra","communityGroup":"Agurain-Salvatierra"},{"id":29,"name":"ESSOUGOU AMOGO, ROBERT","birth":"1977-01-02","birthText":"02/01/1977","onomastic":{"day":17,"month":9},"onomasticText":"17/09 (ST ROBERT)","firstProfession":"2005-09-13","firstProfessionText":"13/09/2005","perpetualProfession":"2011-11-24","perpetualProfessionText":"24/11/2011","ordination":"2013-06-29","ordinationText":"29/06/2013","community":"Muret","communityGroup":"Muret"},{"id":30,"name":"ETXEBARRIA ESPARTA, ÁNGEL","birth":"1941-11-13","birthText":"13/11/1941","onomastic":{"day":2,"month":10},"onomasticText":"02/10 (ST ÁNGEL)","firstProfession":"1958-07-16","firstProfessionText":"16/07/1958","perpetualProfession":"1963-07-16","perpetualProfessionText":"16/07/1963","ordination":"1967-06-29","ordinationText":"29/06/1967","community":"Rentería","communityGroup":"Rentería"},{"id":31,"name":"EURAS BARNIOL, JOAN","birth":"1952-06-21","birthText":"21/06/1952","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JOAN)","firstProfession":"1974-09-08","firstProfessionText":"08/09/1974","perpetualProfession":"1981-12-08","perpetualProfessionText":"08/12/1981","ordination":null,"ordinationText":"No disponible en la fuente","community":"Valls","communityGroup":"Valls"},{"id":32,"name":"FIGUERAS FUNTANÉ, FRANCESC D’ASSÍS","birth":"1941-08-21","birthText":"21/08/1941","onomastic":{"day":4,"month":10},"onomasticText":"04/10 (ST FRANCESC D’ASSÍS)","firstProfession":"1959-07-16","firstProfessionText":"16/07/1959","perpetualProfession":"1965-07-16","perpetualProfessionText":"16/07/1965","ordination":"1968-09-21","ordinationText":"21/09/1968","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":33,"name":"FONT GUMFAUS, JOAN","birth":"1942-12-01","birthText":"01/12/1942","onomastic":{"day":24,"month":6},"onomasticText":"24 de junio (ST JOAN)","firstProfession":"1960-07-16","firstProfessionText":"16/07/1960","perpetualProfession":"1966-07-16","perpetualProfessionText":"16/07/1966","ordination":"1989-04-02","ordinationText":"02/04/1989","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":34,"name":"FRANCIS ASOCK BRITTO MALEY X.","birth":"1972-05-04","birthText":"04/05/1972","onomastic":{"day":4,"month":10},"onomasticText":"04/10 (ST FRANCIS)","firstProfession":"1991-05-31","firstProfessionText":"31/05/1991","perpetualProfession":"1997-05-31","perpetualProfessionText":"31/05/1997","ordination":"1999-08-12","ordinationText":"12/08/1999","community":"Segrate-Lecco","communityGroup":"Segrate-Lecco"},{"id":35,"name":"FUENTES ANDRÉS, FCO. MIGUEL","birth":"1947-03-06","birthText":"06/03/1947","onomastic":{"day":4,"month":10},"onomasticText":"04/10 (ST FRANCISCO)","firstProfession":"1965-08-15","firstProfessionText":"15/08/1965","perpetualProfession":"1971-06-25","perpetualProfessionText":"25/06/1971","ordination":"1972-12-17","ordinationText":"17/12/1972","community":"Bilbao","communityGroup":"Bilbao"},{"id":36,"name":"GALARRAGA LARRAÑAGA, CARLOS","birth":"1939-04-13","birthText":"13/04/1939","onomastic":{"day":4,"month":11},"onomasticText":"04/11 (ST CARLOS)","firstProfession":"1958-07-16","firstProfessionText":"16/07/1958","perpetualProfession":"1964-07-16","perpetualProfessionText":"16/07/1964","ordination":null,"ordinationText":"No disponible en la fuente","community":"Pamplona-Villava Asist","communityGroup":"Pamplona-Villava Asist"},{"id":37,"name":"GÓMEZ BUSTO, RAFAEL","birth":"1960-03-26","birthText":"26/03/1960","onomastic":{"day":29,"month":9},"onomasticText":"29/09 (ST RAFAEL)","firstProfession":"1982-10-02","firstProfessionText":"02/10/1982","perpetualProfession":"1986-10-25","perpetualProfessionText":"25/10/1986","ordination":"1988-05-22","ordinationText":"22/05/1988","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":38,"name":"GOMIS LLADÓ, ANTONI","birth":"1932-12-16","birthText":"16/12/1932","onomastic":{"day":17,"month":1},"onomasticText":"17/01 (ST ANTONI ABAT)","firstProfession":"1952-07-16","firstProfessionText":"16/07/1952","perpetualProfession":"1955-07-16","perpetualProfessionText":"16/07/1955","ordination":"1960-07-24","ordinationText":"24/07/1960","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":39,"name":"GRENDOTI, JOACHIM","birth":"1964-06-30","birthText":"30/06/1964","onomastic":{"day":26,"month":7},"onomasticText":"26/07 (ST JOACHIM)","firstProfession":"1995-10-01","firstProfessionText":"01/10/1995","perpetualProfession":"2001-09-01","perpetualProfessionText":"01/09/2001","ordination":"2003-07-13","ordinationText":"13/07/2003","community":"Marseille","communityGroup":"Marseille"},{"id":40,"name":"GUERENDIAIN CIGANDA, VÍCTOR","birth":"1940-07-21","birthText":"21/07/1940","onomastic":{"day":28,"month":7},"onomasticText":"28/07 (ST VÍCTOR)","firstProfession":"1959-07-16","firstProfessionText":"16/07/1959","perpetualProfession":"1964-07-16","perpetualProfessionText":"16/07/1964","ordination":"1967-05-13","ordinationText":"13/05/1967","community":"Pamplona-Villava","communityGroup":"Pamplona-Villava"},{"id":41,"name":"GUTIÉRREZ QUINTEROS, JUAN JOSÉ","birth":"1989-12-09","birthText":"09/12/1989","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JUAN)","firstProfession":"2015-01-01","firstProfessionText":"01/01/2015","perpetualProfession":"2018-11-03","perpetualProfessionText":"03/11/2018","ordination":"2021-07-31","ordinationText":"31/07/2021","community":"Casa General-Basilica Sacro Cuore di Maria","communityGroup":"Casa General-Basilica Sacro Cuore di Maria"},{"id":42,"name":"HELIN JOHN","birth":"1979-03-10","birthText":"10/03/1979","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JOHN)","firstProfession":"2000-05-31","firstProfessionText":"31/05/2000","perpetualProfession":"2007-10-24","perpetualProfessionText":"24/10/2007","ordination":"2010-07-24","ordinationText":"24/07/2010","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":43,"name":"HERNÁNDEZ MARTÍNEZ, JOSÉ Mª","birth":"1952-08-06","birthText":"06/08/1952","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSÉ)","firstProfession":"1968-08-15","firstProfessionText":"15/08/1968","perpetualProfession":"1976-10-24","perpetualProfessionText":"24/10/1976","ordination":"1977-06-26","ordinationText":"26/06/1977","community":"Segrate-Lecco (En servicio a la Provincia)","communityGroup":"Segrate-Lecco (En servicio a la Provincia)"},{"id":44,"name":"INCAMPO, FRANCO","birth":"1946-05-01","birthText":"01/05/1946","onomastic":{"day":5,"month":6},"onomasticText":"05/06 (ST FRANCO)","firstProfession":"1963-07-16","firstProfessionText":"16/07/1963","perpetualProfession":"1967-08-22","perpetualProfessionText":"22/08/1967","ordination":"1973-09-30","ordinationText":"30/09/1973","community":"Casa General-Basilica Sacro Cuore di Maria","communityGroup":"Casa General-Basilica Sacro Cuore di Maria"},{"id":45,"name":"IRIBARREN LARREA, KOLDO","birth":"1965-12-12","birthText":"12/12/1965","onomastic":{"day":21,"month":6},"onomasticText":"21/06 (ST KOLDO/LUIS)","firstProfession":"1984-09-02","firstProfessionText":"02/09/1984","perpetualProfession":"1989-08-15","perpetualProfessionText":"15/08/1989","ordination":"1992-05-03","ordinationText":"03/05/1992","community":"Rentería","communityGroup":"Rentería"},{"id":46,"name":"JIMÉNEZ ETXABE, AITOR","birth":"1962-12-29","birthText":"29/12/1962","onomastic":{"day":1,"month":11},"onomasticText":"01/11 (SIN SANTO PROPIO)","firstProfession":"1982-10-02","firstProfessionText":"02/10/1982","perpetualProfession":"1987-09-13","perpetualProfessionText":"13/09/1987","ordination":"1989-04-30","ordinationText":"30/04/1989","community":"Casa General-Iuridicum","communityGroup":"Casa General-Iuridicum"},{"id":47,"name":"JIMÉNEZ ETXABE, JESÚS MARÍA","birth":"1961-06-13","birthText":"13/06/1961","onomastic":{"day":3,"month":1},"onomasticText":"03/01 (ST JESÚS)","firstProfession":"1979-09-16","firstProfessionText":"16/09/1979","perpetualProfession":"1985-05-26","perpetualProfessionText":"26/05/1985","ordination":"1986-10-19","ordinationText":"19/10/1986","community":"Bilbao","communityGroup":"Bilbao"},{"id":48,"name":"JOE TERRY DE BOSCO J.","birth":"1970-04-14","birthText":"14/04/1970","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEPH)","firstProfession":"1989-05-31","firstProfessionText":"31/05/1989","perpetualProfession":"1996-05-31","perpetualProfessionText":"31/05/1996","ordination":"1998-04-27","ordinationText":"27/04/1998","community":"Agurain-Salvatierra","communityGroup":"Agurain-Salvatierra"},{"id":49,"name":"KAMIRUAGA MIEZA, AITOR","birth":"1967-04-12","birthText":"12/04/1967","onomastic":{"day":1,"month":11},"onomasticText":"01/11 (SIN SANTO PROPIO)","firstProfession":"1986-08-15","firstProfessionText":"15/08/1986","perpetualProfession":"1991-06-08","perpetualProfessionText":"08/06/1991","ordination":"1992-12-05","ordinationText":"05/12/1992","community":"Pamplona-Villava","communityGroup":"Pamplona-Villava"},{"id":50,"name":"KAMIRUAGA MIEZA, JOSEBA","birth":"1965-08-06","birthText":"06/08/1965","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEBA/JOSÉ)","firstProfession":"1984-09-02","firstProfessionText":"02/09/1984","perpetualProfession":"1989-08-15","perpetualProfessionText":"15/08/1989","ordination":"1992-05-03","ordinationText":"03/05/1992","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":51,"name":"KUBIKULA-VE MBOMA, FRANCIS","birth":"1979-12-22","birthText":"22/12/1979","onomastic":{"day":4,"month":10},"onomasticText":"04/10 (ST FRANCIS)","firstProfession":"2001-09-26","firstProfessionText":"26/09/2001","perpetualProfession":"2007-10-30","perpetualProfessionText":"30/10/2007","ordination":"2009-07-19","ordinationText":"19/07/2009","community":"Marseille","communityGroup":"Marseille"},{"id":52,"name":"KURIAKOSE, JOBISH","birth":"1987-12-09","birthText":"09/12/1987","onomastic":{"day":10,"month":5},"onomasticText":"10/05 (ST JOB)","firstProfession":"2012-05-31","firstProfessionText":"31/05/2012","perpetualProfession":"2018-10-27","perpetualProfessionText":"27/10/2018","ordination":"2020-10-17","ordinationText":"17/10/2020","community":"Bilbao","communityGroup":"Bilbao"},{"id":53,"name":"LARRAÑAGA OYARZABAL, XABIER","birth":"1962-11-17","birthText":"17/11/1962","onomastic":{"day":3,"month":12},"onomasticText":"03/12 (ST XABIER)","firstProfession":"1982-10-02","firstProfessionText":"02/10/1982","perpetualProfession":"1987-09-13","perpetualProfessionText":"13/09/1987","ordination":"1989-04-30","ordinationText":"30/04/1989","community":"Casa General-Claretianum","communityGroup":"Casa General-Claretianum"},{"id":54,"name":"LARRAURI ANTÓN, MATEO","birth":"1957-11-09","birthText":"09/11/1957","onomastic":{"day":21,"month":9},"onomasticText":"21/09 (ST MATEO)","firstProfession":"1977-09-25","firstProfessionText":"25/09/1977","perpetualProfession":"1981-06-27","perpetualProfessionText":"27/06/1981","ordination":"1985-06-30","ordinationText":"30/06/1985","community":"Leioa Askartza Claret","communityGroup":"Leioa Askartza Claret"},{"id":55,"name":"LLAMAS RODRÍGUEZ, JOSEBA","birth":"1963-03-04","birthText":"04/03/1963","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEBA/JOSÉ)","firstProfession":"1982-10-02","firstProfessionText":"02/10/1982","perpetualProfession":"1987-09-13","perpetualProfessionText":"13/09/1987","ordination":"1991-04-28","ordinationText":"28/04/1991","community":"Rentería","communityGroup":"Rentería"},{"id":56,"name":"LÓPEZ LÁNDER, SANTIAGO","birth":"1948-07-25","birthText":"25/07/1948","onomastic":{"day":25,"month":7},"onomasticText":"25/07 (ST SANTIAGO)","firstProfession":"1965-07-16","firstProfessionText":"16/07/1965","perpetualProfession":"1971-06-25","perpetualProfessionText":"25/06/1971","ordination":"1972-12-17","ordinationText":"17/12/1972","community":"Bilbao","communityGroup":"Bilbao"},{"id":57,"name":"MABIALA, ROLAND MBUANGI","birth":"1996-07-04","birthText":"04/07/1996","onomastic":{"day":15,"month":9},"onomasticText":"15/09 (ST ROLAND)","firstProfession":"2024-09-10","firstProfessionText":"10/09/2024","perpetualProfession":null,"perpetualProfessionText":"No disponible en la fuente","ordination":null,"ordinationText":"No disponible en la fuente","community":"Comunidad Formativa Colmenar Viejo","communityGroup":"Comunidad Formativa Colmenar Viejo"},{"id":58,"name":"MADRAZO BIDEA, EDUARDO","birth":"1977-07-12","birthText":"12/07/1977","onomastic":{"day":13,"month":10},"onomasticText":"13/10 (ST EDUARDO)","firstProfession":"2002-09-15","firstProfessionText":"15/09/2002","perpetualProfession":"2006-11-04","perpetualProfessionText":"04/11/2006","ordination":"2008-10-25","ordinationText":"25/10/2008","community":"Leioa Askartza Claret","communityGroup":"Leioa Askartza Claret"},{"id":59,"name":"MALLOL VALLS, JORDI","birth":"1934-11-25","birthText":"25/11/1934","onomastic":{"day":23,"month":4},"onomasticText":"23/04 (ST JORDI)","firstProfession":"1957-07-16","firstProfessionText":"16/07/1957","perpetualProfession":"1960-07-16","perpetualProfessionText":"16/07/1960","ordination":"1968-09-21","ordinationText":"21/09/1968","community":"Girona","communityGroup":"Girona"},{"id":60,"name":"MARIMON CANELA, JORDI","birth":"1939-01-06","birthText":"06/01/1939","onomastic":{"day":23,"month":4},"onomasticText":"23/04 (ST JORDI)","firstProfession":"1955-07-16","firstProfessionText":"16/07/1955","perpetualProfession":"1960-01-06","perpetualProfessionText":"06/01/1960","ordination":"1963-08-27","ordinationText":"27/08/1963","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":61,"name":"MARTÍNEZ JÓDAR, PERE","birth":"1946-09-17","birthText":"17/09/1946","onomastic":{"day":29,"month":6},"onomasticText":"29/06 (ST PERE)","firstProfession":"1965-12-08","firstProfessionText":"08/12/1965","perpetualProfession":"1974-12-08","perpetualProfessionText":"08/12/1974","ordination":null,"ordinationText":"No disponible en la fuente","community":"Vic-Casa Mare","communityGroup":"Vic-Casa Mare"},{"id":62,"name":"MARTOS PAREDES, JUAN CARLOS","birth":"1956-03-05","birthText":"05/03/1956","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JUAN)","firstProfession":"1975-09-07","firstProfessionText":"07/09/1975","perpetualProfession":"1980-06-14","perpetualProfessionText":"14/06/1980","ordination":"1982-04-17","ordinationText":"17/04/1982","community":"Vic-Sallent-CESC","communityGroup":"Vic-Sallent-CESC"},{"id":63,"name":"MASACHS OLIVERAS, LLUÍS","birth":"1931-04-03","birthText":"03/04/1931","onomastic":{"day":21,"month":6},"onomasticText":"21/06 (ST LLUÍS)","firstProfession":"1949-07-16","firstProfessionText":"16/07/1949","perpetualProfession":"1952-07-16","perpetualProfessionText":"16/07/1952","ordination":"1957-06-29","ordinationText":"29/06/1957","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":64,"name":"MBAH ESSOMBA, ULRICH","birth":"1986-06-15","birthText":"15/06/1986","onomastic":{"day":4,"month":7},"onomasticText":"04/07 (ST ULRICH)","firstProfession":"2018-08-15","firstProfessionText":"15/08/2018","perpetualProfession":"2022-09-02","perpetualProfessionText":"02/09/2022","ordination":"2024-02-01","ordinationText":"01/02/2024","community":"Bilbao","communityGroup":"Bilbao"},{"id":65,"name":"METENA KIPATA, AIMÉ CÉSAIRE","birth":"1982-03-11","birthText":"11/03/1982","onomastic":{"day":13,"month":9},"onomasticText":"13/09 (ST AIMÉ)","firstProfession":"2005-09-13","firstProfessionText":"13/09/2005","perpetualProfession":"2011-09-24","perpetualProfessionText":"24/09/2011","ordination":"2013-07-14","ordinationText":"14/07/2013","community":"Estudios Madrid","communityGroup":"Estudios Madrid"},{"id":66,"name":"MORALES SOSA, RODOLFO ESTUARDO","birth":"1963-05-19","birthText":"19/05/1963","onomastic":{"day":17,"month":10},"onomasticText":"17/10 (ST RODOLFO)","firstProfession":"1985-12-12","firstProfessionText":"12/12/1985","perpetualProfession":"1990-10-24","perpetualProfessionText":"24/10/1990","ordination":"1991-11-23","ordinationText":"23/11/1991","community":"Vic-Sallent- CESC","communityGroup":"Vic-Sallent- CESC"},{"id":67,"name":"MULAS, LORENZO","birth":"1943-11-01","birthText":"01/11/1943","onomastic":{"day":10,"month":8},"onomasticText":"10/08 (ST LORENZO)","firstProfession":"1962-07-16","firstProfessionText":"16/07/1962","perpetualProfession":"1967-07-16","perpetualProfessionText":"16/07/1967","ordination":"1974-04-20","ordinationText":"20/04/1974","community":"Altamura","communityGroup":"Altamura"},{"id":68,"name":"MUNDACKAL, SEBASTIAN","birth":"1988-12-16","birthText":"16/12/1988","onomastic":{"day":20,"month":1},"onomasticText":"20/01 (ST SEBASTIAN)","firstProfession":"2011-05-31","firstProfessionText":"31/05/2011","perpetualProfession":"2015-05-31","perpetualProfessionText":"31/05/2015","ordination":"2016-10-05","ordinationText":"05/10/2016","community":"Vic-Sallent-CESC","communityGroup":"Vic-Sallent-CESC"},{"id":69,"name":"MUÑOZ DURAN, MÀXIM","birth":"1958-08-06","birthText":"06/08/1958","onomastic":{"day":14,"month":4},"onomasticText":"14 de abril (ST MÀXIM)","firstProfession":"1977-10-23","firstProfessionText":"23/10/1977","perpetualProfession":"1982-10-24","perpetualProfessionText":"24/10/1982","ordination":"1985-06-23","ordinationText":"23/06/1985","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":70,"name":"NADUPPARAMPIL, SARIN N. J.","birth":"1989-10-26","birthText":"26/10/1989","onomastic":{"day":1,"month":11},"onomasticText":"01/11 (SIN SANTO PROPIO)","firstProfession":"2012-05-31","firstProfessionText":"31/05/2012","perpetualProfession":"2018-10-27","perpetualProfessionText":"27/10/2018","ordination":"2020-10-17","ordinationText":"17/10/2020","community":"Leioa Claret Askartza","communityGroup":"Leioa Claret Askartza"},{"id":71,"name":"NAKAHOSA, WILLY OKEY","birth":"1999-07-10","birthText":"10/07/1999","onomastic":{"day":10,"month":1},"onomasticText":"10/01 (ST WILLIAM)","firstProfession":"2024-08-15","firstProfessionText":"15/08/2024","perpetualProfession":null,"perpetualProfessionText":"No disponible en la fuente","ordination":null,"ordinationText":"No disponible en la fuente","community":"Comunidad Formativa Colmenar Viejo","communityGroup":"Comunidad Formativa Colmenar Viejo"},{"id":72,"name":"NANDUT, DIONISIUS PASKALIS ALINATA","birth":"1982-04-08","birthText":"08/04/1982","onomastic":{"day":9,"month":10},"onomasticText":"09/10 (ST DIONISIO)","firstProfession":"2005-08-15","firstProfessionText":"15/08/2005","perpetualProfession":"2011-10-23","perpetualProfessionText":"23/10/2011","ordination":"2013-06-29","ordinationText":"29/06/2013","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":73,"name":"ÒDENA DULCET, JOSEP MARIA","birth":"1934-07-03","birthText":"03/07/1934","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEP)","firstProfession":"1964-03-19","firstProfessionText":"19/03/1964","perpetualProfession":"1970-03-19","perpetualProfessionText":"19/03/1970","ordination":null,"ordinationText":"No disponible en la fuente","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":74,"name":"OKERE, LAMBERT OLUCHUKWU","birth":"1963-01-14","birthText":"14/01/1963","onomastic":{"day":17,"month":9},"onomasticText":"17/09 (ST LAMBERT)","firstProfession":"1993-09-12","firstProfessionText":"12/09/1993","perpetualProfession":"1997-07-16","perpetualProfessionText":"16/07/1997","ordination":"1998-06-13","ordinationText":"13/06/1998","community":"Agurain-Salvatierra","communityGroup":"Agurain-Salvatierra"},{"id":75,"name":"OLOMÍ BATLLE, RAMON","birth":"1944-02-01","birthText":"01/02/1944","onomastic":{"day":31,"month":8},"onomasticText":"31 de agosto (ST RAMON)","firstProfession":"1961-07-16","firstProfessionText":"16/07/1961","perpetualProfession":"1967-07-16","perpetualProfessionText":"16/07/1967","ordination":"1970-05-17","ordinationText":"17/05/1970","community":"Valls","communityGroup":"Valls"},{"id":76,"name":"ONYEKWERE, CHARLES IFEANYICHUKWU","birth":"1995-06-10","birthText":"10/06/1995","onomastic":{"day":4,"month":11},"onomasticText":"04/11 (ST CHARLES)","firstProfession":"2024-07-20","firstProfessionText":"20/07/2024","perpetualProfession":null,"perpetualProfessionText":"No disponible en la fuente","ordination":null,"ordinationText":"No disponible en la fuente","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":77,"name":"OROZ EZCURRA, JAVIER","birth":"1935-12-31","birthText":"31/12/1935","onomastic":{"day":3,"month":12},"onomasticText":"03/12 (ST JAVIER)","firstProfession":"1953-07-16","firstProfessionText":"16/07/1953","perpetualProfession":"1957-07-16","perpetualProfessionText":"16/07/1957","ordination":"1960-06-29","ordinationText":"29/06/1960","community":"Larraona-Villava Asist","communityGroup":"Larraona-Villava Asist"},{"id":78,"name":"ORTIZ CALZADA, JOSÉ AGUSTÍN","birth":"1969-06-19","birthText":"19/06/1969","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSÉ)","firstProfession":"1988-08-15","firstProfessionText":"15/08/1988","perpetualProfession":"1993-10-02","perpetualProfessionText":"02/10/1993","ordination":"1994-12-18","ordinationText":"18/12/1994","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":79,"name":"ORTIZ DE GUINEA FERNÁNDEZ DE P., JOSÉ LUIS","birth":"1943-02-24","birthText":"24/02/1943","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSÉ)","firstProfession":"1961-07-16","firstProfessionText":"16/07/1961","perpetualProfession":"1967-05-13","perpetualProfessionText":"13/05/1967","ordination":"1969-04-06","ordinationText":"06/04/1969","community":"Leioa Askartza Claret","communityGroup":"Leioa Askartza Claret"},{"id":80,"name":"OTAMENDI EGIGUREN, PATXI","birth":"1954-08-24","birthText":"24/08/1954","onomastic":{"day":4,"month":10},"onomasticText":"04/10 (ST PATXI/FRANCISCO)","firstProfession":"1975-08-31","firstProfessionText":"31/08/1975","perpetualProfession":"1980-02-12","perpetualProfessionText":"12/02/1980","ordination":"1980-09-20","ordinationText":"20/09/1980","community":"Valls","communityGroup":"Valls"},{"id":81,"name":"PAGOLA ECHAURI, FRANCISCO JAVIER CARLOS","birth":"1937-01-05","birthText":"05/01/1937","onomastic":{"day":3,"month":12},"onomasticText":"03/12 (ST FRANCISCO JAVIER)","firstProfession":"1953-07-16","firstProfessionText":"16/07/1953","perpetualProfession":"1959-07-16","perpetualProfessionText":"16/07/1959","ordination":"1961-07-02","ordinationText":"02/07/1961","community":"Pamplona-Villava Asist","communityGroup":"Pamplona-Villava Asist"},{"id":82,"name":"PANIZZA, ELIA","birth":"1947-06-05","birthText":"05/06/1947","onomastic":{"day":20,"month":7},"onomasticText":"20/07 (ST ELIA)","firstProfession":"1964-07-16","firstProfessionText":"16/07/1964","perpetualProfession":"1969-08-22","perpetualProfessionText":"22/08/1969","ordination":"1976-03-13","ordinationText":"13/03/1976","community":"Segrate-Lecco","communityGroup":"Segrate-Lecco"},{"id":83,"name":"PEZ NADALICH, JUAN GUSTAVO","birth":"1963-07-06","birthText":"06/07/1963","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JUAN)","firstProfession":"2002-10-08","firstProfessionText":"08/10/2002","perpetualProfession":"2007-10-06","perpetualProfessionText":"06/10/2007","ordination":"2008-08-23","ordinationText":"23/08/2008","community":"Muret","communityGroup":"Muret"},{"id":84,"name":"PROSCIA, MASSIMO","birth":"1978-04-27","birthText":"27/04/1978","onomastic":{"day":28,"month":6},"onomasticText":"28/06 (ST MASSIMO)","firstProfession":"2002-10-08","firstProfessionText":"08/10/2002","perpetualProfession":"2007-10-14","perpetualProfessionText":"14/10/2007","ordination":"2008-06-28","ordinationText":"28/06/2008","community":"Altamura","communityGroup":"Altamura"},{"id":85,"name":"PUJOL ROMA, FRANCESC","birth":"1936-07-03","birthText":"03/07/1936","onomastic":{"day":3,"month":12},"onomasticText":"03/12 (ST FRANCESC XAVIER)","firstProfession":"1953-07-16","firstProfessionText":"16/07/1953","perpetualProfession":"1957-08-15","perpetualProfessionText":"15/08/1957","ordination":"1961-07-23","ordinationText":"23/07/1961","community":"Vic-Sallet","communityGroup":"Vic-Sallet"},{"id":86,"name":"PULLIKKATTIL, SHINTO THOMAS","birth":"1981-02-13","birthText":"13/02/1981","onomastic":{"day":3,"month":7},"onomasticText":"03/07 (ST THOMAS)","firstProfession":"2003-05-31","firstProfessionText":"31/05/2003","perpetualProfession":"2008-10-26","perpetualProfessionText":"26/10/2008","ordination":"2010-07-31","ordinationText":"31/07/2010","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":87,"name":"REDOÑA TESTON, PERCIVAL","birth":"1953-12-14","birthText":"14/12/1953","onomastic":{"day":1,"month":11},"onomasticText":"01/11 (SIN SANTO PROPIO)","firstProfession":"1975-05-15","firstProfessionText":"15/05/1975","perpetualProfession":"1978-07-16","perpetualProfessionText":"16/07/1978","ordination":"1982-03-06","ordinationText":"06/03/1982","community":"Marseille","communityGroup":"Marseille"},{"id":88,"name":"ROCA ALSINA, JOSEP","birth":"1953-06-19","birthText":"19/06/1953","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEP)","firstProfession":"1972-08-20","firstProfessionText":"20/08/1972","perpetualProfession":"1977-12-08","perpetualProfessionText":"08/12/1977","ordination":"1979-09-30","ordinationText":"30/09/1979","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":89,"name":"ROCCHI, ROBERTO","birth":"1939-01-13","birthText":"13/01/1939","onomastic":{"day":17,"month":9},"onomasticText":"17/09 (ST ROBERTO)","firstProfession":"1956-09-24","firstProfessionText":"24/09/1956","perpetualProfession":"1960-07-16","perpetualProfessionText":"16/07/1960","ordination":"1965-09-25","ordinationText":"25/09/1965","community":"Segrate-Lecco","communityGroup":"Segrate-Lecco"},{"id":90,"name":"RODRÍGUEZ CRISTÓBAL, TEÓDULO","birth":"1937-10-06","birthText":"06/10/1937","onomastic":{"day":4,"month":4},"onomasticText":"04/04 (ST TEÓDULO)","firstProfession":"1955-07-16","firstProfessionText":"16/07/1955","perpetualProfession":"1958-10-24","perpetualProfessionText":"24/10/1958","ordination":"1962-07-08","ordinationText":"08/07/1962","community":"Rentería","communityGroup":"Rentería"},{"id":91,"name":"RODRÍGUEZ VALENCIA, JOSÉ Mª","birth":"1949-11-12","birthText":"12/11/1949","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSÉ)","firstProfession":"1966-07-16","firstProfessionText":"16/07/1966","perpetualProfession":"1970-04-22","perpetualProfessionText":"22/04/1970","ordination":"1975-08-15","ordinationText":"15/08/1975","community":"Pamplona-Villava","communityGroup":"Pamplona-Villava"},{"id":92,"name":"ROHAN PERIES, MATHTHES LEON","birth":"1984-03-26","birthText":"26/03/1984","onomastic":{"day":21,"month":9},"onomasticText":"21/09 (ST MATEO)","firstProfession":"2009-09-08","firstProfessionText":"08/09/2009","perpetualProfession":"2014-09-08","perpetualProfessionText":"08/09/2014","ordination":"2015-04-08","ordinationText":"08/04/2015","community":"Vic-Sallent-CESC","communityGroup":"Vic-Sallent-CESC"},{"id":93,"name":"ROVIRA ARUMÍ, JOSEP","birth":"1942-09-28","birthText":"28/09/1942","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEP)","firstProfession":"1959-07-16","firstProfessionText":"16/07/1959","perpetualProfession":"1966-07-16","perpetualProfessionText":"16/07/1966","ordination":"1968-07-02","ordinationText":"02/07/1968","community":"Vic-Sallent-CESC","communityGroup":"Vic-Sallent-CESC"},{"id":94,"name":"RUÍZ ALONSO, VÍCTOR","birth":"1943-04-12","birthText":"12/04/1943","onomastic":{"day":28,"month":7},"onomasticText":"28/07 (ST VÍCTOR)","firstProfession":"1961-07-16","firstProfessionText":"16/07/1961","perpetualProfession":"1967-07-16","perpetualProfessionText":"16/07/1967","ordination":"1970-04-05","ordinationText":"05/04/1970","community":"Agurain-Vitoria","communityGroup":"Agurain-Vitoria"},{"id":95,"name":"RUÍZ SERRANO, LEONCIO","birth":"1938-04-21","birthText":"21/04/1938","onomastic":{"day":13,"month":1},"onomasticText":"13/01 (ST LEONCIO)","firstProfession":"1957-07-16","firstProfessionText":"16/07/1957","perpetualProfession":"1960-07-26","perpetualProfessionText":"26/07/1960","ordination":"1965-07-11","ordinationText":"11/07/1965","community":"Pamplona-Villava Asist","communityGroup":"Pamplona-Villava Asist"},{"id":96,"name":"SAN NICOLÁS GUIMÓN, IÑAKI","birth":"1985-07-29","birthText":"29/07/1985","onomastic":{"day":31,"month":7},"onomasticText":"31/07 (ST IÑAKI/IGNACIO)","firstProfession":"2010-09-25","firstProfessionText":"25/09/2010","perpetualProfession":"2015-10-24","perpetualProfessionText":"24/10/2015","ordination":"2017-10-29","ordinationText":"29/10/2017","community":"Roma-Banchi Vecchi","communityGroup":"Roma-Banchi Vecchi"},{"id":97,"name":"SÁNCHEZ BOSCH, ANTON Mª","birth":"1936-05-05","birthText":"05/05/1936","onomastic":{"day":24,"month":10},"onomasticText":"24/10 (ST ANTONI M. CLARET)","firstProfession":"1953-07-16","firstProfessionText":"16/07/1953","perpetualProfession":"1957-08-15","perpetualProfessionText":"15/08/1957","ordination":"1961-07-23","ordinationText":"23/07/1961","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":98,"name":"SANROMÀ BADIA, JOSEP","birth":"1948-04-09","birthText":"09/04/1948","onomastic":{"day":19,"month":3},"onomasticText":"19 de marzo (ST JOSEP)","firstProfession":"1965-08-22","firstProfessionText":"22/08/1965","perpetualProfession":"1970-12-08","perpetualProfessionText":"08/12/1970","ordination":null,"ordinationText":"No disponible en la fuente","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":99,"name":"SANZ ELIZALDE, JESÚS MARÍA","birth":"1949-11-20","birthText":"20/11/1949","onomastic":{"day":3,"month":1},"onomasticText":"03/01 (ST JESÚS)","firstProfession":"1967-10-23","firstProfessionText":"23/10/1967","perpetualProfession":"1973-10-24","perpetualProfessionText":"24/10/1973","ordination":null,"ordinationText":"No disponible en la fuente","community":"Leioa Askartza Claret","communityGroup":"Leioa Askartza Claret"},{"id":100,"name":"SANZ VELA, JOSEP","birth":"1949-03-19","birthText":"19/03/1949","onomastic":{"day":19,"month":3},"onomasticText":"19 de marzo (ST JOSEP)","firstProfession":"1966-08-22","firstProfessionText":"22/08/1966","perpetualProfession":"1973-12-08","perpetualProfessionText":"08/12/1973","ordination":"1978-07-01","ordinationText":"01/07/1978","community":"Barcelona Col·legi-Parròquia","communityGroup":"Barcelona Col·legi-Parròquia"},{"id":101,"name":"SETÓ SALA, RAMON","birth":"1931-02-28","birthText":"28/02/1931","onomastic":{"day":31,"month":8},"onomasticText":"31/08 (ST RAMON)","firstProfession":"1955-09-24","firstProfessionText":"24/09/1955","perpetualProfession":"1958-09-24","perpetualProfessionText":"24/09/1958","ordination":"1962-12-22","ordinationText":"22/12/1962","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":102,"name":"SITUMORANG, CANRI IGNATIIUS","birth":"1988-05-07","birthText":"07/05/1988","onomastic":{"day":31,"month":7},"onomasticText":"31 de julio (ST IGNASI DE LOIOLA)","firstProfession":"2013-07-16","firstProfessionText":"16/07/2013","perpetualProfession":"2019-10-26","perpetualProfessionText":"26/10/2019","ordination":"2021-06-26","ordinationText":"26/06/2021","community":"Valls","communityGroup":"Valls"},{"id":103,"name":"SOARES, MATEUS","birth":"1993-05-01","birthText":"01/05/1993","onomastic":{"day":21,"month":9},"onomasticText":"21/09 (ST MATEUS)","firstProfession":"2014-07-16","firstProfessionText":"16/07/2014","perpetualProfession":"2021-10-17","perpetualProfessionText":"17/10/2021","ordination":null,"ordinationText":"No disponible en la fuente","community":"Leioa Askartza Claret","communityGroup":"Leioa Askartza Claret"},{"id":104,"name":"SOLÀ BOHIGAS, NEMESI","birth":"1936-01-23","birthText":"23/01/1936","onomastic":{"day":10,"month":9},"onomasticText":"10/09 (ST NEMESI)","firstProfession":"1954-09-24","firstProfessionText":"24/09/1954","perpetualProfession":"1958-07-16","perpetualProfessionText":"16/07/1958","ordination":"1962-12-22","ordinationText":"22/12/1962","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":105,"name":"SOLÀ BOHIGAS, SALVADOR","birth":"1937-04-12","birthText":"12/04/1937","onomastic":{"day":6,"month":8},"onomasticText":"06/08 (ST SALVADOR)","firstProfession":"1955-07-16","firstProfessionText":"16/07/1955","perpetualProfession":"1958-08-15","perpetualProfessionText":"15/08/1958","ordination":"1964-06-29","ordinationText":"29/06/1964","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":106,"name":"SOLER FELIP, JOAN","birth":"1948-05-04","birthText":"04/05/1948","onomastic":{"day":24,"month":6},"onomasticText":"24/06 (ST JOAN)","firstProfession":"1964-10-04","firstProfessionText":"04/10/1964","perpetualProfession":"1971-12-08","perpetualProfessionText":"08/12/1971","ordination":"1973-06-24","ordinationText":"24/06/1973","community":"Vic-Sallent","communityGroup":"Vic-Sallent"},{"id":107,"name":"SOLÍS ROMERO, BENITO","birth":"1942-01-12","birthText":"12/01/1942","onomastic":{"day":11,"month":7},"onomasticText":"11/07 (ST BENITO)","firstProfession":"1962-07-16","firstProfessionText":"16/07/1962","perpetualProfession":"1968-07-16","perpetualProfessionText":"16/07/1968","ordination":null,"ordinationText":"No disponible","community":"Marseille","communityGroup":"Marseille"},{"id":108,"name":"STANO, FRANCESCO","birth":"1944-02-12","birthText":"12/02/1944","onomastic":{"day":2,"month":4},"onomasticText":"02 de abril (ST FRANCESC DE PAOLA)","firstProfession":"1962-07-16","firstProfessionText":"16/07/1962","perpetualProfession":"1967-07-16","perpetualProfessionText":"16/07/1967","ordination":"1974-06-29","ordinationText":"29/06/1974","community":"Altamura","communityGroup":"Altamura"},{"id":109,"name":"TARRÉS MONER, JORDI","birth":"1939-05-01","birthText":"01/05/1939","onomastic":{"day":23,"month":4},"onomasticText":"23/04 (ST JORDI)","firstProfession":"1958-07-16","firstProfessionText":"16/07/1958","perpetualProfession":"1964-07-16","perpetualProfessionText":"16/07/1964","ordination":"1967-12-23","ordinationText":"23/12/1967","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":110,"name":"TERRERO MARTÍNEZ DE TODA, FRANCISCO JAVIER","birth":"1953-02-12","birthText":"12/02/1953","onomastic":{"day":3,"month":12},"onomasticText":"03/12 (ST FRANCISCO JAVIER)","firstProfession":"1974-09-29","firstProfessionText":"29/09/1974","perpetualProfession":"1979-07-01","perpetualProfessionText":"01/07/1979","ordination":"1980-05-11","ordinationText":"11/05/1980","community":"Agurain-Vitoria","communityGroup":"Agurain-Vitoria"},{"id":111,"name":"URRUTIA GRACIA, FRANCISCO JOSÉ","birth":"1970-05-22","birthText":"22/05/1970","onomastic":{"day":4,"month":10},"onomasticText":"04/10 (ST FRANCISCO)","firstProfession":"1998-09-27","firstProfessionText":"27/09/1998","perpetualProfession":"2003-06-07","perpetualProfessionText":"07/06/2003","ordination":"2006-10-21","ordinationText":"21/10/2006","community":"Leioa Askartza Claret","communityGroup":"Leioa Askartza Claret"},{"id":112,"name":"VAKAYIL, JENNAR JAMES","birth":"1986-05-29","birthText":"29/05/1986","onomastic":{"day":25,"month":7},"onomasticText":"25/07 (ST JAMES)","firstProfession":"2009-05-31","firstProfessionText":"31/05/2009","perpetualProfession":"2013-05-31","perpetualProfessionText":"31/05/2013","ordination":"2014-12-27","ordinationText":"27/12/2014","community":"Segrate","communityGroup":"Segrate"},{"id":113,"name":"VALENCIA LÓPEZ, GILDARDO","birth":"1937-06-09","birthText":"09/06/1937","onomastic":{"day":8,"month":6},"onomasticText":"08/06 (ST GILDARDO)","firstProfession":"1953-09-08","firstProfessionText":"08/09/1953","perpetualProfession":"1960-09-08","perpetualProfessionText":"08/09/1960","ordination":"1964-07-25","ordinationText":"25/07/1964","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":114,"name":"VILARRUBIAS CODINA, ANTON MARIA","birth":"1939-09-26","birthText":"26/09/1939","onomastic":{"day":24,"month":10},"onomasticText":"24/10 (ST ANTONI M. CLARET)","firstProfession":"1958-07-16","firstProfessionText":"16/07/1958","perpetualProfession":"1964-10-12","perpetualProfessionText":"12/10/1964","ordination":"1967-06-29","ordinationText":"29/06/1967","community":"Barcelona Cúria-Assistencial","communityGroup":"Barcelona Cúria-Assistencial"},{"id":115,"name":"VILARRUBIAS CODINA, JOSEP","birth":"1933-09-26","birthText":"26/09/1933","onomastic":{"day":19,"month":3},"onomasticText":"19/03 (ST JOSEP)","firstProfession":"1951-07-16","firstProfessionText":"16/07/1951","perpetualProfession":"1954-09-12","perpetualProfessionText":"12/09/1954","ordination":"1959-09-13","ordinationText":"13/09/1959","community":"Barcelona Cúria-Assistencial Ass","communityGroup":"Barcelona Cúria-Assistencial Ass"},{"id":116,"name":"WAMBO, ROMUALD","birth":"1983-06-19","birthText":"19/06/1983","onomastic":{"day":19,"month":6},"onomasticText":"19/06 (ST ROMUALD)","firstProfession":"2010-08-15","firstProfessionText":"15/08/2010","perpetualProfession":"2017-04-30","perpetualProfessionText":"30/04/2017","ordination":"2019-05-25","ordinationText":"25/05/2019","community":"Bilbao","communityGroup":"Bilbao"},{"id":117,"name":"YAMEOGO, WENDPANGA AUGUSTIN","birth":"1997-08-27","birthText":"27/08/1997","onomastic":{"day":28,"month":8},"onomasticText":"28/08 (ST AUGUSTIN)","firstProfession":null,"firstProfessionText":"No disponible en la fuente","perpetualProfession":null,"perpetualProfessionText":"No disponible en la fuente","ordination":null,"ordinationText":"No disponible en la fuente","community":"Comunidad Formativa Colmenar Viejo","communityGroup":"Comunidad Formativa Colmenar Viejo"},{"id":118,"name":"YENE YENE, ANACLET","birth":"1982-03-29","birthText":"29/03/1982","onomastic":{"day":26,"month":4},"onomasticText":"26 de abril (ST ANACLET)","firstProfession":"2005-09-13","firstProfessionText":"13/09/2005","perpetualProfession":"2011-09-24","perpetualProfessionText":"24/09/2011","ordination":"2014-06-28","ordinationText":"28/06/2014","community":"Segrate-Lecco","communityGroup":"Segrate-Lecco"},{"id":119,"name":"ZANGA, PIERRE","birth":"1975-12-10","birthText":"10/12/1975","onomastic":{"day":29,"month":6},"onomasticText":"29/06 (ST PIERRE)","firstProfession":"2000-09-26","firstProfessionText":"26/09/2000","perpetualProfession":"2006-04-29","perpetualProfessionText":"29/04/2006","ordination":"2008-04-26","ordinationText":"26/04/2008","community":"Exclaustración - Diócesis de Perpiñán","communityGroup":"Exclaustración - Diócesis de Perpiñán"}];
+const MONTHS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const EVENT_META = {
+  birth: {label:"Cumpleaños", icon:"●"},
+  onomastic: {label:"Onomástica", icon:"✦"},
+  firstProfession: {label:"1.ª profesión", icon:"Ⅰ"},
+  perpetualProfession: {label:"Profesión perpetua", icon:"∞"},
+  ordination: {label:"Ordenación presbiteral", icon:"†"}
+};
+const dateFormatter = new Intl.DateTimeFormat("es-ES", {day:"2-digit", month:"2-digit", year:"numeric"});
+const longDateFormatter = new Intl.DateTimeFormat("es-ES", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+
+const els = Object.fromEntries([
+  "search","ageFilter","communityFilter","eventFilter","monthFilter","directoryBody",
+  "resultsText","statVisible","statCommunities","statBirthMonth","statOnomMonth",
+  "currentDate","todayHeadingDate","todayContent","todayCount","calendarMonth",
+  "calendarEvent","calendarDays","memberDialog","dialogName","dialogBody"
+].map(id => [id, document.getElementById(id)]));
+
+function parseISO(iso) {
+  if (!iso) return null;
+  const [y,m,d] = iso.split("-").map(Number);
+  return new Date(y, m-1, d);
+}
+function formatISO(iso) {
+  const d = parseISO(iso);
+  return d ? dateFormatter.format(d) : "No disponible";
+}
+function ageOn(birthISO, ref = new Date()) {
+  const birth = parseISO(birthISO);
+  if (!birth) return null;
+  let age = ref.getFullYear() - birth.getFullYear();
+  const beforeBirthday = ref.getMonth() < birth.getMonth() ||
+    (ref.getMonth() === birth.getMonth() && ref.getDate() < birth.getDate());
+  return age - (beforeBirthday ? 1 : 0);
+}
+function yearsSince(iso, ref = new Date()) {
+  const d = parseISO(iso);
+  if (!d) return null;
+  return ref.getFullYear() - d.getFullYear();
+}
+function dayMonthFromISO(iso) {
+  const d = parseISO(iso);
+  return d ? {day:d.getDate(), month:d.getMonth()+1} : null;
+}
+function sameDayMonth(dm, date = new Date()) {
+  return dm && dm.day === date.getDate() && dm.month === date.getMonth()+1;
+}
+function normalized(text) {
+  return String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+}
+function memberEvents(member) {
+  const events = [];
+  const mappings = [
+    ["birth", member.birth],
+    ["firstProfession", member.firstProfession],
+    ["perpetualProfession", member.perpetualProfession],
+    ["ordination", member.ordination]
+  ];
+  mappings.forEach(([type, iso]) => {
+    const dm = dayMonthFromISO(iso);
+    if (dm) events.push({type, ...dm, iso, member});
+  });
+  if (member.onomastic) events.push({type:"onomastic", ...member.onomastic, iso:null, member});
+  return events;
+}
+function allEvents() {
+  return MEMBERS.flatMap(memberEvents);
+}
+function nextOccurrence(event, ref = new Date()) {
+  let d = new Date(ref.getFullYear(), event.month-1, event.day);
+  const today = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+  if (d < today) d = new Date(ref.getFullYear()+1, event.month-1, event.day);
+  return d;
+}
+function daysUntil(date, ref = new Date()) {
+  const start = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+  return Math.round((date - start) / 86400000);
+}
+function nextMemberEvent(member) {
+  return memberEvents(member)
+    .map(event => ({...event, next:nextOccurrence(event)}))
+    .sort((a,b) => a.next-b.next)[0] || null;
+}
+function eventDescription(event, ref = new Date()) {
+  const meta = EVENT_META[event.type];
+  if (event.type === "birth") {
+    const currentAge = ageOn(event.member.birth, ref);
+    const eventYear = nextOccurrence(event, ref).getFullYear();
+    const birthYear = parseISO(event.member.birth).getFullYear();
+    return `${meta.label}: ${eventYear - birthYear} años`;
+  }
+  if (event.type === "onomastic") return meta.label;
+  const years = yearsSince(event.iso, new Date(ref.getFullYear(), event.month-1, event.day));
+  return `${meta.label}: ${years} años`;
+}
+function exactEventDescription(event, ref = new Date()) {
+  const meta = EVENT_META[event.type];
+  if (event.type === "birth") return `${meta.label}: cumple ${ageOn(event.member.birth, ref)} años`;
+  if (event.type === "onomastic") return meta.label;
+  return `${meta.label}: ${yearsSince(event.iso, ref)}.º aniversario`;
+}
+function switchTab(panelId) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === panelId));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === panelId));
+  if (panelId === "todayPanel") renderToday();
+  if (panelId === "calendarPanel") renderCalendar();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function populateSelectors() {
+  const communities = [...new Set(MEMBERS.map(m => m.communityGroup))].sort((a,b)=>a.localeCompare(b,"es"));
+  communities.forEach(c => els.communityFilter.add(new Option(c,c)));
+  MONTHS.forEach((m,i) => {
+    els.monthFilter.add(new Option(m[0].toUpperCase()+m.slice(1), String(i+1)));
+    els.calendarMonth.add(new Option(m[0].toUpperCase()+m.slice(1), String(i+1)));
+  });
+  els.calendarMonth.value = String(new Date().getMonth()+1);
+}
+function passesAge(age, value) {
+  if (!value) return true;
+  if (age === null) return false;
+  if (value === "lt40") return age < 40;
+  if (value === "40-59") return age >= 40 && age <= 59;
+  if (value === "60-74") return age >= 60 && age <= 74;
+  if (value === "75-89") return age >= 75 && age <= 89;
+  if (value === "90plus") return age >= 90;
+  return true;
+}
+function filteredMembers() {
+  const q = normalized(els.search.value);
+  const ageValue = els.ageFilter.value;
+  const community = els.communityFilter.value;
+  const eventType = els.eventFilter.value;
+  const month = Number(els.monthFilter.value || 0);
+  return MEMBERS.filter(member => {
+    const age = ageOn(member.birth);
+    const haystack = normalized([
+      member.name, member.community, member.communityGroup, member.birthText,
+      member.onomasticText, member.firstProfessionText, member.perpetualProfessionText,
+      member.ordinationText
+    ].join(" "));
+    if (q && !haystack.includes(q)) return false;
+    if (!passesAge(age, ageValue)) return false;
+    if (community && member.communityGroup !== community) return false;
+    if (eventType || month) {
+      const events = memberEvents(member).filter(e => (!eventType || e.type === eventType) && (!month || e.month === month));
+      if (!events.length) return false;
+    }
+    return true;
+  }).sort((a,b)=>a.name.localeCompare(b.name,"es"));
+}
+function renderDirectory() {
+  const rows = filteredMembers();
+  els.directoryBody.innerHTML = rows.map(member => {
+    const age = ageOn(member.birth);
+    const next = nextMemberEvent(member);
+    let nextHtml = '<span class="muted">Sin fecha</span>';
+    if (next) {
+      const diff = daysUntil(next.next);
+      const when = diff === 0 ? "Hoy" : diff === 1 ? "Mañana" : `En ${diff} días`;
+      nextHtml = `<div><span class="badge">${when}</span></div>
+        <div class="muted" style="margin-top:5px">${EVENT_META[next.type].label} · ${dateFormatter.format(next.next)}</div>`;
+    }
+    return `<tr>
+      <td><button class="name-button" type="button" data-member="${member.id}">${member.name}</button></td>
+      <td>${age ?? "—"}</td>
+      <td>${formatISO(member.birth)}</td>
+      <td>${member.onomasticText}</td>
+      <td>${member.communityGroup}</td>
+      <td>${nextHtml}</td>
+    </tr>`;
+  }).join("");
+  if (!rows.length) {
+    els.directoryBody.innerHTML = `<tr><td colspan="6"><div class="empty">No hay resultados con estos filtros.</div></td></tr>`;
+  }
+  els.resultsText.textContent = `${rows.length} de ${MEMBERS.length} personas`;
+  els.statVisible.textContent = rows.length;
+  els.statCommunities.textContent = new Set(rows.map(m=>m.communityGroup)).size;
+  const currentMonth = new Date().getMonth()+1;
+  els.statBirthMonth.textContent = rows.filter(m => dayMonthFromISO(m.birth)?.month === currentMonth).length;
+  els.statOnomMonth.textContent = rows.filter(m => m.onomastic?.month === currentMonth).length;
+  document.querySelectorAll("[data-member]").forEach(btn => btn.addEventListener("click", () => openMember(Number(btn.dataset.member))));
+}
+function todayEvents() {
+  const today = new Date();
+  return allEvents().filter(e => sameDayMonth(e, today));
+}
+function renderToday() {
+  const today = new Date();
+  const events = todayEvents();
+  els.todayHeadingDate.textContent = longDateFormatter.format(today);
+  els.todayCount.textContent = events.length ? `(${events.length})` : "";
+  if (!events.length) {
+    els.todayContent.innerHTML = `<div class="empty">Hoy no consta ningún cumpleaños, onomástica o aniversario.</div>`;
+    return;
+  }
+  const groups = Object.keys(EVENT_META).map(type => {
+    const list = events.filter(e=>e.type===type).sort((a,b)=>a.member.name.localeCompare(b.member.name,"es"));
+    if (!list.length) return "";
+    return `<section class="today-group">
+      <h3>${EVENT_META[type].label} · ${list.length}</h3>
+      <ul class="event-list">${list.map(e=>`<li>
+        <button class="name-button event-title" data-member="${e.member.id}">${e.member.name}</button>
+        <div class="event-meta">${exactEventDescription(e,today)} · ${e.member.communityGroup}</div>
+      </li>`).join("")}</ul>
+    </section>`;
+  }).join("");
+  els.todayContent.innerHTML = `<div class="today-grid">${groups}</div>`;
+  document.querySelectorAll("#todayContent [data-member]").forEach(btn => btn.addEventListener("click", () => openMember(Number(btn.dataset.member))));
+}
+function renderCalendar() {
+  const month = Number(els.calendarMonth.value);
+  const type = els.calendarEvent.value;
+  const year = new Date().getFullYear();
+  const events = allEvents()
+    .filter(e => e.month === month && (!type || e.type === type))
+    .sort((a,b) => a.day-b.day || a.member.name.localeCompare(b.member.name,"es"));
+  if (!events.length) {
+    els.calendarDays.innerHTML = `<div class="empty">No hay celebraciones para la selección.</div>`;
+    return;
+  }
+  const grouped = Map.groupBy ? Map.groupBy(events, e=>e.day) : events.reduce((map,e)=>{
+    if(!map.has(e.day)) map.set(e.day,[]);
+    map.get(e.day).push(e); return map;
+  }, new Map());
+  els.calendarDays.innerHTML = [...grouped.entries()].map(([day,list]) => {
+    const d = new Date(year, month-1, day);
+    const weekday = new Intl.DateTimeFormat("es-ES",{weekday:"short"}).format(d);
+    return `<article class="calendar-day">
+      <div><div class="day-number">${day}</div><div class="day-name">${weekday}</div></div>
+      <div class="event-stack">${list.map(e=>`<button class="event-chip" type="button" data-member="${e.member.id}">
+        <span>${EVENT_META[e.type].icon}</span>
+        <span><strong>${e.member.name}</strong><br><span class="muted">${eventDescription(e)} · ${e.member.communityGroup}</span></span>
+      </button>`).join("")}</div>
+    </article>`;
+  }).join("");
+  document.querySelectorAll("#calendarDays [data-member]").forEach(btn => btn.addEventListener("click", () => openMember(Number(btn.dataset.member))));
+}
+function openMember(id) {
+  const m = MEMBERS.find(x=>x.id===id);
+  if (!m) return;
+  const age = ageOn(m.birth);
+  els.dialogName.textContent = m.name;
+  const details = [
+    ["Edad actual", age === null ? "No disponible" : `${age} años`],
+    ["Fecha de nacimiento", m.birthText],
+    ["Onomástica", m.onomasticText],
+    ["1.ª profesión", detailAnniversary(m.firstProfession, m.firstProfessionText)],
+    ["Profesión perpetua", detailAnniversary(m.perpetualProfession, m.perpetualProfessionText)],
+    ["Ordenación presbiteral", detailAnniversary(m.ordination, m.ordinationText)],
+    ["Comunidad", m.communityGroup],
+    ...(m.community !== m.communityGroup ? [["Comunidad en la fuente",m.community]] : [])
+  ];
+  els.dialogBody.innerHTML = `<div class="detail-grid">${details.map(([label,value])=>`
+    <div class="detail"><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div>
+  `).join("")}</div>`;
+  els.memberDialog.showModal();
+}
+function detailAnniversary(iso, text) {
+  if (!iso) return text;
+  return `${text} · ${yearsSince(iso)} años`;
+}
+function exportCsv() {
+  const rows = filteredMembers();
+  const headers = ["Nombre y apellidos","Edad","Fecha de nacimiento","Onomástica","1.ª profesión","Profesión perpetua","Ordenación presbiteral","Comunidad"];
+  const values = rows.map(m => [m.name, ageOn(m.birth) ?? "", m.birthText, m.onomasticText, m.firstProfessionText, m.perpetualProfessionText, m.ordinationText, m.communityGroup]);
+  const escape = v => `"${String(v).replaceAll('"','""')}"`;
+  const csv = "\ufeff" + [headers,...values].map(row=>row.map(escape).join(";")).join("\r\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "directorio_sp_filtrado.csv"; a.click();
+  URL.revokeObjectURL(url);
+}
+document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click",()=>switchTab(tab.dataset.tab)));
+["search","ageFilter","communityFilter","eventFilter","monthFilter"].forEach(id => document.getElementById(id).addEventListener("input",renderDirectory));
+document.getElementById("clearFilters").addEventListener("click",()=>{
+  ["search","ageFilter","communityFilter","eventFilter","monthFilter"].forEach(id=>document.getElementById(id).value="");
+  renderDirectory();
+});
+document.getElementById("todayButton").addEventListener("click",()=>switchTab("todayPanel"));
+document.getElementById("backDirectory").addEventListener("click",()=>switchTab("directoryPanel"));
+document.getElementById("exportCsv").addEventListener("click",exportCsv);
+els.calendarMonth.addEventListener("change",renderCalendar);
+els.calendarEvent.addEventListener("change",renderCalendar);
+document.getElementById("dialogClose").addEventListener("click",()=>els.memberDialog.close());
+els.memberDialog.addEventListener("click",e=>{
+  const rect = els.memberDialog.getBoundingClientRect();
+  if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) els.memberDialog.close();
+});
+
+populateSelectors();
+els.currentDate.textContent = longDateFormatter.format(new Date());
+renderDirectory();
+renderToday();
+renderCalendar();
+</script>
+</body>
+</html>
