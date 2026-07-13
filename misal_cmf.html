@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misal y Leccionario CMF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400;1,7..72,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --granate:#7b1e2b;
+  --granate-osc:#5e1620;
+  --oro:#b8913f;
+  --oro-claro:#d9bd7f;
+  --fondo:#faf6ee;
+  --papel:#fffdf8;
+  --tinta:#2c2420;
+  --tinta-suave:#6b5d52;
+  --linea:#e5d9c3;
+  --rubrica:#a12433;
+  --sombra:0 2px 14px rgba(60,30,20,.08);
+  --fs:100%;
+}
+html.oscuro{
+  --granate:#c05a68;
+  --granate-osc:#8a2e3c;
+  --oro:#cfa958;
+  --oro-claro:#8a713a;
+  --fondo:#171214;
+  --papel:#211a1c;
+  --tinta:#e8ddd2;
+  --tinta-suave:#a99a8d;
+  --linea:#3a2e30;
+  --rubrica:#d97583;
+  --sombra:0 2px 14px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:var(--fs)}
+body{
+  font-family:'Literata',Georgia,serif;
+  background:var(--fondo);
+  color:var(--tinta);
+  line-height:1.65;
+  min-height:100vh;
+}
+header{
+  background:linear-gradient(160deg,var(--granate-osc),var(--granate));
+  color:#f5ead6;
+  padding:1.1rem 1rem .9rem;
+  position:sticky;top:0;z-index:10;
+  box-shadow:var(--sombra);
+}
+.cab{max-width:46rem;margin:0 auto;display:flex;align-items:center;gap:.7rem}
+.cruz{font-size:1.5rem;color:var(--oro-claro);line-height:1;cursor:pointer;user-select:none}
+html.oscuro .cruz{color:var(--oro)}
+.titulos{flex:1;min-width:0;cursor:pointer}
+.titulos h1{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:600;font-size:1.25rem;letter-spacing:.04em;line-height:1.15;
+}
+.titulos small{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;opacity:.75;font-family:'Literata',serif}
+.ctrl{display:flex;gap:.35rem}
+.ctrl button{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+  color:#f5ead6;border-radius:.5rem;min-width:2.1rem;height:2.1rem;
+  font-family:'Literata',serif;font-size:.85rem;cursor:pointer;
+}
+.ctrl button:hover{background:rgba(255,255,255,.22)}
+main{max-width:46rem;margin:0 auto;padding:1.4rem 1.1rem 4rem}
+.hoy{
+  background:var(--papel);border:1px solid var(--oro);border-left:.35rem solid var(--oro);
+  border-radius:.6rem;padding:.85rem 1rem;margin-bottom:1.4rem;box-shadow:var(--sombra);
+  cursor:pointer;
+}
+.hoy .etq{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--oro);font-weight:600}
+.hoy .nom{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--granate)}
+.hoy .sub{font-size:.85rem;color:var(--tinta-suave);font-style:italic}
+.grupo{margin-bottom:1.6rem}
+.grupo h2{
+  font-family:'Literata',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--oro);
+  border-bottom:1px solid var(--linea);padding-bottom:.35rem;margin-bottom:.6rem;
+}
+.tarjeta{
+  display:flex;align-items:baseline;gap:.75rem;
+  background:var(--papel);border:1px solid var(--linea);border-radius:.6rem;
+  padding:.75rem .95rem;margin-bottom:.5rem;cursor:pointer;box-shadow:var(--sombra);
+  transition:transform .12s ease;
+}
+.tarjeta:hover{transform:translateX(.2rem);border-color:var(--oro)}
+.tarjeta .fecha{
+  font-family:'Cormorant Garamond',serif;font-size:.95rem;font-style:italic;
+  color:var(--rubrica);white-space:nowrap;min-width:5.6rem;
+}
+.tarjeta .nom{font-family:'Cormorant Garamond',serif;font-size:1.12rem;font-weight:600;line-height:1.25}
+.tarjeta .rango{font-size:.78rem;color:var(--tinta-suave);font-style:italic}
+.punto{width:.55rem;height:.55rem;border-radius:50%;flex:none;align-self:center;border:1px solid rgba(0,0,0,.15)}
+.p-rojo{background:#a12433}.p-blanco{background:#f2ead7}.p-morado{background:#6b4a86}.p-verde{background:#4a7a52}
+/* ---- página de celebración ---- */
+.volver{
+  display:inline-flex;align-items:center;gap:.4rem;background:none;border:none;
+  color:var(--granate);font-family:'Literata',serif;font-size:.85rem;cursor:pointer;
+  margin-bottom:1rem;padding:.3rem 0;
+}
+.celeb .fecha-lit{
+  text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:1.05rem;color:var(--tinta-suave);
+}
+.celeb h2.tit{
+  text-align:center;font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:1.7rem;line-height:1.2;color:var(--granate);margin:.2rem 0 .1rem;
+  letter-spacing:.02em;
+}
+.celeb .rango{text-align:center;color:var(--rubrica);font-style:italic;margin-bottom:.4rem}
+.celeb .adorno{text-align:center;color:var(--rubrica);font-size:1.3rem;margin:.5rem 0 1rem}
+.nota{color:var(--rubrica);font-style:italic;font-size:.92rem;margin:1rem 0 .4rem}
+h3.rub{
+  font-family:'Cormorant Garamond',serif;font-variant:small-caps;font-weight:600;
+  letter-spacing:.06em;color:var(--rubrica);font-size:1.18rem;
+  margin:1.5rem 0 .3rem;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+}
+h3.rub .ref{
+  font-family:'Literata',serif;font-variant:normal;font-style:italic;
+  font-weight:400;font-size:.85rem;color:var(--tinta-suave);white-space:nowrap;
+}
+.lema{color:var(--rubrica);font-style:italic;text-align:center;font-size:.95rem;margin:.2rem 0 .6rem}
+.pl{white-space:pre-line;margin:.4rem 0 .9rem}
+p.pr{margin:.4rem 0 .9rem}
+.vr{color:var(--rubrica);font-weight:600;font-style:normal}
+.obien{color:var(--rubrica);font-style:italic;margin:1.1rem 0 .3rem;display:flex;justify-content:space-between;gap:1rem}
+.obien .ref{font-size:.85rem;color:var(--tinta-suave)}
+.fin{margin:.3rem 0 1rem;font-weight:500}
+.celeb footer{
+  margin-top:2.5rem;text-align:center;color:var(--oro);font-size:1.2rem;
+}
+::selection{background:var(--oro-claro)}
+@media (max-width:480px){
+  .tarjeta .fecha{min-width:4.6rem;font-size:.85rem}
+  .celeb h2.tit{font-size:1.45rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="cab">
+    <div class="cruz" onclick="location.hash=''">&#10011;</div>
+    <div class="titulos" onclick="location.hash=''">
+      <h1>Misal y Leccionario</h1>
+      <small>Misioneros Hijos del Inmaculado Corazón de María</small>
+    </div>
+    <div class="ctrl">
+      <button id="btnMenos" title="Reducir letra">A&minus;</button>
+      <button id="btnMas" title="Aumentar letra">A+</button>
+      <button id="btnTema" title="Modo oscuro">&#9789;</button>
+    </div>
+  </div>
+</header>
+<main id="app"></main>
+<script>
+const V='<span class="vr">&#8483;.</span>', R='<span class="vr">&#8479;.</span>';
+const DATA=[
+{id:'martires',grupo:'propio',mes:2,dia:1,color:'rojo',fecha:'1 de febrero',
+titulo:'Beato Felipe de Jesús Munárriz y compañeros, mártires',rango:'Memoria',
+html:`
+<p class="nota">Común de varios mártires, fuera del tiempo pascual.</p>
+<h3 class="rub">Antífona de entrada</h3>
+<p class="pr">En la tierra los santos mártires han derramado su sangre por Cristo, por eso han alcanzado el premio eterno.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Dios Padre nuestro,
+que, con la ayuda de la bienaventurada Virgen María,
+llevaste a los beatos mártires claretianos
+a la imitación de Cristo
+hasta el derramamiento de la sangre,
+concédenos, por su ejemplo e intercesión,
+confesar la fe con fortaleza, de palabra y de obra.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Pueden emplearse las lecturas del Común de mártires, o bien las siguientes:</p>
+<h3 class="rub">Primera lectura <span class="ref">Rm 8, 31-39</span></h3>
+<p class="lema">Ni muerte ni vida, ni criatura alguna podrá separarnos del amor de Cristo</p>
+<p class="pr">Lectura de la carta del apóstol san Pablo a los Romanos.</p>
+<p class="pr">Hermanos:<br>Después de esto, ¿qué diremos? Si Dios está con nosotros, ¿quién estará contra nosotros? El que no se reservó a su propio Hijo, sino que lo entregó por todos nosotros, ¿cómo no nos dará todo con él? ¿Quién acusará a los elegidos de Dios? Dios es el que justifica. ¿Quién condenará? ¿Acaso Cristo Jesús, que murió, más todavía, resucitó, y está a la derecha de Dios y que además intercede por nosotros? ¿Quién nos separará del amor de Cristo?, ¿la tribulación?, ¿la angustia?, ¿la persecución?, ¿el hambre?, ¿la desnudez?, ¿el peligro?, ¿la espada?; como está escrito: «Por tu causa nos degüellan cada día, nos tratan como ovejas de matanza».</p>
+<p class="pr">Pero en todo esto vencemos de sobra gracias a aquel que nos ha amado. Pues estoy convencido de que ni muerte, ni vida, ni ángeles, ni principados, ni presente, ni futuro, ni potencias, ni altura, ni profundidad, ni ninguna otra criatura podrá separarnos del amor de Dios manifestado en Cristo Jesús, nuestro Señor.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 123, 2-5. 7b-8</span></h3>
+<div class="pl">${R} Hemos salvado la vida,
+como un pájaro de la trampa del cazador.
+
+${V} Si el Señor no hubiera estado de nuestra parte,
+cuando nos asaltaban los hombres,
+nos habrían tragado vivos:
+tanto ardía su ira contra nosotros. ${R}
+
+${V} Nos habrían arrollado las aguas,
+llegándonos el torrente hasta el cuello;
+nos habrían llegado hasta el cuello
+las aguas impetuosas. ${R}
+
+${V} La trampa se rompió, y escapamos.
+Nuestro auxilio es el nombre del Señor,
+que hizo el cielo y la tierra. ${R}</div>
+<div class="obien"><span>O bien:</span><span class="ref">2Cor 4, 7-15</span></div>
+<p class="lema">Llevamos en el cuerpo la muerte de Jesús</p>
+<p class="pr">Lectura de la segunda carta del apóstol san Pablo a los Corintios.</p>
+<p class="pr">Hermanos:<br>Llevamos este tesoro del ministerio en vasijas de barro, para que se vea que una fuerza tan extraordinaria es de Dios y no proviene de nosotros. Atribulados en todo, mas no aplastados; apurados, mas no desesperados; perseguidos, pero no abandonados; derribados, mas no aniquilados, llevando siempre y en todas partes en el cuerpo la muerte de Jesús, para que también la vida de Jesús se manifieste en nuestro cuerpo.</p>
+<p class="pr">Pues, mientras vivimos, continuamente nos están entregando a la muerte por causa de Jesús; para que también la vida de Jesús se manifieste en nuestra carne mortal. De este modo, la muerte actúa en nosotros, y la vida en vosotros.</p>
+<p class="pr">Pero teniendo el mismo espíritu de fe, según lo que está escrito: «Creí, por eso hablé», también nosotros creemos y por eso hablamos; sabiendo que quien resucitó al Señor Jesús también nos resucitará a nosotros con Jesús y nos presentará con vosotros ante él.</p>
+<p class="pr">Pues todo esto es para vuestro bien, a fin de que cuantos más reciban la gracia, mayor sea el agradecimiento, para gloria de Dios.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 33, 2-9</span></h3>
+<div class="pl">${R} El Señor me libró de todas mis ansias.
+
+${V} Bendigo al Señor en todo momento,
+su alabanza está siempre en mi boca;
+mi alma se gloría en el Señor:
+que los humildes lo escuchen y se alegren. ${R}
+
+${V} Proclamad conmigo la grandeza del Señor,
+ensalcemos juntos su nombre.
+Yo consulté al Señor, y me respondió,
+me libró de todas mis ansias. ${R}
+
+${V} Contempladlo, y quedaréis radiantes,
+vuestro rostro no se avergonzará.
+El afligido invocó al Señor, Él lo escuchó
+y lo salvó de sus angustias. ${R}
+
+${V} El ángel del Señor acampa
+en torno a quienes lo temen y los protege.
+Gustad y ved qué bueno es el Señor,
+dichoso el que se acoge a Él. ${R}</div>
+<h3 class="rub">Aleluya <span class="ref">Mt 5, 10</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Bienaventurados los perseguidos
+por causa de la justicia,
+porque de ellos es el reino de los cielos. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Jn 17, 11-19</span></h3>
+<p class="lema">Guárdalos en tu nombre, a los que me has dado,<br>para que sean uno, como nosotros</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">En aquel tiempo, oraba Jesús diciendo:</p>
+<p class="pr">«Ya no voy a estar en el mundo, pero ellos están en el mundo, mientras yo voy a ti. Padre santo, guárdalos en tu nombre, a los que me has dado, para que sean uno, como nosotros. Cuando estaba con ellos, yo guardaba en tu nombre a los que me diste, y los custodiaba, y ninguno se perdió, sino el hijo de la perdición, para que se cumpliera la Escritura.</p>
+<p class="pr">Ahora voy a ti, y digo esto en el mundo para que tengan en sí mismos mi alegría cumplida. Yo les he dado tu palabra, y el mundo los ha odiado porque no son del mundo, como tampoco yo soy del mundo. No ruego que los retires del mundo, sino que los guardes del maligno. No son del mundo, como tampoco yo soy del mundo. Santifícalos en la verdad: tu palabra es verdad. Como tú me enviaste al mundo, así yo los envío también al mundo. Y por ellos yo me santifico a mí mismo, para que también ellos sean santificados en la verdad».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Lc 23, 46</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Padre, a tus manos encomiendo mi espíritu. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Jn 15, 18-21</span></h3>
+<p class="lema">Si a mí me han perseguido, también a vosotros os perseguirán</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">En aquel tiempo, dijo Jesús a sus discípulos:</p>
+<p class="pr">«Si el mundo os odia, sabed que me ha odiado a mí antes que a vosotros.</p>
+<p class="pr">Si fuerais del mundo, el mundo os amaría como cosa suya, pero como no sois del mundo, sino que yo os he escogido sacándoos del mundo, por eso el mundo os odia.</p>
+<p class="pr">Recordad lo que os dije: “No es el siervo más que su amo”. Si a mí me han perseguido, también a vosotros os perseguirán; si han guardado mi palabra, también guardarán la vuestra.</p>
+<p class="pr">Y todo eso lo harán con vosotros a causa de mi nombre, porque no conocen al que me envió».</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Recibe, Señor, este sacrificio,
+para que cuanto celebramos
+en el memorial de la pasión de tu Hijo,
+por intercesión y ejemplo de los beatos mártires claretianos,
+se haga vida en nosotros.
+Por Jesucristo, nuestro Señor.</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">Que esta ofrenda que te presentamos, Señor,
+en la memoria de los beatos mártires claretianos,
+encienda en nuestros corazones
+la llama perenne de tu amor,
+y nos disponga a recibir el premio prometido
+a los que perseveran en la fe.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Rm 8, 38-39</span></h3>
+<p class="pr">Ni muerte, ni vida, ni ninguna otra criatura podrá separarnos del amor de Cristo.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Alimentados, Señor,
+con el Cuerpo y la Sangre de tu Hijo,
+concédenos, por intercesión
+de los beatos mártires claretianos,
+permanecer siempre en ti, perseverar en tu amor,
+vivir de tu vida y ser conducidos por tu mano.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'vedruna',grupo:'propio',mes:5,dia:22,color:'blanco',fecha:'22 de mayo',
+titulo:'Santa Joaquina de Vedruna, religiosa',rango:'Memoria',
+html:`
+<p class="nota">Común de santos y santas: para los religiosos.</p>
+<h3 class="rub">Antífona de entrada <span class="ref">cf. Prov 31, 30. 28</span></h3>
+<p class="pr">La mujer que teme al Señor merece alabanza: sus hijos se levantarán para felicitarla. <span class="vr">(T. P. </span>Aleluya<span class="vr">)</span>.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, tú que has suscitado en la Iglesia
+a santa Joaquina de Vedruna
+para la educación cristiana de la juventud
+y alivio de los enfermos,
+haz que nosotros sepamos imitar sus ejemplos
+y dediquemos nuestra vida
+a servir con amor a nuestros hermanos.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Pueden emplearse las lecturas correspondientes al día; las del Común de santos y santas: para religiosos; o las siguientes:</p>
+<h3 class="rub">Primera lectura</h3>
+<div class="obien"><span>Fuera del Tiempo pascual:</span><span class="ref">Prov 31, 10-13. 19-20. 30-31</span></div>
+<p class="lema">La mujer que teme al Señor merece alabanza</p>
+<p class="pr">Lectura del libro de los Proverbios.</p>
+<div class="pl">Una mujer fuerte, ¿quién la hallará?
+Supera en valor a las perlas.
+Su marido se fía de ella,
+pues no le faltan riquezas.
+Le trae ganancias, no pérdidas,
+todos los días de su vida.
+Busca la lana y el lino
+y los trabaja con la destreza de sus manos.
+Aplica sus manos al huso,
+con sus dedos sostiene la rueca.
+Abre sus manos al necesitado
+y tiende sus brazos al pobre.
+Engañosa es la gracia, fugaz la hermosura;
+la que teme al Señor merece alabanza.
+Cantadle por el éxito de su trabajo,
+que sus obras la alaben en público.</div>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>En Tiempo pascual:</span><span class="ref">Ap 19, 1. 5-9a</span></div>
+<p class="lema">Bienaventurados los invitados al banquete de bodas del Cordero</p>
+<p class="pr">Lectura del libro del Apocalipsis.</p>
+<p class="pr">Yo, Juan, oí en el cielo como el vocerío de una gran muchedumbre, que decía:</p>
+<div class="pl">«¡Aleluya!
+La salvación, la gloria y el poder
+son de nuestro Dios».</div>
+<p class="pr">Y salió una voz del trono que decía:</p>
+<p class="pr">«Alabad a nuestro Dios sus siervos todos, los que lo teméis, pequeños y grandes».</p>
+<p class="pr">Y oí como el rumor de una muchedumbre inmensa, como el rumor de muchas aguas, y como el fragor de fuertes truenos, que decían:</p>
+<div class="pl">«Aleluya.
+Porque reina el Señor, nuestro Dios, dueño de todo,
+alegrémonos y gocemos y démosle gracias.
+Llegó la boda del Cordero,
+su esposa se ha embellecido,
+y se le ha concedido vestirse
+de lino resplandeciente y puro
+—el lino son las buenas obras de los santos—».</div>
+<p class="pr">Y me dijo:</p>
+<div class="pl">«Escribe: “Bienaventurados los invitados
+al banquete de bodas del Cordero”».</div>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 111, 1-2. 3-4. 5-7a. 7b-8. 9</span></h3>
+<div class="pl">${R} Dichoso quien teme al Señor.
+<span class="vr">o bien:</span> Aleluya.
+
+${V} Dichoso quien teme al Señor
+y ama de corazón sus mandatos.
+Su linaje será poderoso en la tierra,
+la descendencia del justo será bendita. ${R}
+
+${V} En su casa habrá riquezas y abundancia,
+su caridad dura por siempre.
+En las tinieblas brilla como una luz
+el que es justo, clemente y compasivo. ${R}
+
+${V} Dichoso el que se apiada y presta,
+y administra rectamente sus asuntos,
+porque jamás vacilará.
+El recuerdo del justo será perpetuo.
+No temerá las malas noticias. ${R}
+
+${V} Su corazón está firme en el Señor.
+Su corazón está seguro, sin temor,
+hasta que vea derrotados a sus enemigos. ${R}
+
+${V} Reparte limosna a los pobres;
+su caridad dura por siempre
+y alzará la frente con dignidad. ${R}</div>
+<h3 class="rub">Aleluya <span class="ref">cf. Mt 11, 25</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Te doy gracias, Padre, Señor del cielo y de la tierra,
+porque has revelado los misterios del reino
+a los pequeños. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Mc 9, 34-37</span></h3>
+<p class="lema">El que acoge a un niño me acoge a mí</p>
+<p class="pr">Lectura del santo Evangelio según san Marcos.</p>
+<p class="pr">En aquel tiempo, los discípulos callaban, pues por el camino habían discutido quién era el más importante. Jesús se sentó, llamó a los Doce y les dijo:</p>
+<p class="pr">«Quien quiera ser el primero, que sea el último de todos y el servidor de todos».</p>
+<p class="pr">Y tomando a un niño, lo puso en medio de ellos, lo abrazó y les dijo:</p>
+<p class="pr">«El que acoge a un niño como este en mi nombre, me acoge a mí; y el que me acoge a mí no me acoge a mí, sino al que me ha enviado».</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Acepta, Señor, estos dones
+con los que celebramos
+el memorial del amor de tu Hijo,
+y concede a cuantos participamos en estos misterios
+que, a ejemplo de santa Joaquina de Vedruna,
+te amemos sobre todas las cosas
+y a los hombres por amor a ti.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Jn 15, 13</span></h3>
+<p class="pr">Nadie tiene amor más grande que el que da la vida por sus amigos. <span class="vr">(T. P. </span>Aleluya<span class="vr">)</span>.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Te pedimos, Señor,
+que esta eucaristía acreciente tu vida en nosotros,
+y que, por nuestras palabras y acciones,
+seamos, como santa Joaquina de Vedruna,
+amor para los que nos rodean
+y luz para los que nos contemplan.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'micaela',grupo:'propio',mes:6,dia:15,color:'blanco',fecha:'15 de junio',
+titulo:'Santa María Micaela del Santísimo Sacramento, virgen',rango:'Memoria',
+html:`
+<p class="nota">Común de vírgenes o de santos y santas: para los religiosos.</p>
+<h3 class="rub">Antífona de entrada</h3>
+<p class="pr">Alegrémonos, llenémonos de gozo, porque el Señor ha amado a esta virgen santa y gloriosa.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Oh Dios, que amas a los hombres
+y concedes a todos tu perdón,
+suscita en nosotros un espíritu de generosidad y de amor
+que, alimentado y fortalecido con la eucaristía,
+a imitación de santa María Micaela,
+nos impulse a encontrarte en los más pobres
+y en los más necesitados de tu protección.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Pueden emplearse las lecturas correspondientes al día; las del Común de vírgenes; las del Común de santos y santas: para religiosos; o las siguientes:</p>
+<h3 class="rub">Primera lectura <span class="ref">1Jn 3, 14-18</span></h3>
+<p class="lema">También nosotros debemos dar nuestra vida por los hermanos</p>
+<p class="pr">Lectura de la primera carta del apóstol san Juan.</p>
+<p class="pr">Queridos hermanos:<br>Nosotros sabemos que hemos pasado de la muerte a la vida porque amamos a los hermanos. El que no ama permanece en la muerte.</p>
+<p class="pr">El que odia a su hermano es un homicida. Y sabéis que ningún homicida lleva permanentemente en sí vida eterna. En esto hemos conocido el amor: en que él dio su vida por nosotros. También nosotros debemos dar nuestra vida por los hermanos. Pero si uno tiene bienes del mundo y, viendo a su hermano en necesidad, le cierra sus entrañas, ¿cómo va a estar en él el amor de Dios?</p>
+<p class="pr">Hijos míos, no amemos de palabra y de boca, sino de verdad y con obras.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 22, 1-3a. 3b-4. 5. 6</span></h3>
+<div class="pl">${R} El Señor es mi pastor, nada me falta.
+
+${V} El Señor es mi pastor, nada me falta:
+en verdes praderas me hace recostar;
+me conduce hacia fuentes tranquilas
+y repara mis fuerzas.
+Me guía por el sendero justo,
+por el honor de su nombre. ${R}
+
+${V} Aunque camine por cañadas oscuras,
+nada temo, porque tú vas conmigo:
+tu vara y tu cayado me sosiegan. ${R}
+
+${V} Preparas una mesa ante mí,
+enfrente de mis enemigos;
+me unges la cabeza con perfume,
+y mi copa rebosa. ${R}
+
+${V} Tu bondad y tu misericordia me acompañan
+todos los días de mi vida,
+y habitaré en la casa del Señor
+por años sin término. ${R}</div>
+<h3 class="rub">Aleluya <span class="ref">Jn 6, 54</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} El que come mi carne y bebe mi sangre tiene vida
+eterna, y yo lo resucitaré en el último día. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Jn 6, 47-58</span></h3>
+<p class="lema">El que come de este pan tiene vida eterna</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">En aquel tiempo, dijo Jesús a los judíos:</p>
+<p class="pr">«En verdad, en verdad os digo: el que cree tiene vida eterna. Yo soy el pan de la vida. Vuestros padres comieron en el desierto el maná y murieron; este es el pan que baja del cielo, para que el hombre coma de él y no muera. Yo soy el pan vivo que ha bajado del cielo; el que coma de este pan vivirá para siempre. Y el pan que yo daré es mi carne por la vida del mundo».</p>
+<p class="pr">Disputaban los judíos entre sí:</p>
+<p class="pr">«¿Cómo puede este darnos a comer su carne?».</p>
+<p class="pr">Entonces Jesús les dijo:</p>
+<p class="pr">«En verdad, en verdad os digo: si no coméis la carne del Hijo del hombre y no bebéis su sangre, no tenéis vida en vosotros. El que come mi carne y bebe mi sangre tiene vida eterna, y yo lo resucitaré en el último día. Mi carne es verdadera comida, y mi sangre es verdadera bebida. El que come mi carne y bebe mi sangre habita en mí y yo en él. Como el Padre que vive me ha enviado, y yo vivo por el Padre, así, del mismo modo, el que me come vivirá por mí. Este es el pan que ha bajado del cielo: no como el de vuestros padres, que lo comieron y murieron; el que come este pan vivirá para siempre».</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Recibe, Señor,
+los dones que humildemente te ofrecemos
+en memoria de santa María Micaela
+y concédenos que, al celebrar este misterio,
+libres de pecado, nos ofrezcamos a nosotros mismos
+como oblación agradable a tus ojos.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">cf. Jn 14, 21.23</span></h3>
+<p class="pr">Al que me ama, lo amará mi Padre, y vendremos a él y haremos morada en él.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Reconfortados con el pan del cielo,
+imploramos, Señor, de tu bondad
+que, en la memoria de santa María Micaela,
+nos concedas, por la virtud de este sacramento,
+permanecer en tu presencia,
+ardiendo en el fuego de tu amor.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'corazon',grupo:'propio',movil:'corazon',color:'blanco',fecha:'Sábado posterior al segundo domingo después de Pentecostés',
+titulo:'Inmaculado Corazón de la Bienaventurada Virgen María',rango:'Solemnidad',
+html:`
+<h3 class="rub">Antífona de entrada <span class="ref">1Sam 2, 1abd</span></h3>
+<p class="pr">Mi corazón se regocija en el Señor, mi poder se exalta por Dios, porque gozo con tu salvación.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Eclo 24, 18</span></div>
+<p class="pr">Yo soy la madre del amor hermoso, del conocimiento y de la santa esperanza.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, Dios nuestro, que elegiste a María
+como Madre de tu Hijo y Madre nuestra,
+haz que, por la fiel entrega a su Corazón materno,
+nos configuremos más plenamente con Cristo
+y, urgidos por su caridad, nos dediquemos generosamente
+a proclamar el Evangelio a todos los hombres.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">Oh Dios,
+tú que has preparado en el Corazón de la Virgen María
+una digna morada al Espíritu Santo,
+haz que nosotros, por intercesión de la Virgen,
+lleguemos a ser templos y servidores de tu gloria.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Se pueden escoger lecturas del Común de la bienaventurada Virgen María, o las siguientes:</p>
+<h3 class="rub">Primera lectura <span class="ref">Is 61, 9-11</span></h3>
+<p class="lema">Desbordo de gozo con el Señor</p>
+<p class="pr">Lectura del profeta Isaías.</p>
+<div class="pl">Su estirpe será célebre entre las naciones,
+y sus vástagos entre los pueblos.
+Los que los vean reconocerán
+que son la estirpe que bendijo el Señor.
+
+Desbordo de gozo con el Señor,
+y me alegro con mi Dios:
+porque me ha puesto un traje de salvación,
+y me ha envuelto con un manto de justicia,
+como novio que se pone la corona,
+o novia que se adorna con sus joyas.
+
+Como el suelo echa sus brotes,
+como un jardín hace brotar sus semillas,
+así el Señor hará brotar la justicia
+y los himnos ante todos los pueblos.</div>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">1Sam 2, 1. 4-5. 6-7. 8abcd</span></h3>
+<div class="pl">${R} Mi corazón se regocija por el Señor, mi Salvador.
+
+${V} Mi corazón se regocija en el Señor.
+mi poder se exalta por Dios.
+Mi boca se ríe de mis enemigos,
+porque gozo con tu salvación. ${R}
+
+${V} Se rompen los arcos de los valientes,
+mientras los cobardes se ciñen de valor.
+Los hartos se contratan por el pan,
+mientras los hambrientos engordan;
+la mujer estéril da a luz siete hijos,
+mientras la madre de muchos queda baldía. ${R}
+
+${V} El Señor da la muerte y la vida,
+hunde en el abismo y levanta;
+da la pobreza y la riqueza,
+humilla y enaltece. ${R}
+
+${V} Él levanta del polvo al desvalido,
+alza de la basura al pobre,
+para hacer que se siente entre príncipes
+y que herede un trono de gloria. ${R}</div>
+<div class="obien"><span>O bien:</span><span class="ref">Zac 2, 14-17</span></div>
+<p class="lema">Alégrate, hija de Sion, que yo vengo</p>
+<p class="pr">Lectura del profeta Zacarías.</p>
+<div class="pl">Alégrate y goza, Sion,
+pues voy a habitar dentro de ti
+—oráculo del Señor—.
+
+Aquel día se asociarán al Señor
+pueblos sin número;
+ellos serán mi pueblo,
+y habitaré en medio de ti.
+
+Entonces reconocerás que el Señor del universo
+me ha enviado a ti.
+Judá será la herencia del Señor,
+su lote en la tierra santa,
+y volverá a elegir a Jerusalén.
+¡Silencio todo el mundo
+ante el Señor que se levanta de su morada santa!</div>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Lc 1, 46-47. 48-49. 50-51. 52-53. 54-55</span></h3>
+<div class="pl">${R} El Poderoso ha hecho obras grandes por mí:
+su nombre es santo.
+<span class="vr">O bien:</span>
+Bienaventurada eres, Virgen María,
+que llevaste en tu seno al Hijo del eterno Padre.
+
+${V} Proclama mi alma la grandeza del Señor,
+se alegra mi espíritu en Dios, mi salvador;
+porque ha mirado la humildad de su esclava. ${R}
+
+${V} Desde ahora me felicitarán todas las generaciones,
+porque el Poderoso ha hecho obras grandes en mí:
+su nombre es santo. ${R}
+
+${V} Y su misericordia llega a sus fieles
+de generación en generación.
+Él hace proezas con su brazo:
+dispersa a los soberbios de corazón. ${R}
+
+${V} Derriba del trono a los poderosos
+y enaltece a los humildes,
+a los hambrientos los colma de bienes
+y a los ricos los despide vacíos. ${R}
+
+${V} Auxilia a Israel, su siervo,
+acordándose de la misericordia
+—como lo había prometido a nuestros padres—
+en favor de Abrahán
+y su descendencia por siempre. ${R}</div>
+<h3 class="rub">Segunda lectura <span class="ref">Gál 4, 4-7</span></h3>
+<p class="lema">Envió Dios a su Hijo, nacido de una mujer</p>
+<p class="pr">Lectura de la carta del apóstol san Pablo a los Gálatas.</p>
+<p class="pr">Hermanos:<br>Cuando llegó la plenitud del tiempo, envió Dios a su Hijo, nacido de mujer, nacido bajo la ley, para rescatar a los que estaban bajo la ley, para que recibiéramos la adopción filial. Como sois hijos, Dios envió a nuestros corazones el Espíritu de su Hijo, que clama: «¡Abba, Padre!». Así que ya no eres esclavo, sino hijo; y si eres hijo, eres también heredero por voluntad de Dios.</p>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Hch 1, 12-14</span></div>
+<p class="lema">Se dedicaban a la oración, junto con María, la Madre de Jesús</p>
+<p class="pr">Lectura de los Hechos de los Apóstoles.</p>
+<p class="pr">Después de subir Jesús al cielo, los apóstoles se volvieron a Jerusalén, desde el monte que llaman de los Olivos, que dista de Jerusalén lo que se permite caminar en sábado. Cuando llegaron, subieron a la sala superior, donde se alojaban: Pedro y Juan, Santiago y Andrés, Felipe y Tomás, Bartolomé y Mateo, Santiago el de Alfeo y Simón el Zelotes y Judas el de Santiago.</p>
+<p class="pr">Todos ellos perseveraban unánimes en la oración, junto con algunas mujeres y María, la madre de Jesús, y con sus hermanos.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Aleluya <span class="ref">cf. Lc 2, 19</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Bienaventurada es la Virgen María,
+que conservaba la palabra de Dios,
+meditándola en su corazón. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Lc 2, 41-52</span></h3>
+<p class="lema">Conservaba todo esto en su corazón</p>
+<p class="pr">Lectura del santo Evangelio según san Lucas.</p>
+<p class="pr">Los padres de Jesús solían ir cada año a Jerusalén por la fiesta de la Pascua.</p>
+<p class="pr">Cuando cumplió doce años, subieron a la fiesta según la costumbre y, cuando terminó, se volvieron; pero el niño Jesús se quedó en Jerusalén, sin que lo supieran sus padres.</p>
+<p class="pr">Estos, creyendo que estaba en la caravana, anduvieron el camino de un día y se pusieron a buscarlo entre los parientes y conocidos; al no encontrarlo, se volvieron a Jerusalén buscándolo.</p>
+<p class="pr">Y sucedió que, a los tres días, lo encontraron en el templo, sentado en medio de los maestros, escuchándolos y haciéndoles preguntas. Todos los que lo oían quedaban asombrados de su talento y de las respuestas que daba.</p>
+<p class="pr">Al verlo, se quedaron atónitos, y le dijo su madre:</p>
+<p class="pr">«Hijo, ¿por qué nos has tratado así? Tu padre y yo te buscábamos angustiados».</p>
+<p class="pr">Él les contestó:</p>
+<p class="pr">«¿Por qué me buscabais? ¿No sabíais que yo debía estar en las cosas de mi Padre?».</p>
+<p class="pr">Pero ellos no comprendieron lo que les dijo.</p>
+<p class="pr">Él bajó con ellos y fue a Nazaret y estaba sujeto a ellos. Su madre conservaba todo esto en su corazón.</p>
+<p class="pr">Y Jesús iba creciendo en sabiduría, en estatura y en gracia ante Dios y ante los hombres.</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Bienaventurada Virgen María,
+que llevaste en tu seno al Hijo del eterno Padre. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Lc 11, 27-28</span></h3>
+<p class="lema">Bienaventurado el vientre que te llevó</p>
+<p class="pr">Lectura del santo Evangelio según san Lucas.</p>
+<p class="pr">En aquel tiempo, mientras Jesús hablaba estas cosas, una mujer de entre el gentío, levantando la voz, le dijo:</p>
+<p class="pr">«Bienaventurado el vientre que te llevó y los pechos que te criaron».</p>
+<p class="pr">Pero él dijo:</p>
+<p class="pr">«Mejor, bienaventurados los que escuchan la palabra de Dios y la cumplen».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">cf. Jn 19, 27</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} «Ahí tienes a tu madre».
+Y desde aquella hora,
+el discípulo la recibió como algo propio. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Jn 19, 25-27</span></h3>
+<p class="lema">Ahí tienes a tu hijo. Ahí tienes a tu madre</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">Junto a la cruz de Jesús estaban su madre, la hermana de su madre, María, la de Cleofás, y María, la Magdalena.</p>
+<p class="pr">Jesús, al ver a su madre y junto a ella al discípulo al que amaba, dijo a su madre:</p>
+<p class="pr">«Mujer, ahí tienes a tu hijo».</p>
+<p class="pr">Luego, dijo al discípulo:</p>
+<p class="pr">«Ahí tienes a tu madre».</p>
+<p class="pr">Y desde aquella hora, el discípulo la recibió como algo propio.</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Mira, Señor, los dones que te presentamos
+en la fiesta de la bienaventurada Virgen María,
+y concédenos guardar con fidelidad
+y meditar asiduamente, en unión con ella,
+las riquezas de la gracia de tu Hijo.
+Él, que vive y reina por los siglos de los siglos.</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">Al ofrecerte el Cordero inmaculado,
+te rogamos, Señor, que inflames nuestros corazones
+en el fuego divino que abrasó de manera inefable
+el Corazón de la siempre Virgen María.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Prefacio</h3>
+<div class="pl">${V} El Señor esté con vosotros.
+${R} Y con tu espíritu.
+${V} Levantemos el corazón.
+${R} Lo tenemos levantado hacia el Señor.
+${V} Demos gracias al Señor, nuestro Dios.
+${R} Es justo y necesario.
+
+En verdad es justo y necesario,
+es nuestro deber y salvación
+darte gracias siempre y en todo lugar,
+Señor, Padre Santo,
+Dios todopoderoso y eterno,
+por Cristo, Señor nuestro.
+
+Porque, según el eterno beneplácito de tu voluntad,
+quisiste que la siempre Virgen María
+estuviera unida de modo singular
+a Cristo, tu Hijo, y a su obra de salvación.
+
+Ella, abrazando con toda docilidad
+tu voluntad salvífica,
+recibió gozosa y guardó fielmente
+tu Palabra en su Corazón;
+para cumplir tu designio divino
+se mantuvo en pie junto al ara de la cruz
+y allí, con el Corazón traspasado,
+aceptó amorosamente la inmolación de la Víctima
+que ella misma había engendrado.
+
+Elevada en cuerpo y alma al cielo,
+sigue cuidando con amor materno de nosotros,
+y consolándonos en las angustias y peligros
+hasta que lleguemos a la patria celestial.
+
+Por eso, en comunión con los santos,
+y en espera del día en que podamos contemplarte
+eternamente en los cielos,
+te glorificamos hoy en la tierra, diciendo:
+
+Santo, Santo, Santo...</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">En verdad es justo y necesario,
+es nuestro deber y salvación
+darte gracias siempre y en todo lugar,
+Señor, Padre santo,
+Dios todopoderoso y eterno,
+por Cristo Señor nuestro.
+
+Porque diste a la Virgen María
+un corazón sabio y dócil,
+dispuesto siempre a agradarte;
+un corazón nuevo y humilde,
+para grabar en él la ley de la nueva Alianza;
+un corazón sencillo y limpio,
+que la hizo digna de concebir virginalmente a tu Hijo
+y la capacitó para contemplarte eternamente;
+un corazón generoso
+para estar cerca de los necesitados
+y llevarles la Palabra de la salvación;
+un corazón firme y dispuesto
+para soportar con fortaleza la espada del dolor
+y esperar, llena de fe, la resurrección de su Hijo.
+
+Por eso, unidos a los coros angélicos,
+te aclamamos llenos de alegría:
+
+Santo, Santo, Santo...</div>
+<h3 class="rub">Antífona de comunión <span class="ref">cf. Lc 11, 27b. 28b</span></h3>
+<p class="pr">Bienaventurado el vientre que te llevó. Bienaventurados más bien los que escuchan la palabra de Dios y la cumplen.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Recibidos los sacramentos de nuestra salvación,
+te pedimos humildemente, Señor,
+que, venerando a María, Virgen y Madre,
+imitemos su fe y su caridad,
+de tal forma que merezcamos llamarnos y ser hijos suyos
+y configurarnos plenamente con el Hijo de tu amor.
+Él, que vive y reina por los siglos de los siglos.</div>
+<h3 class="rub">Bendición solemne</h3>
+<div class="pl">El Señor esté con vosotros.
+${R} Y con tu espíritu.
+
+Inclinaos para recibir la bendición.
+
+El Padre de la gloria eterna,
+que eligió el Corazón de la Virgen María
+para que fuera digna morada del Espíritu Santo,
+os colme con su continua bendición.
+${R} Amén.
+
+El Señor Jesús,
+que en el seno de la Virgen María tomó carne humana
+para que su humanidad santísima
+fuera perenne fuente de salvación
+para cuantos creen en Él,
+os conceda ser santos e inmaculados en su presencia.
+${R} Amén.
+
+El Espíritu Santo,
+que cubrió con su sombra a la bienaventurada Virgen María
+para hacerla templo vivo de gracia y santidad,
+os llene de alegría y fortaleza
+para comunicar a los hermanos la Palabra de Dios.
+${R} Amén.
+
+Y la bendición de Dios todopoderoso,
+Padre, Hijo <span class="vr">&#10011;</span> y Espíritu Santo,
+descienda sobre vosotros y os acompañe siempre.
+${R} Amén.</div>
+`},
+{id:'carmelo',grupo:'propio',mes:7,dia:16,color:'blanco',fecha:'16 de julio',
+titulo:'Bienaventurada Virgen María del Monte Carmelo',rango:'Aniversario de la fundación de la Congregación · Fiesta',
+html:`
+<h3 class="rub">Antífona de entrada <span class="ref">Lc 1, 48a; cf. Prov 31, 28a</span></h3>
+<p class="pr">El Señor ha mirado la humildad de su esclava; y sus hijos la llaman dichosa.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Al venerar hoy la memoria
+de la bienaventurada Virgen María del Monte Carmelo
+y celebrar el origen de la Congregación de Misioneros
+fundada por san Antonio María Claret,
+te rogamos, Señor,
+que confirmes a tus hijos en su plena consagración
+y hagas fecundas las tareas de nuestro apostolado
+para que siempre y en todo
+seamos hijos fieles de esta misma Madre.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Se pueden escoger lecturas del Común de la bienaventurada Virgen María, o las siguientes. Si la fiesta se celebra en domingo, antes del Evangelio se leen ambas lecturas. El salmo responsorial sigue a la primera lectura.</p>
+<h3 class="rub">Primera lectura <span class="ref">Zac 2, 14-17</span></h3>
+<p class="lema">Alégrate, hija de Sion, que yo vengo</p>
+<p class="pr">Lectura del profeta Zacarías.</p>
+<div class="pl">Alégrate y goza, Sion,
+pues voy a habitar en medio de ti
+—oráculo del Señor—.
+
+Aquel día se asociarán al Señor
+pueblos sin número;
+ellos serán mi pueblo,
+y habitaré en medio de ti.
+
+Entonces reconocerás que el Señor del universo
+me ha enviado a ti.
+Judá será la herencia del Señor,
+su lote en la tierra santa,
+y volverá a elegir a Jerusalén.
+¡Silencio todo el mundo
+ante el Señor que se levanta de su morada santa!</div>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Ef 1, 3-14</span></div>
+<p class="lema">Nos eligió en Cristo antes de la fundación del mundo</p>
+<p class="pr">Lectura de la carta del apóstol san Pablo a los Efesios.</p>
+<div class="pl">Bendito sea Dios,
+Padre de nuestro Señor Jesucristo,
+que nos ha bendecido en Cristo
+con toda clase de bendiciones espirituales
+en los cielos.
+
+Él nos eligió en Cristo
+antes de la fundación del mundo
+para que fuésemos santos e intachables
+ante él por el amor.
+
+Él nos ha destinado por medio de Jesucristo,
+según el beneplácito de su voluntad,
+a ser sus hijos,
+para alabanza de la gloria de su gracia,
+que tan generosamente nos ha concedido en el Amado.
+
+En él, por su sangre, tenemos la redención,
+el perdón de los pecados,
+conforme a la riqueza de la gracia
+que en su sabiduría y prudencia
+ha derrochado sobre nosotros,
+dándonos a conocer el misterio de su voluntad:
+el plan que había proyectado realizar por Cristo,
+en la plenitud de los tiempos:
+recapitular en Cristo todas las cosas del cielo y de la tierra.
+
+En él hemos heredado también
+los que ya estábamos destinados por decisión
+del que lo hace todo según su voluntad,
+para que seamos alabanza de su gloria
+quienes antes esperábamos en el Mesías.
+
+En él también vosotros,
+después de haber escuchado la palabra de la verdad
+—el evangelio de vuestra salvación—,
+creyendo en él
+habéis sido marcados
+con el sello del Espíritu Santo prometido.
+
+Él es la prenda de nuestra herencia,
+mientras llega la redención del pueblo de su propiedad,
+para alabanza de su gloria.</div>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 22, 1-3a. 3b-4. 5. 6</span></h3>
+<div class="pl">${R} El Señor es mi pastor, nada me falta.
+
+${V} El Señor es mi pastor, nada me falta:
+en verdes praderas me hace recostar;
+me conduce hacia fuentes tranquilas
+y repara mis fuerzas. ${R}
+
+${V} Me guía por el sendero justo,
+por el honor de su nombre.
+Aunque camine por cañadas oscuras,
+nada temo, porque tú vas conmigo:
+tu vara y tu cayado me sosiegan. ${R}
+
+${V} Preparas una mesa ante mí,
+enfrente de mis enemigos;
+me unges la cabeza con perfume,
+y mi copa rebosa. ${R}
+
+${V} Tu bondad y tu misericordia me acompañan
+todos los días de mi vida,
+y habitaré en la casa del Señor
+por años sin término. ${R}</div>
+<h3 class="rub">Aleluya <span class="ref">Lc 11, 28</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Bienaventurados los que escuchan
+la Palabra de Dios y la cumplen. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Mt 12, 46-50</span></h3>
+<p class="lema">Señalando con la mano a los discípulos, dijo:<br>«Estos son mi madre y mis hermanos»</p>
+<p class="pr">Lectura del santo Evangelio según san Mateo.</p>
+<p class="pr">En aquel tiempo estaba Jesús hablando a la gente, cuando su madre y sus hermanos se presentaron fuera, tratando de hablar con él.</p>
+<p class="pr">Uno se lo avisó:</p>
+<p class="pr">«Tu madre y tus hermanos están fuera y quieren hablar contigo».</p>
+<p class="pr">Pero él contestó al que le avisaba:</p>
+<p class="pr">«¿Quién es mi madre y quiénes son mis hermanos?».</p>
+<p class="pr">Y, extendiendo su mano hacia sus discípulos, dijo:</p>
+<p class="pr">«Estos son mi madre y mis hermanos. El que haga la voluntad de mi Padre que está en los cielos, ese es mi hermano y mi hermana y mi madre».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Lc 1, 45</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Bienaventurada tú, Virgen María, que has creído,
+porque lo que te ha dicho el Señor se cumplirá. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Lc 1, 39-56</span></h3>
+<p class="lema">¿Quién soy yo para que me visite la madre de mi Señor?</p>
+<p class="pr">Lectura del santo Evangelio según san Lucas.</p>
+<p class="pr">En aquellos días, María se levantó y se puso en camino de prisa hacia la montaña, a una ciudad de Judá; entró en casa de Zacarías y saludó a Isabel.</p>
+<p class="pr">Aconteció que, en cuanto Isabel oyó el saludo de María, saltó la criatura en su vientre. Se llenó Isabel de Espíritu Santo y, levantando la voz, exclamó:</p>
+<p class="pr">«¡Bendita tú entre las mujeres, y bendito el fruto de tu vientre! ¿Quién soy yo para que me visite la madre de mi Señor? Pues, en cuanto tu saludo llegó a mis oídos, la criatura saltó de alegría en mi vientre. Bienaventurada la que ha creído, porque lo que le ha dicho el Señor se cumplirá».</p>
+<p class="pr">María dijo:</p>
+<div class="pl">«Proclama mi alma la grandeza del Señor,
+se alegra mi espíritu en Dios, mi salvador;
+porque ha mirado la humildad de su esclava.
+
+Desde ahora me felicitarán todas las generaciones,
+porque el Poderoso ha hecho obras grandes en mí:
+su nombre es santo,
+y su misericordia llega a sus fieles
+de generación en generación.
+
+Él hace proezas con su brazo:
+dispersa a los soberbios de corazón,
+derriba del trono a los poderosos
+y enaltece a los humildes,
+a los hambrientos los colma de bienes
+y a los ricos los despide vacíos.
+
+Auxilia a Israel, su siervo,
+acordándose de la misericordia
+—como lo había prometido a nuestros padres—
+en favor de Abrahán y su descendencia por siempre».</div>
+<p class="pr">María se quedó con ella unos tres meses y volvió a su casa.</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Mira, Señor, estas ofrendas
+que ponemos sobre tu altar,
+y concede a cuantos celebramos
+la fiesta de la bienaventurada Virgen María
+bajo la advocación del Monte Carmelo
+entregarnos con fidelidad a la misión recibida.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Prefacio</h3>
+<p class="nota">Del Común de la bienaventurada María Virgen, de la solemnidad del Inmaculado Corazón de María, o el siguiente:</p>
+<div class="pl">${V} El Señor esté con vosotros.
+${R} Y con tu espíritu.
+${V} Levantemos el corazón.
+${R} Lo tenemos levantado hacia el Señor.
+${V} Demos gracias al Señor, nuestro Dios.
+${R} Es justo y necesario.
+
+En verdad es justo y necesario,
+es nuestro deber y salvación
+darte gracias siempre y en todo lugar,
+Señor, Padre Santo,
+Dios todopoderoso y eterno,
+y alabarte debidamente
+en esta celebración en honor de la Virgen María.
+
+Ella, al aceptar a tu Verbo con inmaculado corazón,
+mereció concebirlo en su seno virginal,
+y, al dar a luz al Creador,
+preparó el nacimiento de la Iglesia.
+
+Ella, al recibir junto a la cruz
+el testamento de tu amor divino,
+tomó como hijos a todos los hombres,
+nacidos a la vida sobrenatural
+por la muerte de Cristo.
+
+Ella, esperando con los apóstoles la venida del Espíritu,
+al unir sus oraciones a las de los discípulos,
+se convirtió en el modelo de la Iglesia suplicante.
+
+Desde su asunción a los cielos,
+acompaña con amor materno a la Iglesia peregrina
+y protege sus pasos hacia la patria celeste,
+hasta la venida gloriosa del Señor.
+
+Por eso, con los ángeles y todos los santos,
+te alabamos, proclamando sin cesar:
+
+Santo, Santo, Santo…</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Lc 1, 45</span></h3>
+<p class="pr">Bienaventurada tú, Virgen María, que has creído, porque lo que te ha dicho el Señor se cumplirá.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Alimentados con los sacramentos de salvación,
+te pedimos, Señor, que nuestra Congregación,
+impulsada por el espíritu de san Antonio María Claret,
+se entregue con renovada fidelidad
+al servicio de tu Evangelio.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'claret',grupo:'propio',mes:10,dia:24,color:'blanco',fecha:'24 de octubre',
+titulo:'San Antonio María Claret, obispo y fundador de la Congregación',rango:'Solemnidad',
+html:`
+<h3 class="rub">Antífona de entrada <span class="ref">Is 61, 1</span></h3>
+<p class="pr">El Espíritu del Señor, Dios, está sobre mí, porque el Señor me ha ungido. Me ha enviado para dar la buena noticia a los pobres, para anunciar a los cautivos la libertad.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Oh Dios, que concediste
+a tu obispo Antonio María Claret
+una caridad y firmeza admirables
+para anunciar el Evangelio a los pobres,
+y lo constituiste padre
+de nuevas familias apostólicas en la Iglesia;
+concédenos, por su intercesión,
+que, buscando siempre y en todo tu voluntad,
+trabajemos incansablemente
+por ganar nuevos hermanos para Cristo.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">Señor, Dios nuestro,
+que escogiste a san Antonio María
+para fundador de nuestra Congregación,
+e hiciste que, ardiendo en caridad, se gozara
+en los trabajos, en las calumnias y en los tormentos,
+concédenos que, siguiendo fielmente
+sus enseñanzas y ejemplos,
+proclamemos tu gloria en todo el mundo
+y busquemos con solicitud la salvación
+de todos los hombres.
+Por nuestro Señor Jesucristo,
+tu Hijo, que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Se pueden escoger lecturas del Común de pastores: para misioneros, o las siguientes:</p>
+<h3 class="rub">Primera lectura <span class="ref">Is 61, 1-6</span></h3>
+<p class="lema">El Señor me ha ungido y enviado para dar la buena noticia a los pobres</p>
+<p class="pr">Lectura del libro de Isaías.</p>
+<div class="pl">El Espíritu del Señor, Dios, está sobre mí,
+porque el Señor me ha ungido.
+Me ha enviado para dar la buena noticia a los pobres,
+para curar los corazones desgarrados,
+proclamar la amnistía a los cautivos,
+y a los prisioneros la libertad;
+para proclamar un año de gracia del Señor,
+un día de venganza de nuestro Dios,
+para consolar a los afligidos,
+para dar a los afligidos de Sion
+una diadema en lugar de cenizas,
+perfume de fiesta en lugar de duelo,
+un vestido de alabanza en lugar de un espíritu abatido.
+
+Los llamarán «robles de justicia»,
+«plantación del Señor, para mostrar su gloria».
+Reconstruirán sobre ruinas antiguas,
+pondrán en pie los sitios desolados de antaño,
+renovarán ciudades devastadas,
+lugares desolados por generaciones.
+
+Extranjeros serán pastores de vuestros rebaños,
+forasteros, vuestros labradores y viñadores.
+Vosotros os llamaréis «Sacerdotes del Señor»,
+dirán de vosotros: «Ministros de nuestro Dios».
+Comeréis la opulencia de los pueblos,
+y tomaréis posesión de sus riquezas.</div>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 22, 1-3a. 3b-4. 5. 6</span></h3>
+<div class="pl">${R} El Señor es mi pastor, nada me falta.
+
+${V} El Señor es mi pastor, nada me falta:
+en verdes praderas me hace recostar;
+me conduce hacia fuentes tranquilas
+y repara mis fuerzas.
+Me guía por el sendero justo,
+por el honor de su nombre. ${R}
+
+${V} Aunque camine por cañadas oscuras,
+nada temo, porque tú vas conmigo:
+tu vara y tu cayado me sosiegan. ${R}
+
+${V} Preparas una mesa ante mí,
+enfrente de mis enemigos;
+me unges la cabeza con perfume,
+y mi copa rebosa. ${R}
+
+${V} Tu bondad y tu misericordia me acompañan
+todos los días de mi vida,
+y habitaré en la casa del Señor
+por años sin término. ${R}</div>
+<div class="obien"><span>O bien:</span><span class="ref">Is 49, 1-6</span></div>
+<p class="lema">Te hago luz de las naciones</p>
+<p class="pr">Lectura del libro de Isaías.</p>
+<div class="pl">Escuchadme, islas: atended, pueblos lejanos:
+El Señor me llamó desde el vientre materno,
+de las entrañas de mi madre, y pronunció mi nombre.
+
+Hizo de mi boca una espada afilada,
+me escondió en la sombra de su mano;
+me hizo flecha bruñida,
+me guardó en su aljaba y me dijo:
+«Tú eres mi siervo, Israel,
+por medio de ti me glorificaré».
+
+Y yo pensaba:
+«En vano me he cansado,
+en viento y en nada he gastado mis fuerzas».
+
+En realidad el Señor defendía mi causa,
+mi recompensa la custodiaba Dios.
+
+Y ahora dice el Señor,
+el que me formó desde el vientre como siervo suyo,
+para que le devolviese a Jacob,
+para que le reuniera a Israel;
+he sido glorificado a los ojos de Dios.
+Y mi Dios era mi fuerza:
+
+«Es poco que seas mi siervo
+para restablecer las tribus de Jacob
+y traer de vuelta a los supervivientes de Israel.
+Te hago luz de las naciones,
+para que mi salvación alcance hasta el confín de la tierra».</div>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 26, 1. 4. 13-14</span></h3>
+<div class="pl">${R} El Señor es mi luz y mi salvación.
+
+${V} El Señor es mi luz y mi salvación,
+¿a quién temeré?
+El Señor es la defensa de mi vida,
+¿quién me hará temblar? ${R}
+
+${V} Una cosa pido al Señor,
+eso buscaré:
+habitar en la casa del Señor
+por los días de mi vida;
+gozar de la dulzura del Señor,
+contemplando su templo. ${R}
+
+${V} Espero gozar de la dicha del Señor
+en el país de la vida.
+Espera en el Señor, sé valiente,
+ten ánimo, espera en el Señor. ${R}</div>
+<h3 class="rub">Segunda lectura <span class="ref">2Cor 5, 14-20</span></h3>
+<p class="lema">El amor de Cristo nos apremia</p>
+<p class="pr">Lectura de la segunda carta del apóstol san Pablo a los Corintios.</p>
+<p class="pr">Hermanos:<br>Nos apremia el amor de Cristo al considerar que, si uno murió por todos, todos murieron. Y Cristo murió por todos, para que los que viven ya no vivan para sí, sino para el que murió y resucitó por ellos.</p>
+<p class="pr">De modo que nosotros desde ahora no conocemos a nadie según la carne; si alguna vez conocimos a Cristo según la carne, ahora ya no lo conocemos así.</p>
+<p class="pr">Por tanto, si alguno está en Cristo, es una criatura nueva. Lo viejo ha pasado, ha comenzado lo nuevo. Todo procede de Dios, que nos reconcilió consigo por medio de Cristo y nos encargó el ministerio de la reconciliación. Porque Dios mismo estaba en Cristo reconciliando al mundo consigo, sin pedirles cuenta de sus pecados, y ha puesto en nosotros el mensaje de la reconciliación.</p>
+<p class="pr">Por eso, nosotros actuamos como enviados de Cristo, y es como si Dios mismo exhortara por medio de nosotros. En nombre de Cristo os pedimos que os reconciliéis con Dios.</p>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Hch 1, 3-8</span></div>
+<p class="lema">Seréis mis testigos hasta el confín de la tierra</p>
+<p class="pr">Lectura de los Hechos de los Apóstoles.</p>
+<p class="pr">Jesús resucitado se presentó él mismo a los apóstoles después de su pasión, dándoles numerosas pruebas de que estaba vivo, apareciéndoseles durante cuarenta días y hablándoles del reino de Dios.</p>
+<p class="pr">Una vez que comían juntos, les ordenó que no se alejaran de Jerusalén, sino «aguardad que se cumpla la promesa del Padre, de la que me habéis oído hablar, porque Juan bautizó con agua, pero vosotros seréis bautizados con Espíritu Santo dentro de no muchos días».</p>
+<p class="pr">Los que se habían reunido le preguntaron, diciendo:</p>
+<p class="pr">«Señor, ¿es ahora cuando vas a restaurar el reino de Israel?».</p>
+<p class="pr">Les dijo:</p>
+<p class="pr">«No os toca a vosotros conocer los tiempos o momentos que el Padre ha establecido con su propia autoridad; en cambio, recibiréis la fuerza del Espíritu Santo que va a venir sobre vosotros y seréis mis testigos en Jerusalén, en toda Judea y Samaría y hasta el confín de la tierra».</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Aleluya <span class="ref">Mt 28, 19a-20b</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Id y haced discípulos a todos los pueblos,
+dice el Señor,
+y sabed que yo estoy con vosotros
+todos los días, hasta el final de los tiempos. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Mc 16, 15-20</span></h3>
+<p class="lema">Id al mundo entero y proclamad el Evangelio</p>
+<p class="pr">Lectura del santo Evangelio según san Marcos.</p>
+<p class="pr">En aquel tiempo, se apareció Jesús a los Once, cuando estaban a la mesa, y les dijo:</p>
+<p class="pr">«Id al mundo entero y proclamad el Evangelio a toda la creación. El que crea y sea bautizado se salvará; el que no crea será condenado.</p>
+<p class="pr">A los que crean, les acompañarán estos signos: echarán demonios en mi nombre, hablarán lenguas nuevas, cogerán serpientes en sus manos y, si beben un veneno mortal, no les hará daño. Impondrán las manos a los enfermos y quedarán sanos».</p>
+<p class="pr">Después de hablarles, el Señor Jesús fue llevado al cielo y se sentó a la derecha de Dios. Ellos se fueron a predicar por todas partes, y el Señor cooperaba confirmando la palabra con las señales que los acompañaban.</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Lc 10, 2</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} La mies es abundante y los obreros pocos, dice
+el Señor, rogad, pues, al dueño de la mies que
+envíe obreros a su mies. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Lc 10, 1-9</span></h3>
+<p class="lema">La mies es abundante y los obreros pocos</p>
+<p class="pr">Lectura del santo Evangelio según san Lucas.</p>
+<p class="pr">En aquel tiempo, designó el Señor otros setenta y dos, y los mandó delante de él, de dos en dos, a todos los pueblos y lugares adonde pensaba ir él. Y les decía:</p>
+<p class="pr">«La mies es abundante y los obreros pocos: rogad, pues, al dueño de la mies que envíe obreros a su mies.</p>
+<p class="pr">¡Poneos en camino! Mirad que os envío como corderos en medio de lobos. No llevéis bolsa, ni alforja, ni sandalias; y no saludéis a nadie por el camino.</p>
+<p class="pr">Cuando entréis en una casa, decid primero: “Paz a esta casa”. Y si allí hay gente de paz, descansará sobre ellos vuestra paz; si no, volverá a vosotros.</p>
+<p class="pr">Quedaos en la misma casa, comiendo y bebiendo de lo que tengan: porque el obrero merece su salario. No andéis cambiando de casa en casa.</p>
+<p class="pr">Si entráis en una ciudad y os reciben, comed lo que os pongan, curad a los enfermos que haya en ella, y decidles: “El reino de Dios ha llegado a vosotros”».</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Al presentar estas ofrendas,
+te suplicamos, Señor, que el Espíritu Santo
+infunda en nuestros corazones
+aquel celo apostólico
+que impulsó a san Antonio María Claret
+a entregarse totalmente a ti en favor de sus hermanos.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Prefacio</h3>
+<div class="pl">${V} El Señor esté con vosotros.
+${R} Y con tu espíritu.
+${V} Levantemos el corazón.
+${R} Lo tenemos levantado hacia el Señor.
+${V} Demos gracias al Señor, nuestro Dios.
+${R} Es justo y necesario.
+
+En verdad es justo y necesario,
+es nuestro deber y salvación
+darte gracias siempre y en todo lugar,
+Señor, Padre Santo,
+Dios todopoderoso y eterno,
+por Cristo, Señor nuestro.
+
+Porque para continuar tu obra de salvación en la Iglesia,
+suscitaste a san Antonio María Claret
+como pastor y misionero urgido por la caridad,
+y lo hiciste fundador de nuevas familias
+que, animadas de su espíritu, siguieran e imitaran a Cristo,
+procurando siempre y únicamente
+tu mayor gloria y la salvación de los hombres.
+
+Por eso, nos unimos al coro de los ángeles y de los santos
+para cantar sin cesar el himno de tu gloria:
+
+Santo, Santo, Santo...</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Gál 2, 20</span></h3>
+<p class="pr">Vivo, pero no soy yo el que vive, es Cristo quien vive en mí; que me amó y se entregó por mí.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Flp 1, 23</span></div>
+<p class="pr">Deseo partir para estar con Cristo.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Señor, Dios nuestro,
+haz que los sacramentos que hemos recibido
+acrecienten en nosotros
+la fe que predicaron los Apóstoles
+y que solícitamente difundió san Antonio María Claret.
+Por Jesucristo, nuestro Señor.</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">Señor, alimentados con tus sacramentos,
+te rogamos que, sostenidos por tu gracia,
+a imitación de nuestro padre, san Antonio María Claret,
+seamos testigos de tu Palabra salvadora en todo el mundo.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Bendición solemne</h3>
+<div class="pl">El Señor esté con vosotros.
+${R} Y con tu espíritu.
+
+Inclinaos para recibir la bendición.
+
+Dios, fuente de toda santidad,
+en la solemnidad de san Antonio María Claret,
+os conceda vivir gozosamente la vocación
+a la que habéis sido llamados.
+${R} Amén.
+
+Él, que os ha enriquecido con su Palabra
+y el ejemplo de san Antonio María Claret,
+os ayude a perseverar fielmente
+en el servicio de Dios y de los hombres.
+${R} Amén.
+
+El Señor, que os ha llamado a participar en esta eucaristía,
+os enriquezca con los dones de la fe y de la caridad,
+y os reúna con los hermanos
+que gozan ya de las alegrías del cielo.
+${R} Amén.
+
+Y la bendición de Dios todopoderoso,
+Padre, Hijo <span class="vr">&#10011;</span> y Espíritu Santo,
+descienda sobre vosotros y os acompañe siempre.
+${R} Amén.</div>
+`},
+{id:'difuntos',grupo:'propio',mes:11,dia:5,color:'morado',fecha:'5 de noviembre',
+titulo:'Conmemoración de los difuntos de la Congregación, familiares y bienhechores',rango:'Conmemoración',
+html:`
+<p class="nota">Cuando el día 5 sea domingo, esta conmemoración se traslada al día siguiente.</p>
+<p class="nota">Estos textos se emplearán cuando la comunidad quiera hacer memoria de nuestros difuntos. Pueden utilizarse los textos del Misal Romano y del Leccionario o los siguientes:</p>
+<h3 class="rub">Antífona de entrada <span class="ref">cf. Rom 8, 11</span></h3>
+<p class="pr">Si el Espíritu del que resucitó a Jesús de entre los muertos habita en vosotros, el que resucitó de entre los muertos a Cristo Jesús también dará vida a vuestros cuerpos mortales, por el mismo Espíritu que habita en vosotros.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Ap 14, 13</span></div>
+<p class="pr">Bienaventurados los muertos, los que mueren en el Señor. Que descansen de sus fatigas, porque sus obras los acompañan.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Oh Dios, que por el misterio pascual de tu Hijo
+mantienes la esperanza de nuestra resurrección,
+te pedimos humildemente
+que cuantos consagraron su vida al anuncio del Evangelio
+y cuantos participaron en la tierra
+de nuestra fraternidad claretiana
+alcancen el gozo de la felicidad eterna.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo
+y es Dios por los siglos de los siglos.</div>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Al recordar a nuestros hermanos difuntos,
+te pedimos, Señor,
+que aceptes los dones que te presentamos
+y los admitas en las moradas eternas.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Mt 25, 34</span></h3>
+<p class="pr">Venid vosotros, benditos de mi Padre, heredad el Reino preparado para vosotros desde la creación del mundo.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Jn 11, 25-26</span></div>
+<p class="pr">Yo soy la resurrección y la vida: el que cree en mí, aunque haya muerto, vivirá; y el que está vivo y cree en mí, no morirá para siempre.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Alimentados con el Cuerpo y la Sangre de tu Hijo,
+te pedimos, Señor,
+que cuantos han muerto piadosamente
+en nuestra familia claretiana,
+purificados por estos sacramentos
+que recibieron en la tierra,
+participen de la salvación eterna.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'patrocinio',grupo:'propio',mes:11,dia:13,color:'rojo',fecha:'13 de noviembre',
+titulo:'Beata María Patrocinio Giner, virgen y mártir',rango:'Memoria libre',
+html:`
+<p class="nota">Común de mártires, de vírgenes o de santas: para religiosas.</p>
+<h3 class="rub">Antífona de entrada</h3>
+<p class="pr">Los santos que siguieron las huellas de Cristo, viven gozosos en el cielo. Derramaron la sangre por su amor, por eso se alegran con Cristo para siempre.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Dios todopoderoso y misericordioso,
+tú que has hecho a la beata María Patrocinio
+admirable en el servicio de los hermanos y en el martirio,
+concédenos, por su intercesión,
+seguir a Cristo con perseverancia
+en el camino de la cruz,
+para alcanzar la gloria de la resurrección.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Descienda tu bendición como rocío, Señor,
+en la ofrenda que te presentamos,
+y confírmanos en aquella fe
+que la beata María Patrocinio
+testimonió hasta dar su vida.
+Por Jesucristo, nuestro Señor.</div>
+<p class="nota">Prefacio de mártires o de vírgenes y religiosos.</p>
+<h3 class="rub">Antífona de comunión <span class="ref">Jn 15, 1.5</span></h3>
+<p class="pr">Yo soy la vid verdadera y vosotros los sarmientos, dice el Señor; el que permanece en mí y yo en él, ese da fruto abundante.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Oh Dios, que en estos santos misterios
+renuevas a tu Iglesia,
+concédenos imitar la fortaleza
+de la beata María Patrocinio,
+para conseguir el premio prometido
+a los que sufren por tu nombre.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'profesion',grupo:'rituales',color:'blanco',fecha:'Misa ritual',
+titulo:'Misa ritual para el día de la profesión religiosa',rango:'',
+html:`
+<p class="nota">Todo como en el <em>Misal Romano</em> y el Leccionario, o bien las antífonas y oraciones siguientes:</p>
+<h3 class="rub">Antífona de entrada <span class="ref">Jn 15, 16</span></h3>
+<p class="pr">No sois vosotros los que me habéis elegido, soy yo quien os he elegido; y os he destinado para que vayáis y deis fruto, y vuestro fruto permanezca.</p>
+<div class="obien"><span>O bien:</span><span class="ref">cf. Sal 39, 8-10</span></div>
+<p class="pr">Aquí estoy, Señor, para hacer tu voluntad. Llevo tu ley en las entrañas y proclamaré tu justicia ante la gran asamblea.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, autor y dispensador de la vocación,
+concede a estos hermanos nuestros
+<span class="vr">(</span>este hermano nuestro<span class="vr">)</span>
+que, respondiendo con generosidad
+a tu llamada al seguimiento de tu Hijo Jesucristo,
+te consagren <span class="vr">(</span>consagre<span class="vr">)</span> toda su vida,
+y, ardiendo en caridad,
+según el espíritu de san Antonio María Claret,
+sean <span class="vr">(</span>sea<span class="vr">)</span> signo visible
+de que tú eres el único Dios verdadero
+y lleven <span class="vr">(</span>lleve<span class="vr">)</span> a todos los hombres tu salvación.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Acepta, Señor, los dones depositados en tu altar
+y la generosa entrega
+de estos siervos tuyos <span class="vr">(</span>este siervo tuyo<span class="vr">)</span>,
+que hoy, por la profesión religiosa,
+se han <span class="vr">(</span>ha<span class="vr">)</span> consagrado a ti
+y a tu servicio en el ministerio apostólico.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Prefacio</h3>
+<div class="pl">${V} El Señor esté con vosotros.
+${R} Y con tu espíritu.
+${V} Levantemos el corazón.
+${R} Lo tenemos levantado hacia el Señor.
+${V} Demos gracias al Señor, nuestro Dios.
+${R} Es justo y necesario.
+
+En verdad es justo y necesario,
+es nuestro deber y salvación
+darte gracias siempre y en todo lugar,
+Señor, Padre Santo,
+Dios todopoderoso y eterno,
+y celebrar tu admirable providencia
+en favor de tus siervos, en quienes has suscitado
+el propósito de seguir más de cerca a Cristo Señor
+siguiendo las huellas de san Antonio María Claret.
+
+Tú los llamas incesantemente a la santidad
+y al ejercicio del ministerio de la Palabra;
+y los haces gustar de antemano los bienes del reino futuro.
+
+Por eso, con los ángeles y los santos,
+cantamos sin cesar el himno de tu gloria:
+
+Santo, Santo, Santo...</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Col 1, 24</span></h3>
+<p class="pr">Completo en mi carne lo que falta a los padecimientos de Cristo, en favor de su cuerpo, que es la Iglesia.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Sal 132, 1</span></div>
+<p class="pr">Ved qué dulzura, qué delicia, convivir los hermanos unidos.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Señor, los sacramentos que hemos recibido
+confirmen en su vocación
+a nuestros hermanos <span class="vr">(</span>a nuestro hermano<span class="vr">)</span>
+para que, entregándose en especial servicio
+al Inmaculado Corazón de María,
+alcancen <span class="vr">(</span>alcance<span class="vr">)</span> la caridad perfecta en su vida misionera.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'aniversario',grupo:'rituales',color:'blanco',fecha:'Misa ritual',
+titulo:'Misa en el XXV o L aniversario de la profesión',rango:'',
+html:`
+<p class="nota">Esta misa se puede celebrar cuando lo permite la normativa litúrgica.</p>
+<p class="nota">Se utilizan los textos de la Misa ritual de profesión, o las siguientes oraciones (A), o el formulario B cuando el que celebra el aniversario no preside la celebración.</p>
+<h3 class="rub" style="justify-content:center">A</h3>
+<p class="nota">Cuando el que celebra el aniversario de la Profesión preside la celebración, se emplean las siguientes oraciones:</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, te damos gracias,
+porque hoy me permites celebrar
+el vigésimoquinto <span class="vr">(</span>quincuagésimo<span class="vr">)</span> aniversario
+de vida misionera claretiana,
+renovando con alegría mi consagración a ti
+y mi entrega en servicio especial
+al Inmaculado Corazón de María;
+concédeme arder en caridad,
+para que, imitando a san Antonio María Claret,
+busque siempre y únicamente tu mayor gloria
+y la salvación de los hombres.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Recibe, Señor, los dones que te presentamos
+y la oblación que hoy renuevo y confirmo;
+concédeme que, fiel al espíritu de san Antonio María Claret,
+pueda servirte a ti y a tu Iglesia.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Después de recibir, Señor,
+el Cuerpo y la Sangre de tu Hijo,
+te suplicamos que me concedas,
+en el aniversario de mi profesión,
+perseverar en la vocación claretiana.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub" style="justify-content:center">B</h3>
+<p class="nota">Cuando el que preside la celebración es distinto del que celebra el aniversario de Profesión, se emplean las siguientes oraciones:</p>
+<h3 class="rub">Antífona de entrada <span class="ref">Sal 39, 8-9</span></h3>
+<p class="pr">Aquí estoy para hacer tu voluntad. Dios mío, lo quiero, y llevo tu ley en las entrañas.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, te damos gracias,
+porque hoy nuestro hermano <span class="vr">N.</span>
+celebra el vigésimoquinto <span class="vr">(</span>quincuagésimo<span class="vr">)</span> aniversario
+de vida misionera claretiana,
+renovando con alegría su consagración a ti
+y su entrega en especial servicio
+al Inmaculado Corazón de María;
+concédele arder en caridad,
+para que, imitando a san Antonio María Claret,
+busque siempre y únicamente tu mayor gloria
+y la salvación de los hombres.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo
+y es Dios por los siglos de los siglos.</div>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Recibe, Señor, los dones que te presentamos
+y la oblación que nuestro hermano
+hoy renueva y confirma;
+concédele que, fiel al espíritu de san Antonio María Claret,
+pueda servirte a ti y a tu Iglesia.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Mc 3, 35</span></h3>
+<p class="pr">El que haga la voluntad de Dios, ese es mi hermano, y mi hermana, y mi madre.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Después de recibir, Señor,
+el Cuerpo y la Sangre de tu Hijo,
+te suplicamos que concedas a nuestro hermano <span class="vr">N.</span>,
+que celebra su aniversario de profesión,
+perseverar en su vocación claretiana.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'votiva',grupo:'votivas',color:'blanco',fecha:'Los sábados',
+titulo:'Misa votiva del Inmaculado Corazón de la Bienaventurada Virgen María',rango:'',
+html:`
+<p class="nota">Esta misa se puede celebrar los sábados, cuando lo permita la normativa litúrgica.</p>
+<h3 class="rub">Antífona de entrada <span class="ref">cf. Jdt 13, 18-20</span></h3>
+<p class="pr">El Señor Dios te ha bendecido, Virgen María, entre todas las mujeres de la tierra: ha glorificado tu nombre de tal modo que tu alabanza está siempre en la boca de todos.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Concédenos, Señor,
+imitar de tal modo a la santísima Virgen María
+en su cooperación en la obra salvadora de tu Hijo,
+que, bajo la guía del Espíritu Santo,
+progresemos en fe, esperanza y caridad,
+y nos dediquemos al ministerio de la salvación
+de todos los hombres.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<div class="obien"><span>O bien:</span></div>
+<div class="pl">Concédenos, Señor, meditar tu Palabra,
+encarnada en el seno de la Virgen María,
+y guardarla en nuestro corazón,
+para que seamos fieles servidores
+en la proclamación de la buena nueva de tu reino.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Te presentamos, Señor, estos dones,
+al celebrar la memoria de la siempre Virgen María,
+que ofreció a tu Hijo al pie de la cruz;
+concédenos que te sea siempre grata
+la oblación de nuestra vida.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">cf. Lc 1, 48</span></h3>
+<p class="pr">Me felicitarán todas las generaciones, porque Dios ha mirado la humildad de su esclava.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Fortalecidos con estos sacramentos,
+concédenos, Señor, Dios nuestro,
+que, venerando a la Inmaculada Virgen María,
+cooperemos en su oficio maternal
+en la misión apostólica.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'comunidad',grupo:'necesidades',color:'verde',fecha:'Por diversas necesidades',
+titulo:'Para fomentar la vida de comunidad',rango:'',
+html:`
+<h3 class="rub">Antífona de entrada <span class="ref">Jn 17, 21</span></h3>
+<p class="pr">Que todos sean uno. Como tú, Padre, en mí y yo en ti, que ellos también sean uno en nosotros, para que el mundo crea que tú me has enviado.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Sal 132, 1</span></div>
+<p class="pr">Ved qué dulzura, qué delicia, convivir los hermanos unidos.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Te suplicamos, Señor, Dios nuestro,
+que unas en un mismo corazón
+a los que compartimos el espíritu
+de san Antonio María Claret,
+para que, concordes en el mutuo amor,
+seamos testigos de tu caridad entre los hombres.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Se pueden escoger algunas de las lecturas siguientes:</p>
+<h3 class="rub">Primera lectura <span class="ref">Hch 2, 42-47</span></h3>
+<p class="lema">Los creyentes vivían todos unidos y perseveraban en la fracción del pan</p>
+<p class="pr">Lectura de los Hechos de los Apóstoles.</p>
+<p class="pr">Los hermanos perseveraban en la enseñanza de los apóstoles, en la comunión, en la fracción del pan y en las oraciones.</p>
+<p class="pr">Todo el mundo estaba impresionado y los apóstoles hacían muchos prodigios y signos. Los creyentes vivían todos unidos y tenían todo en común; vendían posesiones y bienes, y los repartían entre todos, según la necesidad de cada uno.</p>
+<p class="pr">Con perseverancia acudían a diario al templo con un mismo espíritu, partían el pan en las casas y tomaban el alimento con alegría y sencillez de corazón; alababan a Dios y eran bien vistos de todo el pueblo; y día tras día el Señor iba agregando a los que se iban salvando.</p>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Hch 4, 32-35</span></div>
+<p class="lema">Pensaban y sentían lo mismo</p>
+<p class="pr">Lectura de los Hechos de los Apóstoles.</p>
+<p class="pr">El grupo de los creyentes tenía un solo corazón y una sola alma; nadie llamaba suyo propio nada de lo que tenía, pues lo poseían todo en común.</p>
+<p class="pr">Los apóstoles daban testimonio de la resurrección del Señor Jesús con mucho valor. Y se los miraba a todos con mucho agrado. Entre ellos no había necesitados, pues los que poseían tierras o casas las vendían, traían el dinero de lo vendido y lo ponían a los pies de los apóstoles; luego se distribuía a cada uno según lo que necesitaba.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">1Jn 4, 7. 8. 10. 11. 12</span></h3>
+<div class="pl">${R} Permanezcamos en el amor fraterno.
+
+${V} Amémonos unos a otros,
+ya que el amor es de Dios,
+y todo el que ama ha nacido de Dios
+y conoce a Dios. ${R}
+
+${V} Quien no ama no ha conocido a Dios,
+porque Dios es amor. ${R}
+
+${V} En esto consiste el amor:
+no en que nosotros hayamos amado a Dios,
+sino en que él nos amó y nos envió a su Hijo
+como víctima de propiciación
+por nuestros pecados. ${R}
+
+${V} Si Dios nos amó de esta manera,
+también nosotros debemos amarnos
+unos a otros. ${R}
+
+${V} A Dios nadie lo ha visto nunca.
+Si nos amamos unos a otros,
+Dios permanece en nosotros
+y su amor ha llegado en nosotros a su plenitud. ${R}</div>
+<h3 class="rub">Segunda lectura <span class="ref">Rom 12, 3-13</span></h3>
+<p class="lema">Cada miembro está al servicio de los otros miembros</p>
+<p class="pr">Lectura de la carta del apóstol san Pablo a los Romanos.</p>
+<p class="pr">Hermanos:<br>Por la gracia de Dios que me ha sido dada os digo a todos y a cada uno de vosotros: no os estiméis en más de lo que conviene, sino estimaos moderadamente, según la medida de la fe que Dios otorgó a cada cual. Pues, así como en un solo cuerpo tenemos muchos miembros, y no todos los miembros cumplen la misma función, así nosotros, siendo muchos, somos un solo cuerpo en Cristo, pero cada cual existe en relación con los otros miembros.</p>
+<p class="pr">Teniendo dones diferentes, según la gracia que se nos ha dado, deben ejercerse así: la profecía, de acuerdo con la regla de la fe; el servicio, dedicándose a servir; el que enseña, aplicándose a la enseñanza; el que exhorta, ocupándose de la exhortación; el que se dedica a distribuir los bienes, hágalo con generosidad; el que preside, con solicitud; el que hace obras de misericordia, con gusto.</p>
+<p class="pr">Que vuestro amor no sea fingido; aborreciendo lo malo, apegaos a lo bueno. Amaos cordialmente unos a otros; que cada cual estime a los otros más que a sí mismo; en la actividad, no seáis negligentes; en el espíritu, manteneos fervorosos, sirviendo constantemente al Señor.</p>
+<p class="pr">Que la esperanza os tenga alegres; manteneos firmes en la tribulación, sed asiduos en la oración; compartid las necesidades de los santos; practicad la hospitalidad.</p>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">1Jn 4, 7-16</span></div>
+<p class="lema">Si nos amamos unos a otros, Dios permanece en nosotros</p>
+<p class="pr">Lectura de la primera carta del apóstol san Juan.</p>
+<p class="pr">Queridos hermanos:<br>Amémonos unos a otros, ya que el amor es de Dios, y todo el que ama ha nacido de Dios y conoce a Dios. Quien no ama no ha conocido a Dios, porque Dios es amor.</p>
+<p class="pr">En esto se manifestó el amor que Dios nos tiene: en que Dios envió al mundo a su Unigénito, para que vivamos por medio de él. En esto consiste el amor: no en que nosotros hayamos amado a Dios, sino en que él nos amó y nos envió a su Hijo, como víctima de propiciación por nuestros pecados.</p>
+<p class="pr">Queridos hermanos, si Dios nos amó de esta manera, también nosotros debemos amarnos unos a otros. A Dios nadie lo ha visto nunca. Si nos amamos unos a otros, Dios permanece en nosotros y su amor ha llegado en nosotros a su plenitud.</p>
+<p class="pr">En esto conocemos que permanecemos en él, y él en nosotros: en que nos ha dado de su Espíritu. Y nosotros hemos visto y damos testimonio de que el Padre envió a su Hijo para ser Salvador del mundo.</p>
+<p class="pr">Quien confiese que Jesús es el Hijo de Dios, Dios permanece en él, y él en Dios. Y nosotros hemos conocido el amor que Dios nos tiene y hemos creído en él. Dios es amor, y quien permanece en el amor permanece en Dios y Dios en él.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Aleluya <span class="ref">Sal 132, 1</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Ved, qué dulzura, qué delicia,
+convivir los hermanos unidos. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Mt 18, 15-22</span></h3>
+<p class="lema">Donde dos o tres están reunidos en mi nombre, allí estoy en medio de ellos</p>
+<p class="pr">Lectura del santo Evangelio según san Mateo.</p>
+<p class="pr">En aquel tiempo, dijo Jesús a sus discípulos:</p>
+<p class="pr">«Si tu hermano peca contra ti, repréndelo estando los dos a solas. Si te hace caso, has salvado a tu hermano. Si no te hace caso, llama a otro o a otros dos, para que todo el asunto quede confirmado por boca de dos o tres testigos. Si no les hace caso, díselo a la comunidad, y si no hace caso ni siquiera a la comunidad, considéralo como un pagano o un publicano.</p>
+<p class="pr">En verdad os digo que todo lo que atéis en la tierra quedará atado en los cielos, y todo lo que desatéis en la tierra quedará desatado en los cielos. Os digo, además, que si dos de vosotros se ponen de acuerdo en la tierra para pedir algo, se lo dará mi Padre que está en los cielos. Porque donde dos o tres están reunidos en mi nombre, allí estoy en medio de ellos».</p>
+<p class="pr">Acercándose Pedro a Jesús le preguntó:</p>
+<p class="pr">«Señor, si mi hermano me ofende, ¿cuántas veces tengo que perdonarlo? ¿Hasta siete veces?».</p>
+<p class="pr">Jesús le contesta:</p>
+<p class="pr">«No te digo hasta siete veces, sino hasta setenta veces siete».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Jn 13, 34</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Os doy un mandamiento nuevo, dice el Señor,
+que os améis unos a otros como yo os he amado. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Jn 15, 9-17</span></h3>
+<p class="lema">Este es mi mandamiento: que os améis unos a otros como yo os he amado</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">En aquel tiempo, dijo Jesús a sus discípulos:</p>
+<p class="pr">«Como el Padre me ha amado, así os he amado yo; permaneced en mi amor. Si guardáis mis mandamientos, permaneceréis en mi amor; lo mismo que yo he guardado los mandamientos de mi Padre y permanezco en su amor. Os he hablado de esto para que mi alegría esté en vosotros, y vuestra alegría llegue a plenitud.</p>
+<p class="pr">Este es mi mandamiento: que os améis unos a otros como yo os he amado. Nadie tiene amor más grande que el que da la vida por sus amigos. Vosotros sois mis amigos si hacéis lo que yo os mando. Ya no os llamo siervos, porque el siervo no sabe lo que hace su señor: a vosotros os llamo amigos, porque todo lo que he oído a mi Padre os lo he dado a conocer. No sois vosotros los que me habéis elegido, soy yo quien os he elegido y os he destinado para que vayáis y deis fruto, y vuestro fruto permanezca. De modo que lo que pidáis al Padre en mi nombre os lo dé. Esto os mando: que os améis unos a otros».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Col 3, 15</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} La paz de Cristo reine en vuestro corazón:
+a ella habéis sido convocados en un solo cuerpo. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Jn 17, 1a. 20-26</span></h3>
+<p class="lema">Que todos sean uno</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">En aquel tiempo, Jesús, levantando los ojos al cielo, dijo:</p>
+<p class="pr">«Padre, no sólo por ellos ruego, sino también por los que crean en mí por la palabra de ellos, para que todos sean uno, como tú, Padre, en mí, y yo en ti, que ellos también sean uno en nosotros, para que el mundo crea que tú me has enviado.</p>
+<p class="pr">Yo les he dado la gloria que tú me diste, para que sean uno, como nosotros somos uno; yo en ellos, y tú en mí, para que sean completamente uno, de modo que el mundo sepa que tú me has enviado y que los has amado a ellos como me has amado a mí.</p>
+<p class="pr">Padre, este es mi deseo: que los que me has dado estén conmigo donde yo estoy y contemplen mi gloria, la que me diste, porque me amabas, antes de la fundación del mundo.</p>
+<p class="pr">Padre justo, si el mundo no te ha conocido, yo te he conocido, y estos han conocido que tú me enviaste. Les he dado a conocer y les daré a conocer tu nombre, para que el amor que me tenías esté en ellos, y yo en ellos».</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Recibe, Señor, las ofrendas que te presentamos
+y haz que por este sacrificio
+crezca sin cesar el amor que esperas de nosotros
+y se edifique nuestra comunidad.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Jn 15, 12</span></h3>
+<p class="pr">Este es mi mandamiento: que os améis unos a otros como yo os he amado.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Estos sacramentos de unidad y de amor
+con los que nos has saciado, Señor, Dios nuestro,
+nos unan más íntimamente contigo
+y con los hermanos,
+para que el mundo crea en tu Hijo
+y por Él obtenga la salvación.
+Él, que vive y reina, por los siglos de los siglos.</div>
+`},
+{id:'vocaciones',grupo:'necesidades',color:'verde',fecha:'Por diversas necesidades',
+titulo:'Por las vocaciones claretianas',rango:'',
+html:`
+<p class="nota">Todo como en el <em>Misal Romano</em> y el Leccionario por las vocaciones sacerdotales o religiosas. También pueden utilizarse las oraciones y antífonas siguientes:</p>
+<h3 class="rub">Antífona de entrada <span class="ref">Mt 9, 37-38</span></h3>
+<p class="pr">La mies es abundante, pero los trabajadores son pocos; rogad, pues, al Señor de la mies que mande trabajadores a su mies.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Mt 4, 19</span></div>
+<p class="pr">Venid en pos de mí —dice el Señor— y os haré pescadores de hombres.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, tú que llamaste a los apóstoles
+para que fueran pescadores de hombres,
+dígnate llamar a nuestra Congregación
+a nuevos miembros
+que sean sal de la tierra y luz del mundo,
+y trabajen en todas partes
+con la caridad que apremiaba
+a tu siervo Antonio María Claret.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Se pueden escoger las lecturas de las misas por diversas circunstancias: por las vocaciones; o las siguientes.</p>
+<h3 class="rub">Primera lectura <span class="ref">1Sam 3, 1-10</span></h3>
+<p class="lema">Habla, Señor, que tu siervo te escucha</p>
+<p class="pr">Lectura del primer libro de Samuel.</p>
+<p class="pr">En aquel tiempo, el joven Samuel servía al Señor al lado de Elí.</p>
+<p class="pr">En aquellos días era rara la palabra del Señor y no eran frecuentes las visiones.</p>
+<p class="pr">Un día Elí estaba acostado en su habitación. Sus ojos habían comenzado a debilitarse y no podía ver.</p>
+<p class="pr">La lámpara de Dios aún no se había apagado y Samuel estaba acostado en el templo del Señor, donde se encontraba el Arca de Dios.</p>
+<p class="pr">Entonces el Señor llamó a Samuel. Este respondió:</p>
+<p class="pr">«Aquí estoy».</p>
+<p class="pr">Corrió adonde estaba Elí y dijo:</p>
+<p class="pr">«Aquí estoy, porque me has llamado».</p>
+<p class="pr">Respondió:</p>
+<p class="pr">«No te he llamado. Vuelve a acostarte». Fue y se acostó. El Señor volvió a llamar a Samuel. Se levantó Samuel, fue adonde estaba Elí y dijo:</p>
+<p class="pr">«Aquí estoy, porque me has llamado».</p>
+<p class="pr">Respondió:</p>
+<p class="pr">«No te he llamado, hijo mío. Vuelve a acostarte».</p>
+<p class="pr">Samuel no conocía aún al Señor, ni se le había manifestado todavía la palabra del Señor.</p>
+<p class="pr">El Señor llamó a Samuel, por tercera vez. Se levantó, fue adonde estaba Elí y dijo:</p>
+<p class="pr">«Aquí estoy, porque me has llamado».</p>
+<p class="pr">Comprendió entonces Elí que era el Señor el que llamaba al joven. Y dijo a Samuel:</p>
+<p class="pr">«Ve a acostarte. Y si te llama de nuevo, di: “Habla, Señor, que tu siervo escucha”».</p>
+<p class="pr">Samuel fue a acostarse en su sitio.</p>
+<p class="pr">El Señor se presentó y llamó como las veces anteriores:</p>
+<p class="pr">«Samuel, Samuel».</p>
+<p class="pr">Respondió Samuel:</p>
+<p class="pr">«Habla, que tu siervo escucha».</p>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Jer 1, 4-9</span></div>
+<p class="lema">Irás a donde yo te envíe</p>
+<p class="pr">Lectura del libro de Jeremías.</p>
+<p class="pr">En aquel tiempo, el Señor me dirigió la palabra:</p>
+<p class="pr">«Antes de formarte en el vientre, te elegí; antes de que salieras del seno materno, te consagré: te constituí profeta de las naciones».</p>
+<p class="pr">Yo repuse:</p>
+<p class="pr">«¡Ay, Señor, Dios mío! Mira que no sé hablar, que sólo soy un niño».</p>
+<p class="pr">El Señor me contestó:</p>
+<p class="pr">«No digas que eres un niño, pues irás adonde yo te envíe y dirás lo que yo te ordene. No les tengas miedo, que yo estoy contigo para librarte —oráculo del Señor—».</p>
+<p class="pr">El Señor extendió la mano, tocó mi boca y me dijo:</p>
+<p class="pr">«Voy a poner mis palabras en tu boca».</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 39, 2 y 4ab. 7-8. 10. 12</span></h3>
+<div class="pl">${R} Aquí estoy, Señor, para hacer tu voluntad.
+
+${V} Yo esperaba con ansia al Señor;
+él se inclinó y escuchó mi grito;
+me puso en la boca un cántico nuevo,
+un himno a nuestro Dios. ${R}
+
+${V} Tú no quieres sacrificios ni ofrendas
+y, en cambio, me abriste el oído;
+no pides holocaustos ni sacrificios expiatorios,
+entonces yo digo: «aquí estoy». ${R}
+
+${V} Como está escrito en mi libro:
+«Para hacer tu voluntad».
+Dios mío, lo quiero,
+y llevo tu ley en las entrañas. ${R}
+
+${V} He proclamado tu justicia
+ante la gran asamblea;
+no he cerrado los labios,
+Señor, tú lo sabes. ${R}
+
+${V} Tú, Señor, no me cierres tus entrañas
+que tu misericordia y tu lealtad
+me guarden siempre. ${R}</div>
+<div class="obien"><span>O bien:</span><span class="ref">Sal 26, 1. 4. 5. 8b-9ab. 9cd y 11 (R.: 8b)</span></div>
+<div class="pl">${R} Tu rostro buscaré, Señor.
+
+${V} El Señor es mi luz y mi salvación,
+¿a quién temeré?
+El Señor es la defensa de mi vida,
+¿quién me hará temblar? ${R}
+
+${V} Una cosa pido al Señor, eso buscaré:
+habitar en la casa del Señor
+por los días de mi vida;
+gozar de la dulzura del Señor,
+contemplando su templo. ${R}
+
+${V} Él me protegerá en su tienda
+el día del peligro;
+me esconderá en lo escondido de su morada,
+me alzará sobre la roca. ${R}
+
+${V} Tu rostro buscaré, Señor.
+No me escondas tu rostro.
+No rechaces con ira a tu siervo,
+que tú eres mi auxilio. ${R}
+
+${V} No me deseches, no me abandones,
+Dios de mi salvación.
+Señor, enséñame tu camino,
+guíame por la senda llana,
+porque tengo enemigos. ${R}</div>
+<h3 class="rub">Segunda lectura <span class="ref">Flp 3, 8-14</span></h3>
+<p class="lema">Lo perdí todo con tal de ganar a Cristo</p>
+<p class="pr">Lectura de la carta del apóstol san Pablo a los Filipenses.</p>
+<p class="pr">Hermanos:<br>Todo lo considero pérdida comparado con la excelencia del conocimiento de Cristo Jesús, mi Señor.</p>
+<p class="pr">Por él lo perdí todo, y todo lo considero basura con tal de ganar a Cristo y ser hallado en él, no con una justicia mía, la de la ley, sino con la que viene de la fe de Cristo, la justicia que viene de Dios y se apoya en la fe. Todo para conocerlo a él, y la fuerza de su resurrección, y la comunión con sus padecimientos, muriendo su misma muerte, con la esperanza de llegar a la resurrección de entre los muertos.</p>
+<p class="pr">No es que ya lo haya conseguido o que ya sea perfecto: yo lo persigo, a ver si lo alcanzo como yo he sido alcanzado por Cristo.</p>
+<p class="pr">Hermanos, yo no pienso haber conseguido el premio. Sólo busco una cosa: olvidándome de lo que queda atrás y lanzándome hacia lo que está por delante, corro hacia la meta, hacia el premio, al cual me llama Dios desde arriba en Cristo Jesús.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Aleluya <span class="ref">cf. Jn 15, 5</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Os he elegido, para que vayáis y deis fruto,
+y vuestro fruto permanezca. ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Mt 9, 35-38</span></h3>
+<p class="lema">La mies es abundante, pero los trabajadores son pocos</p>
+<p class="pr">Lectura del santo Evangelio según san Mateo.</p>
+<p class="pr">En aquel tiempo, Jesús recorría todas las ciudades y aldeas, enseñando en sus sinagogas, proclamando el evangelio del reino y curando toda enfermedad y toda dolencia.</p>
+<p class="pr">Al ver a las muchedumbres, se compadecía de ellas, porque estaban extenuadas y abandonadas, «como ovejas que no tienen pastor».</p>
+<p class="pr">Entonces dice a sus discípulos:</p>
+<p class="pr">«La mies es abundante, pero los trabajadores son pocos; rogad, pues, al Señor de la mies que mande trabajadores a su mies».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Mc 1, 17</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Venid en pos de mí, dice el Señor,
+y os haré pescadores de hombres. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Lc 5, 1-11</span></h3>
+<p class="lema">Desde ahora serás pescador de hombres</p>
+<p class="pr">Lectura del santo Evangelio según san Lucas.</p>
+<p class="pr">En aquel tiempo, la gente se agolpaba en torno a Jesús para oír la palabra de Dios, estando él de pie junto al lago de Genesaret, vio dos barcas que estaban en la orilla; los pescadores, que habían desembarcado, estaban lavando las redes. Subiendo a una de las barcas, que era la de Simón, le pidió que la apartara un poco de tierra. Desde la barca, sentado, enseñaba a la gente.</p>
+<p class="pr">Cuando acabó de hablar, dijo a Simón:</p>
+<p class="pr">«Rema mar adentro, y echad vuestras redes para la pesca».</p>
+<p class="pr">Respondió Simón y dijo:</p>
+<p class="pr">«Maestro, hemos estado bregando toda la noche y no hemos recogido nada; pero, por tu palabra, echaré las redes».</p>
+<p class="pr">Y, puestos a la obra, hicieron una redada tan grande de peces que las redes comenzaban a reventarse. Entonces hicieron señas a los compañeros, que estaban en la otra barca, para que vinieran a echarles una mano. Vinieron y llenaron las dos barcas, hasta el punto de que casi se hundían.</p>
+<p class="pr">Al ver esto, Simón Pedro se echó a los pies de Jesús diciendo:</p>
+<p class="pr">«Señor, apártate de mí, que soy un pecador».</p>
+<p class="pr">Y es que el estupor se había apoderado de él y de los que estaban con él, por la redada de peces que habían recogido; y lo mismo les pasaba a Santiago y Juan, hijos de Zebedeo, que eran compañeros de Simón.</p>
+<p class="pr">Y Jesús dijo a Simón:</p>
+<p class="pr">«No temas; desde ahora serás pescador de hombres».</p>
+<p class="pr">Entonces sacaron las barcas a tierra y, dejándolo todo, lo siguieron.</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Recibe complacido, Señor,
+las súplicas y ofrendas que te presentamos,
+y a quienes nos alegramos en la fraternidad claretiana
+concédenos permanecer siempre fieles
+a la vocación misionera.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Mt 5, 14-16</span></h3>
+<p class="pr">Vosotros sois la luz del mundo, dice el Señor; brille así vuestra luz ante los hombres, para que vean vuestras buenas obras y den gloria a vuestro Padre que está en los cielos.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Jn 15, 16</span></div>
+<p class="pr">No sois vosotros los que me habéis elegido, soy yo quien os he elegido y os he destinado para que vayáis y deis fruto, y vuestro fruto permanezca.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Habiendo participado en el sacramento de tu amor,
+te pedimos, Señor,
+que suscites abundantes vocaciones
+para nuestra Congregación,
+infundas en los llamados
+el deseo de la perfección evangélica,
+enriquezcas a tu Iglesia
+con su constante servicio apostólico
+y les concedas permanecer fieles a tu llamada.
+Por Jesucristo, nuestro Señor.</div>
+`},
+{id:'fruto',grupo:'necesidades',color:'verde',fecha:'Por diversas necesidades',
+titulo:'Por el fruto apostólico de los misioneros',rango:'',
+html:`
+<h3 class="rub">Antífona de entrada <span class="ref">cf. Sal 66, 2-3</span></h3>
+<p class="pr">Que Dios tenga piedad y nos bendiga, ilumine su rostro sobre nosotros, para que conozcamos en la tierra tus caminos, todos los pueblos tu salvación.</p>
+<h3 class="rub">Oración colecta</h3>
+<div class="pl">Señor, Dios nuestro,
+que quieres que la humanidad entera se salve
+y llegue al conocimiento de la verdad,
+bendice los empeños de nuestra fraternidad misionera
+por llevar tu Palabra a todos los confines de la tierra.
+Por nuestro Señor Jesucristo, tu Hijo,
+que vive y reina contigo
+en la unidad del Espíritu Santo y es Dios
+por los siglos de los siglos.</div>
+<p class="nota">Se pueden escoger algunas de las siguientes lecturas:</p>
+<h3 class="rub">Primera lectura <span class="ref">Is 49, 1-6</span></h3>
+<p class="lema">Te hago luz de las naciones</p>
+<p class="pr">Lectura del profeta Isaías.</p>
+<div class="pl">Escuchadme, islas; atended, pueblos lejanos:
+El Señor me llamó desde el vientre materno,
+de las entrañas de mi madre, y pronunció mi nombre.
+
+Hizo de mi boca una espada afilada,
+me escondió en la sombra de su mano;
+me hizo flecha bruñida, me guardó en su aljaba
+y me dijo: «Tú eres mi siervo, Israel,
+por medio de ti me glorificaré».
+
+Y yo pensaba: «En vano me he cansado,
+en viento y en nada he gastado mis fuerzas».
+En realidad el Señor defendía mi causa,
+mi recompensa la custodiaba Dios.
+
+Y ahora dice el Señor,
+el que me formó desde el vientre como siervo suyo,
+para que le devolviese a Jacob,
+para que le reuniera a Israel;
+he sido glorificado a los ojos de Dios.
+Y mi Dios era mi fuerza:
+«Es poco que seas mi siervo
+para restablecer las tribus de Jacob
+y traer de vuelta a los supervivientes de Israel.
+Te hago luz de las naciones,
+para que mi salvación alcance
+hasta el confín de la tierra».</div>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Is 52, 7-10</span></div>
+<p class="lema">La bendición del envío: mensajeros de esperanza y liberación</p>
+<p class="pr">Lectura del profeta Isaías.</p>
+<div class="pl">Qué hermosos son sobre los montes
+los pies del mensajero que proclama la paz,
+que anuncia la buena noticia,
+que pregona la justicia,
+que dice a Sion: «¡Tu Dios reina!».
+
+Escucha: tus vigías gritan, cantan a coro,
+porque ven cara a cara al Señor,
+que vuelve a Sion.
+
+Romped a cantar a coro,
+ruinas de Jerusalén,
+porque el Señor ha consolado a su pueblo,
+ha rescatado a Jerusalén.
+
+Ha descubierto el Señor su santo brazo
+a los ojos de todas las naciones,
+y verán los confines de la tierra
+la salvación de nuestro Dios.</div>
+<p class="fin">Palabra de Dios.</p>
+<div class="obien"><span>O bien:</span><span class="ref">1Cor 9, 16-23</span></div>
+<p class="lema">¡Ay de mí si no anuncio el Evangelio!</p>
+<p class="pr">Lectura de la primera carta del apóstol san Pablo a los Corintios.</p>
+<p class="pr">Hermanos:<br>El hecho de predicar no es para mí motivo de orgullo. No tengo más remedio y, ¡ay de mí si no anuncio el Evangelio!</p>
+<p class="pr">Si yo lo hiciera por mi propio gusto, eso mismo sería mi paga. Pero, si lo hago a pesar mío, es que me han encargado este oficio.</p>
+<p class="pr">Entonces, ¿cuál es la paga? Precisamente dar a conocer el Evangelio, anunciándolo de balde, sin usar el derecho que me da la predicación del Evangelio.</p>
+<p class="pr">Porque, siendo libre como soy, me he hecho esclavo de todos para ganar a los más posibles. Me he hecho judío con los judíos, para ganar a los judíos; con los que están bajo ley me he hecho como bajo ley, no estando yo bajo ley, para ganar a los que están bajo ley; con los que no tienen ley me he hecho como quien no tiene ley, no siendo yo alguien que no tiene ley de Dios, sino alguien que vive en la ley de Cristo, para ganar a los que no tienen ley. Me he hecho débil con los débiles, para ganar a los débiles; me he hecho todo para todos, para ganar, sea como sea, a algunos. Y todo lo hago por causa del Evangelio, para participar yo también de sus bienes.</p>
+<p class="pr">¿No sabéis que en el estadio todos los corredores cubren la carrera, aunque uno solo se lleva el premio? Pues corred así: para ganar. Pero un atleta se impone toda clase de privaciones; ellos, para ganar una corona que se marchita; nosotros, en cambio, una que no se marchita.</p>
+<p class="pr">Por eso corro yo, pero no al azar; lucho, pero no contra el aire; sino que golpeo mi cuerpo y lo someto, no sea que, habiendo predicado a otros, quede yo descalificado.</p>
+<p class="fin">Palabra de Dios.</p>
+<h3 class="rub">Salmo responsorial <span class="ref">Sal 96, 1-5 y 11-12</span></h3>
+<div class="pl">${R} Cantad al Señor un cántico nuevo,
+cantad al Señor, toda la tierra.
+
+${V} Cantad al Señor un cántico nuevo,
+cantad al Señor, toda la tierra;
+cantad al Señor, bendecid su nombre,
+proclamad día tras día su victoria.
+Contad a los pueblos su gloria,
+sus maravillas a todas las naciones. ${R}
+
+${V} Porque es grande el Señor,
+y muy digno de alabanza,
+más temible que todos los dioses.
+Pues los dioses de los gentiles no son nada,
+mientras que el Señor ha hecho el cielo. ${R}
+
+${V} Alégrese el cielo, goce la tierra,
+retumbe el mar y cuanto lo llena;
+vitoreen los campos y cuanto hay en ellos,
+aclamen los árboles del bosque. ${R}</div>
+<div class="obien"><span>O bien:</span><span class="ref">Sal 67, 1-8</span></div>
+<div class="pl">${R} Oh Dios, que te alaben los pueblos,
+que todos los pueblos te alaben.
+
+${V} Que Dios tenga piedad y nos bendiga,
+ilumine su rostro sobre nosotros;
+conozca la tierra tus caminos,
+todos los pueblos tu salvación. ${R}
+
+${V} Oh Dios, que te alaben los pueblos,
+que todos los pueblos te alaben.
+La tierra ha dado su fruto,
+nos bendice el Señor, nuestro Dios. ${R}
+
+${V} Que Dios nos bendiga;
+que le teman todos los confines de la tierra. ${R}</div>
+<div class="obien"><span>O bien:</span><span class="ref">Sal 127, 1-5</span></div>
+<div class="pl">${R} Si el Señor no construye la casa,
+en vano se cansan los albañiles.
+
+${V} Es inútil que madruguéis,
+que veléis hasta muy tarde,
+que comáis el pan de vuestros sudores:
+¡Dios lo da a sus amigos mientras duermen! ${R}
+
+${V} La herencia que da el Señor son los hijos;
+su salario, el fruto del vientre:
+son saetas en manos de un guerrero
+los hijos de la juventud. ${R}
+
+${V} Dichoso el hombre que llena con ellas su aljaba:
+no quedará derrotado
+cuando litigue con su adversario en la plaza. ${R}</div>
+<h3 class="rub">Aleluya <span class="ref">Sal 27, 1</span></h3>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} El Señor es mi luz y mi salvación,
+¿a quién temeré?
+El Señor es la defensa de mi vida,
+¿quién me hará temblar? ${R}</div>
+<h3 class="rub">Evangelio <span class="ref">Mt 28, 18-20</span></h3>
+<p class="lema">Id y haced discípulos a todos los pueblos</p>
+<p class="pr">Lectura del santo Evangelio según san Mateo.</p>
+<p class="pr">En aquel tiempo, acercándose a sus discípulos, Jesús les dijo:</p>
+<p class="pr">«Se me ha dado todo poder en el cielo y en la tierra. Id, pues, y haced discípulos a todos los pueblos, bautizándolos en el nombre del Padre y del Hijo y del Espíritu Santo; enseñándoles a guardar todo lo que os he mandado. Y sabed que yo estoy con vosotros todos los días, hasta el final de los tiempos».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">cf. Jn 14, 6</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Abramos nuestros corazones
+a la enseñanza del Señor,
+quien nos muestra el camino de la vida eterna. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Mt 9, 35-38</span></h3>
+<p class="lema">Jesús recorría las ciudades y aldeas proclamando el evangelio del reino</p>
+<p class="pr">Lectura del santo Evangelio según san Mateo.</p>
+<p class="pr">En aquel tiempo, Jesús recorría todas las ciudades y aldeas, enseñando en sus sinagogas, proclamando el evangelio del reino y curando toda enfermedad y toda dolencia. Al ver a las muchedumbres, se compadecía de ellas, porque estaban extenuadas y abandonadas, «como ovejas que no tienen pastor».</p>
+<p class="pr">Entonces dice a sus discípulos:</p>
+<p class="pr">«La mies es abundante, pero los trabajadores son pocos; rogad, pues, al Señor de la mies que mande trabajadores a su mies».</p>
+<p class="fin">Palabra del Señor.</p>
+<div class="obien"><span>O bien:</span><span class="ref">Sal 118, 1</span></div>
+<div class="pl">${R} Aleluya, aleluya, aleluya.
+
+${V} Dad gracias al Señor porque es bueno,
+porque es eterna su misericordia. ${R}</div>
+<h3 class="rub">&nbsp;<span class="ref">Jn 20, 19-23</span></h3>
+<p class="lema">Como el Padre me ha enviado, así también os envío yo</p>
+<p class="pr">Lectura del santo Evangelio según san Juan.</p>
+<p class="pr">Al anochecer de aquel día, el primero de la semana, estaban los discípulos en una casa, con las puertas cerradas por miedo a los judíos.</p>
+<p class="pr">Y en esto entró Jesús, se puso en medio y les dijo:</p>
+<p class="pr">«Paz a vosotros».</p>
+<p class="pr">Y, diciendo esto, les enseñó las manos y el costado. Y los discípulos se llenaron de alegría al ver al Señor.</p>
+<p class="pr">Jesús repitió:</p>
+<p class="pr">«Paz a vosotros. Como el Padre me ha enviado, así también os envío yo».</p>
+<p class="pr">Y, dicho esto, sopló sobre ellos y les dijo:</p>
+<p class="pr">«Recibid el Espíritu Santo; a quienes les perdonéis los pecados, les quedan perdonados; a quienes se los retengáis, les quedan retenidos».</p>
+<p class="fin">Palabra del Señor.</p>
+<h3 class="rub">Oración sobre las ofrendas</h3>
+<div class="pl">Mira, Señor, con bondad
+los dones que te presentamos,
+y concédenos,
+por intercesión del Corazón Inmaculado de María,
+vivir y anunciar siempre tu Palabra
+con fidelidad y alegría.
+Por Jesucristo, nuestro Señor.</div>
+<h3 class="rub">Antífona de comunión <span class="ref">Jn 15, 16</span></h3>
+<p class="pr">No sois vosotros los que me habéis elegido, soy yo quien os he elegido y os he destinado para que vayáis y deis fruto, y vuestro fruto permanezca.</p>
+<h3 class="rub">Oración después de la comunión</h3>
+<div class="pl">Alimentados con el Cuerpo y la Sangre de tu Hijo,
+te pedimos, Señor, que procuremos siempre
+con el mayor empeño tu gloria
+y colaboremos con tu Espíritu
+para encender al mundo entero en el fuego de tu amor.
+Por Jesucristo, nuestro Señor.</div>
+`}
+];
+/* ---------- fechas ---------- */
+function pascua(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
+  f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+  i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+  mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;
+  return new Date(y,mes-1,dia);
+}
+function fechaCorazon(y){
+  const d=pascua(y); d.setDate(d.getDate()+69); return d; // Pentecostés+20
+}
+function fechaDe(c,y){
+  if(c.movil==='corazon') return fechaCorazon(y);
+  if(c.mes) return new Date(y,c.mes-1,c.dia);
+  return null;
+}
+function mismaFecha(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function fmt(d){return d.getDate()+' de '+MESES[d.getMonth()];}
+
+/* ---------- render ---------- */
+const app=document.getElementById('app');
+const GRUPOS=[['propio','Propio de los santos'],['rituales','Misas rituales'],['votivas','Misa votiva'],['necesidades','Por diversas necesidades']];
+
+function portada(){
+  const hoy=new Date(); const y=hoy.getFullYear();
+  let html='';
+  const deHoy=DATA.find(c=>mismaFecha(fechaDe(c,y),hoy));
+  if(deHoy){
+    html+='<div class="hoy" onclick="location.hash=\'#/'+deHoy.id+'\'">'+
+      '<div class="etq">Hoy · '+fmt(hoy)+'</div>'+
+      '<div class="nom">'+deHoy.titulo+'</div>'+
+      (deHoy.rango?'<div class="sub">'+deHoy.rango+'</div>':'')+'</div>';
+  }else{
+    // próxima celebración
+    let prox=null,proxF=null;
+    DATA.forEach(c=>{
+      let f=fechaDe(c,y); if(!f)return;
+      if(f<hoy){f=fechaDe(c,y+1);}
+      if(!proxF||f<proxF){proxF=f;prox=c;}
+    });
+    if(prox){
+      html+='<div class="hoy" onclick="location.hash=\'#/'+prox.id+'\'">'+
+        '<div class="etq">Próxima celebración · '+fmt(proxF)+'</div>'+
+        '<div class="nom">'+prox.titulo+'</div>'+
+        (prox.rango?'<div class="sub">'+prox.rango+'</div>':'')+'</div>';
+    }
+  }
+  GRUPOS.forEach(([g,nombre])=>{
+    const items=DATA.filter(c=>c.grupo===g);
+    if(!items.length)return;
+    html+='<section class="grupo"><h2>'+nombre+'</h2>';
+    items.forEach(c=>{
+      html+='<div class="tarjeta" onclick="location.hash=\'#/'+c.id+'\'">'+
+        '<span class="punto p-'+c.color+'"></span>'+
+        '<span class="fecha">'+(c.mes?c.dia+' '+MESES[c.mes-1].slice(0,3)+'.':(c.movil?'móvil':'—'))+'</span>'+
+        '<span><span class="nom">'+c.titulo+'</span>'+
+        (c.rango?'<br><span class="rango">'+c.rango+'</span>':'')+'</span></div>';
+    });
+    html+='</section>';
+  });
+  app.innerHTML=html;
+  window.scrollTo(0,0);
+}
+
+function celebracion(id){
+  const c=DATA.find(x=>x.id===id);
+  if(!c){portada();return;}
+  let fechaTxt=c.fecha;
+  if(c.movil==='corazon'){
+    fechaTxt+=' · Este año: '+fmt(fechaCorazon(new Date().getFullYear()));
+  }
+  app.innerHTML='<button class="volver" onclick="location.hash=\'\'">&larr; Índice</button>'+
+    '<article class="celeb">'+
+    '<div class="fecha-lit">'+fechaTxt+'</div>'+
+    '<h2 class="tit">'+c.titulo+'</h2>'+
+    (c.rango?'<div class="rango">'+c.rango+'</div>':'')+
+    '<div class="adorno">&#10011;</div>'+
+    c.html+
+    '<footer>&#10011;</footer></article>';
+  window.scrollTo(0,0);
+}
+
+function ruta(){
+  const h=location.hash;
+  if(h.startsWith('#/')) celebracion(h.slice(2)); else portada();
+}
+window.addEventListener('hashchange',ruta);
+
+/* ---------- controles ---------- */
+let fs=parseInt(localStorage.getItem('misal_fs')||'100',10);
+function aplicaFs(){document.documentElement.style.setProperty('--fs',fs+'%');localStorage.setItem('misal_fs',fs);}
+document.getElementById('btnMenos').onclick=()=>{if(fs>75){fs-=5;aplicaFs();}};
+document.getElementById('btnMas').onclick=()=>{if(fs<160){fs+=5;aplicaFs();}};
+aplicaFs();
+
+const btnTema=document.getElementById('btnTema');
+function aplicaTema(osc){
+  document.documentElement.classList.toggle('oscuro',osc);
+  btnTema.innerHTML=osc?'&#9788;':'&#9789;';
+  localStorage.setItem('misal_tema',osc?'oscuro':'claro');
+}
+btnTema.onclick=()=>aplicaTema(!document.documentElement.classList.contains('oscuro'));
+aplicaTema(localStorage.getItem('misal_tema')==='oscuro');
+
+ruta();
+</script>
+</body>
+</html>
