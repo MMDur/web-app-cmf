@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tibidabo · Guía del Templo Expiatorio del Sagrado Corazón</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --garnet:#6d1a2e;
+  --garnet-deep:#54121f;
+  --garnet-soft:#7b1e2b;
+  --gold:#c9a227;
+  --gold-soft:#e8c96a;
+  --paper:#f6f1e7;
+  --paper-card:#ffffff;
+  --ink:#2b2b2b;
+  --ink-soft:#5a5347;
+  --rule:#e4d9c3;
+  --shadow:rgba(60,30,30,.10);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --body:'Literata',Georgia,serif;
+  --fs:1;
+}
+[data-theme="dark"]{
+  --garnet:#8a2438;
+  --garnet-deep:#3a0e18;
+  --garnet-soft:#a13048;
+  --gold:#d9b23f;
+  --gold-soft:#f0d585;
+  --paper:#17110f;
+  --paper-card:#231b18;
+  --ink:#ece3d4;
+  --ink-soft:#b3a893;
+  --rule:#3a2e28;
+  --shadow:rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:calc(1rem * var(--fs));
+  line-height:1.68;
+  -webkit-text-size-adjust:100%;
+  overflow-x:hidden;
+}
+img,svg{max-width:100%;display:block}
+
+/* ---------- Barra superior ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--garnet-deep);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  padding-top:calc(10px + env(safe-area-inset-top));
+  box-shadow:0 2px 10px var(--shadow);
+}
+.topbar .brand{
+  font-family:var(--serif);color:var(--gold-soft);
+  font-size:calc(1.05rem * var(--fs));letter-spacing:.14em;text-transform:uppercase;
+  font-weight:600;
+}
+.tools{display:flex;gap:6px}
+.tool{
+  background:rgba(255,255,255,.08);border:1px solid rgba(232,201,106,.35);
+  color:var(--gold-soft);width:36px;height:36px;border-radius:50%;
+  font-family:var(--serif);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  transition:background .2s;
+}
+.tool:hover{background:rgba(255,255,255,.16)}
+.tool:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+
+/* ---------- Índice desplegable ---------- */
+.menu{
+  position:sticky;top:56px;z-index:39;
+  background:var(--garnet);
+  padding:0;max-height:0;overflow:hidden;
+  transition:max-height .35s ease;
+}
+.menu.open{max-height:70vh;overflow-y:auto}
+.menu a{
+  display:block;color:var(--paper);text-decoration:none;
+  padding:11px 22px;border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:var(--serif);font-size:calc(1.15rem * var(--fs));letter-spacing:.02em;
+}
+.menu a .n{color:var(--gold-soft);font-size:.75em;margin-right:10px;font-variant-numeric:tabular-nums}
+.menu a:active{background:var(--garnet-soft)}
+
+/* ---------- Portada ---------- */
+.hero{
+  position:relative;
+  background:
+    radial-gradient(140% 120% at 50% -10%, rgba(201,162,39,.22), transparent 55%),
+    linear-gradient(160deg,var(--garnet) 0%, var(--garnet-deep) 100%);
+  color:var(--paper);
+  padding:38px 22px 30px;
+  text-align:center;
+  overflow:hidden;
+}
+.hero .eyebrow{
+  font-family:var(--serif);letter-spacing:.32em;text-transform:uppercase;
+  font-size:calc(.72rem * var(--fs));color:var(--gold-soft);margin-bottom:14px;
+}
+.hero h1{
+  font-family:var(--serif);font-weight:600;line-height:1.02;
+  font-size:calc(2.9rem * var(--fs));margin-bottom:6px;
+}
+.hero h1 .sub{display:block;font-style:italic;font-weight:400;font-size:.42em;color:var(--gold-soft);letter-spacing:.04em;margin-top:10px}
+.hero .lat{
+  font-family:var(--serif);font-style:italic;font-size:calc(1.15rem * var(--fs));
+  color:var(--paper);opacity:.85;margin-top:18px;
+}
+.hero-illu{margin:6px auto 0;max-width:340px}
+.scroll-cue{margin-top:14px;color:var(--gold-soft);font-size:1.4rem;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ---------- Secciones ---------- */
+main{padding:0 0 60px}
+.section{padding:34px 20px 8px;max-width:720px;margin:0 auto;scroll-margin-top:64px}
+.kicker{
+  font-family:var(--serif);letter-spacing:.24em;text-transform:uppercase;
+  font-size:calc(.72rem * var(--fs));color:var(--garnet-soft);font-weight:600;
+  display:flex;align-items:center;gap:10px;margin-bottom:6px;
+}
+.kicker .num{
+  font-variant-numeric:tabular-nums;background:var(--garnet);color:var(--gold-soft);
+  border-radius:3px;padding:1px 7px;font-size:.9em;letter-spacing:.05em;
+}
+h2{
+  font-family:var(--serif);font-weight:600;color:var(--garnet-soft);
+  font-size:calc(2.1rem * var(--fs));line-height:1.08;margin-bottom:4px;
+}
+.rule{width:58px;height:3px;background:var(--gold);margin:12px 0 20px;border-radius:2px}
+h3{
+  font-family:var(--serif);font-weight:600;color:var(--ink);
+  font-size:calc(1.5rem * var(--fs));margin:26px 0 8px;line-height:1.15;
+}
+p{margin-bottom:15px;text-align:justify;hyphens:auto}
+p .lead{font-size:1.05em}
+em{color:var(--garnet-soft);font-style:italic}
+strong{color:var(--ink);font-weight:600}
+a.inline{color:var(--garnet-soft);text-decoration:underline;text-decoration-color:var(--gold)}
+
+/* Tarjeta / recuadro */
+.card{
+  background:var(--paper-card);border:1px solid var(--rule);
+  border-left:4px solid var(--gold);border-radius:8px;
+  padding:16px 18px;margin:20px 0;box-shadow:0 1px 4px var(--shadow);
+}
+.card .card-t{font-family:var(--serif);color:var(--garnet-soft);font-weight:600;font-size:calc(1.2rem * var(--fs));margin-bottom:4px}
+
+/* Cita / dato destacado */
+.pull{
+  font-family:var(--serif);font-style:italic;font-size:calc(1.5rem * var(--fs));
+  color:var(--garnet-soft);line-height:1.3;text-align:center;
+  padding:22px 10px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  margin:26px 0;
+}
+
+/* Cronología */
+.timeline{list-style:none;margin:18px 0;border-left:2px solid var(--rule);padding-left:0}
+.timeline li{position:relative;padding:0 0 20px 26px}
+.timeline li::before{
+  content:"";position:absolute;left:-7px;top:5px;width:12px;height:12px;
+  background:var(--gold);border:2px solid var(--paper);border-radius:50%;
+}
+.timeline .yr{font-family:var(--serif);color:var(--garnet-soft);font-weight:600;font-size:calc(1.25rem * var(--fs));display:block}
+
+/* Ficha de datos */
+.facts{list-style:none;margin:18px 0}
+.facts li{display:flex;gap:12px;padding:9px 0;border-bottom:1px dotted var(--rule);align-items:baseline}
+.facts .k{flex:0 0 42%;font-family:var(--serif);color:var(--garnet-soft);font-weight:600}
+.facts .v{flex:1}
+
+/* Figura con ilustración */
+figure{margin:24px 0}
+figure svg{margin:0 auto;filter:drop-shadow(0 4px 10px var(--shadow))}
+figcaption{
+  text-align:center;font-family:var(--serif);font-style:italic;
+  color:var(--ink-soft);font-size:calc(1rem * var(--fs));margin-top:10px;
+  padding:0 16px;line-height:1.4;
+}
+.figframe{background:var(--paper-card);border:1px solid var(--rule);border-radius:10px;padding:18px 12px}
+
+/* Consejo / práctico */
+.tip{
+  background:linear-gradient(135deg,rgba(201,162,39,.12),rgba(109,26,46,.06));
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  font-size:.97em;
+}
+.tip b{color:var(--garnet-soft);font-family:var(--serif);font-size:1.1em}
+
+/* Separador ornamental */
+.orn{text-align:center;color:var(--gold);font-size:1.3rem;letter-spacing:.5em;margin:30px 0 6px;opacity:.8}
+
+/* Pie */
+footer{
+  background:var(--garnet-deep);color:var(--paper);text-align:center;
+  padding:30px 22px;padding-bottom:calc(30px + env(safe-area-inset-bottom));
+}
+footer .fc{font-family:var(--serif);color:var(--gold-soft);letter-spacing:.06em;font-size:calc(1.1rem * var(--fs))}
+footer .fs{opacity:.6;font-size:.82em;margin-top:8px;line-height:1.5}
+
+/* Botón subir */
+.up{
+  position:fixed;right:16px;bottom:16px;z-index:35;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--garnet);color:var(--gold-soft);font-size:1.2rem;
+  box-shadow:0 3px 12px var(--shadow);opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.up.show{opacity:1;pointer-events:auto}
+
+@media(min-width:680px){
+  .hero h1{font-size:calc(3.6rem * var(--fs))}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;scroll-behavior:auto!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">Tibidabo</span>
+  <div class="tools">
+    <button class="tool" id="btnMenu" aria-label="Índice">☰</button>
+    <button class="tool" id="btnMinus" aria-label="Reducir letra">A−</button>
+    <button class="tool" id="btnPlus" aria-label="Aumentar letra">A+</button>
+    <button class="tool" id="btnTheme" aria-label="Modo oscuro">☾</button>
+  </div>
+</div>
+
+<nav class="menu" id="menu">
+  <a href="#nombre"><span class="n">01</span>El nombre: «Tibi dabo»</a>
+  <a href="#montana"><span class="n">02</span>La montaña de Barcelona</a>
+  <a href="#llegar"><span class="n">03</span>Cómo subir</a>
+  <a href="#historia"><span class="n">04</span>Historia del Templo</a>
+  <a href="#arquitectura"><span class="n">05</span>Arquitectura</a>
+  <a href="#estatua"><span class="n">06</span>La estatua del Sagrado Corazón</a>
+  <a href="#arte"><span class="n">07</span>Mosaicos, vidrieras y escultura</a>
+  <a href="#parque"><span class="n">08</span>El parque de atracciones</a>
+  <a href="#torre"><span class="n">09</span>La Torre de Collserola</a>
+  <a href="#mirador"><span class="n">10</span>El mirador de la ciudad</a>
+  <a href="#practico"><span class="n">11</span>Datos prácticos</a>
+</nav>
+
+<!-- ============ PORTADA ============ -->
+<header class="hero">
+  <div class="eyebrow">Guía de visita · Barcelona</div>
+  <h1>Tibidabo
+    <span class="sub">El Templo Expiatorio del Sagrado Corazón</span>
+  </h1>
+
+  <figure class="hero-illu" aria-label="Silueta del Templo del Tibidabo coronado por la estatua del Sagrado Corazón">
+  <svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg" role="img">
+    <defs>
+      <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e8c96a"/>
+        <stop offset="1" stop-color="#c9a227"/>
+      </linearGradient>
+    </defs>
+    <!-- rayos -->
+    <g stroke="#e8c96a" stroke-width="1" opacity=".5">
+      <line x1="170" y1="42" x2="170" y2="8"/>
+      <line x1="170" y1="42" x2="140" y2="16"/>
+      <line x1="170" y1="42" x2="200" y2="16"/>
+      <line x1="170" y1="42" x2="120" y2="34"/>
+      <line x1="170" y1="42" x2="220" y2="34"/>
+    </g>
+    <!-- estatua Sagrado Corazón -->
+    <g fill="url(#hg)">
+      <circle cx="170" cy="52" r="9"/>
+      <path d="M170 60 q-13 4 -13 22 l0 20 q0 5 5 5 l16 0 q5 0 5 -5 l0 -20 q0 -18 -13 -22z"/>
+      <!-- brazos abiertos -->
+      <path d="M160 70 q-16 6 -22 20 l4 3 q7 -12 20 -16z"/>
+      <path d="M180 70 q16 6 22 20 l-4 3 q-7 -12 -20 -16z"/>
+    </g>
+    <!-- torre / templo neogótico -->
+    <g fill="#f6f1e7" opacity=".95">
+      <rect x="150" y="112" width="40" height="70"/>
+      <polygon points="150,112 170,96 190,112"/>
+      <rect x="158" y="128" width="8" height="18" fill="url(#hg)"/>
+      <rect x="174" y="128" width="8" height="18" fill="url(#hg)"/>
+      <!-- cuatro torretas -->
+      <rect x="132" y="150" width="14" height="32"/><polygon points="132,150 139,138 146,150"/>
+      <rect x="194" y="150" width="14" height="32"/><polygon points="194,150 201,138 208,150"/>
+    </g>
+    <!-- cripta / base -->
+    <g fill="#f6f1e7" opacity=".9">
+      <rect x="112" y="182" width="116" height="46"/>
+      <path d="M124 182 a12 12 0 0 1 24 0z"/>
+      <path d="M158 182 a12 12 0 0 1 24 0z"/>
+      <path d="M192 182 a12 12 0 0 1 24 0z"/>
+    </g>
+    <!-- montaña -->
+    <path d="M0 300 L0 250 Q80 210 170 228 Q260 210 340 250 L340 300 Z" fill="#54121f"/>
+    <path d="M0 300 L0 268 Q90 244 170 250 Q250 244 340 268 L340 300 Z" fill="#3a0e18" opacity=".7"/>
+  </svg>
+  </figure>
+
+  <p class="lat">«Haec ómnia tibi dabo…»</p>
+  <div class="scroll-cue">⌄</div>
+</header>
+
+<main>
+
+<!-- ============ 01 NOMBRE ============ -->
+<section class="section" id="nombre">
+  <div class="kicker"><span class="num">01</span> El nombre</div>
+  <h2>«Tibi dabo»: te daré</h2>
+  <div class="rule"></div>
+
+  <p class="lead">El nombre de la montaña procede de dos palabras latinas, <em>tibi dabo</em>, «te daré». La tradición las toma del relato evangélico de las tentaciones de Jesús, cuando el tentador lo lleva a un monte muy alto, le muestra todos los reinos del mundo y le dice: <em>«Todo esto te daré si postrándote me adoras»</em> (Mateo 4, 9; en la Vulgata, <em>«Haec omnia tibi dabo, si cadens adoraveris me»</em>).</p>
+
+  <p>La asociación entre esta cumbre de Barcelona y el pasaje evangélico está documentada al menos desde el siglo XIX y se popularizó precisamente cuando la montaña empezó a destinarse a un gran templo. Conviene tomarla como una <strong>lectura devota y toponímica consagrada por el uso</strong>, más que como una etimología histórica probada: lo que la hace elocuente es el contraste. Donde el relato evangélico ofrece todos los reinos a cambio de una adoración idolátrica, la montaña se corona con un templo en el que es Cristo quien recibe la adoración.</p>
+
+  <div class="pull">Donde se ofrecieron los reinos del mundo,<br>se levantó un templo a Cristo Rey.</div>
+</section>
+
+<!-- ============ 02 MONTAÑA ============ -->
+<section class="section" id="montana">
+  <div class="kicker"><span class="num">02</span> La montaña</div>
+  <h2>El techo de Barcelona</h2>
+  <div class="rule"></div>
+
+  <p class="lead">El Tibidabo es la cima más alta de la sierra de Collserola, el pulmón verde que cierra Barcelona por el noroeste. Con sus <strong>512 metros</strong> sobre el nivel del mar, domina toda la ciudad, el litoral mediterráneo y, en los días claros, un horizonte que llega hasta Montserrat y los Pirineos.</p>
+
+  <p>Su cumbre concentra tres hitos que conviven de forma singular: el <strong>Templo Expiatorio del Sagrado Corazón</strong>, que la corona; el <strong>Parque de Atracciones</strong>, uno de los más antiguos de Europa; y la esbelta <strong>Torre de Collserola</strong>, de comunicaciones. Fe, ocio popular y técnica contemporánea comparten la misma montaña.</p>
+
+  <figure>
+  <div class="figframe">
+  <svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Perfil de la cima del Tibidabo con el templo, la torre de comunicaciones y el parque de atracciones">
+    <!-- cielo -->
+    <rect width="360" height="200" fill="none"/>
+    <!-- montaña -->
+    <path d="M0 200 L0 150 Q120 90 200 120 Q290 95 360 150 L360 200 Z" fill="var(--garnet)"/>
+    <path d="M0 200 L0 170 Q120 140 200 150 Q290 140 360 170 L360 200 Z" fill="var(--garnet-deep)" opacity=".65"/>
+    <!-- Torre Collserola (derecha) -->
+    <g stroke="var(--ink-soft)" stroke-width="2" fill="none">
+      <line x1="300" y1="118" x2="300" y2="30"/>
+    </g>
+    <ellipse cx="300" cy="72" rx="9" ry="16" fill="var(--ink-soft)"/>
+    <line x1="300" y1="30" x2="300" y2="10" stroke="var(--gold)" stroke-width="1.5"/>
+    <!-- Templo (centro) -->
+    <g fill="var(--paper-card)" stroke="var(--rule)" stroke-width="1">
+      <rect x="150" y="96" width="26" height="30"/>
+      <polygon points="150,96 163,78 176,96"/>
+      <rect x="138" y="110" width="10" height="16"/>
+      <rect x="178" y="110" width="10" height="16"/>
+    </g>
+    <circle cx="163" cy="70" r="4" fill="var(--gold)"/>
+    <!-- Parque: noria (izquierda) -->
+    <g stroke="var(--gold)" stroke-width="1.5" fill="none">
+      <circle cx="70" cy="118" r="18"/>
+      <line x1="52" y1="118" x2="88" y2="118"/>
+      <line x1="70" y1="100" x2="70" y2="136"/>
+      <line x1="57" y1="105" x2="83" y2="131"/>
+      <line x1="83" y1="105" x2="57" y2="131"/>
+    </g>
+    <line x1="70" y1="118" x2="64" y2="140" stroke="var(--ink-soft)" stroke-width="1.5"/>
+    <line x1="70" y1="118" x2="76" y2="140" stroke="var(--ink-soft)" stroke-width="1.5"/>
+  </svg>
+  </div>
+  <figcaption>De izquierda a derecha: la noria del parque de atracciones, el Templo del Sagrado Corazón y la Torre de Collserola.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 03 LLEGAR ============ -->
+<section class="section" id="llegar">
+  <div class="kicker"><span class="num">03</span> Cómo subir</div>
+  <h2>El viaje a la cumbre</h2>
+  <div class="rule"></div>
+
+  <p>Buena parte del encanto del Tibidabo está en el modo de llegar, que conserva un sabor de principios del siglo XX. El itinerario clásico combina tres tramos:</p>
+
+  <ul class="facts">
+    <li><span class="k">Ferrocarril</span><span class="v">FGC hasta la estación de <em>Av. Tibidabo</em>.</span></li>
+    <li><span class="k">Tranvía Azul</span><span class="v">El histórico <em>Tramvia Blau</em> (o autobús sustitutorio) sube por la avenida hasta la plaza del Doctor Andreu.</span></li>
+    <li><span class="k">Funicular</span><span class="v">Desde allí, el <em>funicular del Tibidabo</em>, en servicio desde 1901, salva la fuerte pendiente hasta la cumbre.</span></li>
+  </ul>
+
+  <div class="tip"><b>Consejo.</b> Existen también líneas de autobús que suben directamente a la cima (el llamado <em>Tibibus</em> y otras) cuando el parque está abierto. Conviene comprobar horarios antes de ir, pues varían mucho según la temporada.</div>
+</section>
+
+<!-- ============ 04 HISTORIA ============ -->
+<section class="section" id="historia">
+  <div class="kicker"><span class="num">04</span> Historia</div>
+  <h2>Sesenta años de obra</h2>
+  <div class="rule"></div>
+
+  <p class="lead">El templo nace del impulso devocional al Sagrado Corazón que recorrió la Iglesia a finales del siglo XIX. Un episodio le dio raíz local: en <strong>1886</strong>, san Juan Bosco visitó Barcelona. Un grupo de barceloneses, deseoso de dedicar la cumbre del Tibidabo a un templo del Sagrado Corazón, puso el terreno bajo su patrocinio; la obra quedaría vinculada a los salesianos, que aún hoy la custodian.</p>
+
+  <p>Sobre una primera capilla provisional, el arquitecto <strong>Enric Sagnier i Villavecchia</strong> proyectó un conjunto monumental de dos niveles. Las obras se prolongaron durante seis décadas, atravesando la Guerra Civil, y las culminó su hijo, <strong>Josep Maria Sagnier i Vidal</strong>.</p>
+
+  <ul class="timeline">
+    <li><span class="yr">1886</span>Visita de san Juan Bosco a Barcelona; la cumbre se destina a un templo al Sagrado Corazón.</li>
+    <li><span class="yr">1902</span>Comienzan las obras del templo monumental según proyecto de Enric Sagnier.</li>
+    <li><span class="yr">1911</span>Se consagra la <em>cripta</em>, el nivel inferior, de estilo neobizantino.</li>
+    <li><span class="yr">1915 en adelante</span>Se levanta la iglesia superior, de estilo neogótico, sobre la cripta.</li>
+    <li><span class="yr">Guerra Civil</span>Las obras se interrumpen y el conjunto sufre daños.</li>
+    <li><span class="yr">1961</span>Se da por concluido el templo y se corona con la gran estatua del Sagrado Corazón.</li>
+  </ul>
+
+  <div class="card">
+    <div class="card-t">Un templo «expiatorio»</div>
+    <p style="margin-bottom:0">El término no alude a un castigo, sino a una tradición de piedad: un templo levantado en desagravio y como ofrenda reparadora, sostenido a menudo por la aportación popular. En la misma Barcelona, la Sagrada Familia comparte esa condición de <em>temple expiatori</em>.</p>
+  </div>
+</section>
+
+<!-- ============ 05 ARQUITECTURA ============ -->
+<section class="section" id="arquitectura">
+  <div class="kicker"><span class="num">05</span> Arquitectura</div>
+  <h2>Dos iglesias superpuestas</h2>
+  <div class="rule"></div>
+
+  <p class="lead">La gran originalidad del edificio es su composición en <strong>dos niveles de estilos distintos</strong>, uno sobre otro, coronados por la estatua. Es, en la práctica, un templo levantado sobre otro templo.</p>
+
+  <figure>
+  <div class="figframe">
+  <svg viewBox="0 0 240 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sección esquemática del templo: cripta neobizantina abajo, iglesia neogótica en medio y estatua del Sagrado Corazón arriba">
+    <defs>
+      <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--paper-card)"/>
+        <stop offset="1" stop-color="var(--rule)"/>
+      </linearGradient>
+    </defs>
+    <!-- ESTATUA -->
+    <g fill="var(--gold)">
+      <circle cx="120" cy="34" r="8"/>
+      <path d="M120 41 q-11 3 -11 18 l0 14 q0 4 4 4 l14 0 q4 0 4 -4 l0 -14 q0 -15 -11 -18z"/>
+      <path d="M111 50 q-13 5 -18 16 l3 3 q6 -10 16 -13z"/>
+      <path d="M129 50 q13 5 18 16 l-3 3 q-6 -10 -16 -13z"/>
+    </g>
+    <text x="165" y="60" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">Estatua</text>
+    <line x1="120" y1="84" x2="120" y2="96" stroke="var(--gold)" stroke-width="1.5"/>
+    <!-- terraza mirador -->
+    <rect x="96" y="96" width="48" height="8" fill="var(--gold)" opacity=".7"/>
+    <text x="150" y="104" fill="var(--ink-soft)" font-family="var(--serif)" font-style="italic" font-size="10">terraza</text>
+
+    <!-- IGLESIA SUPERIOR neogótica -->
+    <g fill="url(#stone)" stroke="var(--rule)" stroke-width="1">
+      <rect x="98" y="104" width="44" height="86"/>
+      <!-- torretas -->
+      <rect x="80" y="120" width="14" height="70"/><polygon points="80,120 87,104 94,120" fill="var(--garnet-soft)"/>
+      <rect x="146" y="120" width="14" height="70"/><polygon points="146,120 153,104 160,120" fill="var(--garnet-soft)"/>
+    </g>
+    <!-- ventanas ojivales -->
+    <g fill="var(--garnet)">
+      <path d="M108 130 q4 -8 12 -8 q8 0 12 8 l0 22 l-24 0 z" opacity=".85"/>
+    </g>
+    <path d="M112 160 q4 -6 8 -6 q4 0 8 6 l0 16 l-16 0z" fill="var(--gold-soft)" opacity=".8"/>
+    <text x="170" y="150" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">Iglesia</text>
+    <text x="170" y="164" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">neogótica</text>
+
+    <!-- CRIPTA neobizantina -->
+    <g fill="url(#stone)" stroke="var(--rule)" stroke-width="1">
+      <rect x="60" y="190" width="120" height="120"/>
+      <!-- arcos de medio punto -->
+    </g>
+    <g fill="var(--garnet)" opacity=".85">
+      <path d="M74 250 a13 13 0 0 1 26 0 l0 60 l-26 0 z"/>
+      <path d="M107 250 a13 13 0 0 1 26 0 l0 60 l-26 0 z"/>
+      <path d="M140 250 a13 13 0 0 1 26 0 l0 60 l-26 0 z"/>
+    </g>
+    <!-- cúpula bizantina insinuada -->
+    <path d="M96 190 a24 12 0 0 1 48 0 z" fill="var(--gold)" opacity=".55"/>
+    <text x="8" y="240" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">Cripta</text>
+    <text x="8" y="254" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">neobizantina</text>
+
+    <!-- roca -->
+    <path d="M40 310 L200 310 L210 340 L30 340 Z" fill="var(--garnet-deep)"/>
+    <rect x="30" y="340" width="180" height="14" fill="var(--garnet-deep)" opacity=".7"/>
+  </svg>
+  </div>
+  <figcaption>Esquema del conjunto: la cripta de arcos de medio punto sostiene la iglesia neogótica, rematada por la terraza-mirador y la estatua.</figcaption>
+  </figure>
+
+  <h3>La cripta neobizantina</h3>
+  <p>El nivel inferior, el primero en construirse y consagrarse (1911), adopta un lenguaje <strong>neobizantino y románico</strong>, con arcos de medio punto, muros macizos y una penumbra recogida. Es la parte más cálida y ornamentada del conjunto: a lo largo del tiempo, distintas capillas se fueron revistiendo de mosaicos y vidrieras. Su atmósfera contrasta deliberadamente con la verticalidad luminosa del piso superior.</p>
+
+  <h3>La iglesia neogótica</h3>
+  <p>Sobre la cripta se eleva la iglesia alta, de <strong>estilo neogótico</strong>, construida en piedra. Aquí manda la verticalidad: arcos ojivales, ventanales altos, pináculos y cuatro <strong>torreones angulares</strong> que enmarcan el cuerpo central. Este es el volumen que, visto desde la ciudad, dibuja la silueta reconocible del Tibidabo antes incluso de distinguir la figura que lo corona.</p>
+</section>
+
+<!-- ============ 06 ESTATUA ============ -->
+<section class="section" id="estatua">
+  <div class="kicker"><span class="num">06</span> La imagen que corona</div>
+  <h2>El Sagrado Corazón sobre la ciudad</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Todo el edificio culmina en la gran estatua del <strong>Sagrado Corazón de Jesús</strong>, de bronce, con los brazos abiertos hacia Barcelona. Es obra del escultor <strong>Josep Miret i Llopart</strong> y se instaló al concluir el templo, hacia 1961. Una imagen anterior no llegó a perdurar a causa de los avatares de la Guerra Civil.</p>
+
+  <p>La figura, de brazos extendidos y mirada dirigida a la ciudad, se ha comparado a menudo con el <em>Cristo Redentor</em> de Río de Janeiro y con el <em>Sacré-Cœur</em> de Montmartre, en París. El gesto no es de dominio, sino de acogida: los brazos abiertos que reciben a la ciudad tendida a sus pies.</p>
+
+  <div class="tip"><b>Sube a la terraza.</b> Un ascensor interior conduce hasta la terraza situada bajo la estatua. Desde allí, a más de quinientos metros de altura, se abre una de las <strong>panorámicas más completas de Barcelona</strong>, con el Mediterráneo al fondo.</div>
+
+  <div class="orn">✦ ✦ ✦</div>
+</section>
+
+<!-- ============ 07 ARTE ============ -->
+<section class="section" id="arte">
+  <div class="kicker"><span class="num">07</span> Las artes</div>
+  <h2>Mosaicos, vidrieras y piedra</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Más allá de la arquitectura, el templo es un compendio de artes al servicio del culto. Merece detenerse en tres registros.</p>
+
+  <h3>El mosaico</h3>
+  <p>La cripta y diversas capillas acogen conjuntos de <strong>mosaico</strong> de inspiración bizantina, con fondos dorados y figuras de contorno firme, propios de la sensibilidad de comienzos del siglo XX. El oro del teselado responde a una intención teológica: la luz que no procede del sol, sino que emana de las propias figuras sagradas.</p>
+
+  <h3>La vidriera</h3>
+  <p>Los <strong>ventanales</strong>, sobre todo en la iglesia alta, filtran la luz mediterránea y la tiñen, subrayando la verticalidad del espacio neogótico. La vidriera cumple aquí su función medieval: convertir el muro en un umbral de luz y transformar la piedra en relato.</p>
+
+  <h3>La escultura</h3>
+  <p>El programa escultórico se despliega por fachadas, torres y coronamiento. A la figura mayor del Sagrado Corazón se suman imágenes de <strong>apóstoles y evangelistas</strong> y motivos alusivos al culto al Corazón de Cristo, que ordenan la lectura simbólica del conjunto de abajo arriba: de la comunidad de los apóstoles a la figura de Cristo que todo lo culmina.</p>
+
+  <figure>
+  <div class="figframe">
+  <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Detalle ornamental: roseta de vidriera con motivo del Sagrado Corazón">
+    <circle cx="150" cy="75" r="62" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <circle cx="150" cy="75" r="50" fill="none" stroke="var(--rule)" stroke-width="1"/>
+    <g stroke="var(--garnet-soft)" stroke-width="1.5" opacity=".8">
+      <line x1="150" y1="13" x2="150" y2="137"/>
+      <line x1="88" y1="75" x2="212" y2="75"/>
+      <line x1="106" y1="31" x2="194" y2="119"/>
+      <line x1="194" y1="31" x2="106" y2="119"/>
+    </g>
+    <g fill="var(--garnet)">
+      <path d="M150 60 q-9 -12 -18 -2 q-6 8 2 16 l16 16 l16 -16 q8 -8 2 -16 q-9 -10 -18 2z"/>
+    </g>
+    <g stroke="var(--gold)" stroke-width="1"><line x1="150" y1="52" x2="150" y2="44"/><line x1="150" y1="44" x2="146" y2="38"/><line x1="150" y1="44" x2="154" y2="38"/></g>
+    <circle cx="150" cy="75" r="62" fill="none" stroke="var(--garnet-deep)" stroke-width="6" opacity=".15"/>
+  </svg>
+  </div>
+  <figcaption>Motivo del Corazón de Cristo, recurrente en el programa artístico del templo.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 08 PARQUE ============ -->
+<section class="section" id="parque">
+  <div class="kicker"><span class="num">08</span> El otro Tibidabo</div>
+  <h2>El parque de atracciones</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Junto al templo, y casi tan antiguo como él, se extiende el <strong>Parque de Atracciones del Tibidabo</strong>, inaugurado a comienzos del siglo XX (hacia 1901–1905). Es uno de los <strong>parques en funcionamiento más antiguos de Europa</strong>, y conserva un aire romántico que lo distingue de los recintos modernos.</p>
+
+  <p>Entre sus atracciones históricas destaca <strong>«L'Avió»</strong>, una réplica de avión que gira suspendida sobre el vacío, en servicio desde 1928; el <strong>Museo de Autómatas</strong>, con figuras mecánicas de feria; y la <strong>Atalaya</strong>, un mirador giratorio. Muchas de estas piezas tienen un valor patrimonial en sí mismas.</p>
+
+  <div class="card">
+    <div class="card-t">Sagrado y popular, lado a lado</div>
+    <p style="margin-bottom:0">La convivencia del gran templo con el parque de feria es uno de los rasgos más característicos del Tibidabo: la misma cumbre reúne el recogimiento del santuario y la alegría popular de la montaña de atracciones, sin que ninguno estorbe al otro.</p>
+  </div>
+</section>
+
+<!-- ============ 09 TORRE ============ -->
+<section class="section" id="torre">
+  <div class="kicker"><span class="num">09</span> El hito contemporáneo</div>
+  <h2>La Torre de Collserola</h2>
+  <div class="rule"></div>
+
+  <p class="lead">A escasa distancia se alza la <strong>Torre de Collserola</strong>, una torre de telecomunicaciones proyectada por el arquitecto británico <strong>Norman Foster</strong> con motivo de los Juegos Olímpicos de Barcelona de <strong>1992</strong>. Su fuste esbelto, sostenido por tensores, contrasta radicalmente con la masa pétrea del templo.</p>
+
+  <p>Dispone de un <strong>mirador acristalado</strong> en altura que, sumado a su emplazamiento en la sierra, ofrece otra perspectiva privilegiada de la ciudad. Templo, parque y torre resumen, cada uno a su modo, un siglo largo de la historia de Barcelona.</p>
+</section>
+
+<!-- ============ 10 MIRADOR ============ -->
+<section class="section" id="mirador">
+  <div class="kicker"><span class="num">10</span> La vista</div>
+  <h2>Barcelona a los pies</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Sea desde la terraza del templo, desde la torre o desde las plazas de la cumbre, el Tibidabo ofrece el <strong>gran balcón de Barcelona</strong>. La ciudad se despliega en su trama, con el mar cerrando el horizonte y, tierra adentro, el perfil inconfundible de Montserrat.</p>
+
+  <div class="tip"><b>El mejor momento.</b> Las horas de luz baja —primera mañana o atardecer— regalan las vistas más nítidas y una fotografía memorable de la estatua recortada sobre el cielo. En días de tramontana, tras la lluvia, la visibilidad puede alcanzar decenas de kilómetros.</div>
+</section>
+
+<!-- ============ 11 PRÁCTICO ============ -->
+<section class="section" id="practico">
+  <div class="kicker"><span class="num">11</span> En resumen</div>
+  <h2>Datos prácticos</h2>
+  <div class="rule"></div>
+
+  <ul class="facts">
+    <li><span class="k">Qué es</span><span class="v">Templo Expiatorio del Sagrado Corazón de Jesús, en la cumbre del Tibidabo.</span></li>
+    <li><span class="k">Dónde</span><span class="v">Sierra de Collserola, Barcelona. 512 m de altitud.</span></li>
+    <li><span class="k">Arquitecto</span><span class="v">Enric Sagnier i Villavecchia; concluido por Josep Maria Sagnier.</span></li>
+    <li><span class="k">Fechas</span><span class="v">Obras 1902–1961; cripta consagrada en 1911.</span></li>
+    <li><span class="k">Estilos</span><span class="v">Cripta neobizantina; iglesia superior neogótica.</span></li>
+    <li><span class="k">Estatua</span><span class="v">Sagrado Corazón, en bronce, de Josep Miret i Llopart.</span></li>
+    <li><span class="k">Custodia</span><span class="v">Congregación salesiana.</span></li>
+    <li><span class="k">Cómo llegar</span><span class="v">FGC + Tramvia Blau + funicular; o autobús a la cumbre.</span></li>
+    <li><span class="k">No olvidar</span><span class="v">Subir en ascensor a la terraza bajo la estatua.</span></li>
+  </ul>
+
+  <div class="tip"><b>Antes de ir.</b> Los horarios del templo, del funicular y del parque varían mucho según la época del año y pueden cambiar. Conviene consultarlos el mismo día de la visita.</div>
+
+  <div class="orn">✦</div>
+</section>
+
+</main>
+
+<footer>
+  <div class="fc">«Haec omnia tibi dabo»</div>
+  <div class="fs">
+    Guía de visita del Tibidabo y del Templo Expiatorio del Sagrado Corazón de Jesús · Barcelona<br>
+    Ilustraciones esquemáticas orientativas. Verifique horarios y accesos antes de la visita.
+  </div>
+</footer>
+
+<button class="up" id="btnUp" aria-label="Volver arriba">↑</button>
+
+<script>
+(function(){
+  var root=document.documentElement, fs=1;
+  function load(){
+    try{
+      var t=localStorage.getItem('tibi_theme'); if(t){root.setAttribute('data-theme',t);syncTheme();}
+      var f=parseFloat(localStorage.getItem('tibi_fs')); if(f){fs=f;root.style.setProperty('--fs',fs);}
+    }catch(e){}
+  }
+  function syncTheme(){
+    var dark=root.getAttribute('data-theme')==='dark';
+    document.getElementById('btnTheme').textContent=dark?'☀':'☾';
+  }
+  document.getElementById('btnPlus').onclick=function(){fs=Math.min(1.5,fs+0.1);root.style.setProperty('--fs',fs);try{localStorage.setItem('tibi_fs',fs)}catch(e){}};
+  document.getElementById('btnMinus').onclick=function(){fs=Math.max(0.8,fs-0.1);root.style.setProperty('--fs',fs);try{localStorage.setItem('tibi_fs',fs)}catch(e){}};
+  document.getElementById('btnTheme').onclick=function(){
+    var dark=root.getAttribute('data-theme')==='dark';
+    if(dark){root.removeAttribute('data-theme');try{localStorage.setItem('tibi_theme','light')}catch(e){}}
+    else{root.setAttribute('data-theme','dark');try{localStorage.setItem('tibi_theme','dark')}catch(e){}}
+    syncTheme();
+  };
+  var menu=document.getElementById('menu');
+  document.getElementById('btnMenu').onclick=function(){menu.classList.toggle('open')};
+  menu.querySelectorAll('a').forEach(function(a){a.onclick=function(){menu.classList.remove('open')}});
+
+  var up=document.getElementById('btnUp');
+  up.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>500)up.classList.add('show');else up.classList.remove('show');
+  },{passive:true});
+
+  load();
+})();
+</script>
+</body>
+</html>
