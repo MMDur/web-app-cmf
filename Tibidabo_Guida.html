@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tibidabo · Guida al Tempio Espiatorio del Sacro Cuore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --garnet:#6d1a2e;
+  --garnet-deep:#54121f;
+  --garnet-soft:#7b1e2b;
+  --gold:#c9a227;
+  --gold-soft:#e8c96a;
+  --paper:#f6f1e7;
+  --paper-card:#ffffff;
+  --ink:#2b2b2b;
+  --ink-soft:#5a5347;
+  --rule:#e4d9c3;
+  --shadow:rgba(60,30,30,.10);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --body:'Literata',Georgia,serif;
+  --fs:1;
+}
+[data-theme="dark"]{
+  --garnet:#8a2438;
+  --garnet-deep:#3a0e18;
+  --garnet-soft:#a13048;
+  --gold:#d9b23f;
+  --gold-soft:#f0d585;
+  --paper:#17110f;
+  --paper-card:#231b18;
+  --ink:#ece3d4;
+  --ink-soft:#b3a893;
+  --rule:#3a2e28;
+  --shadow:rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:calc(1rem * var(--fs));
+  line-height:1.68;
+  -webkit-text-size-adjust:100%;
+  overflow-x:hidden;
+}
+img,svg{max-width:100%;display:block}
+
+/* ---------- Barra superior ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--garnet-deep);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  padding-top:calc(10px + env(safe-area-inset-top));
+  box-shadow:0 2px 10px var(--shadow);
+}
+.topbar .brand{
+  font-family:var(--serif);color:var(--gold-soft);
+  font-size:calc(1.05rem * var(--fs));letter-spacing:.14em;text-transform:uppercase;
+  font-weight:600;
+}
+.tools{display:flex;gap:6px}
+.tool{
+  background:rgba(255,255,255,.08);border:1px solid rgba(232,201,106,.35);
+  color:var(--gold-soft);width:36px;height:36px;border-radius:50%;
+  font-family:var(--serif);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  transition:background .2s;
+}
+.tool:hover{background:rgba(255,255,255,.16)}
+.tool:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+
+/* ---------- Índice desplegable ---------- */
+.menu{
+  position:sticky;top:56px;z-index:39;
+  background:var(--garnet);
+  padding:0;max-height:0;overflow:hidden;
+  transition:max-height .35s ease;
+}
+.menu.open{max-height:70vh;overflow-y:auto}
+.menu a{
+  display:block;color:var(--paper);text-decoration:none;
+  padding:11px 22px;border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:var(--serif);font-size:calc(1.15rem * var(--fs));letter-spacing:.02em;
+}
+.menu a .n{color:var(--gold-soft);font-size:.75em;margin-right:10px;font-variant-numeric:tabular-nums}
+.menu a:active{background:var(--garnet-soft)}
+
+/* ---------- Portada ---------- */
+.hero{
+  position:relative;
+  background:
+    radial-gradient(140% 120% at 50% -10%, rgba(201,162,39,.22), transparent 55%),
+    linear-gradient(160deg,var(--garnet) 0%, var(--garnet-deep) 100%);
+  color:var(--paper);
+  padding:38px 22px 30px;
+  text-align:center;
+  overflow:hidden;
+}
+.hero .eyebrow{
+  font-family:var(--serif);letter-spacing:.32em;text-transform:uppercase;
+  font-size:calc(.72rem * var(--fs));color:var(--gold-soft);margin-bottom:14px;
+}
+.hero h1{
+  font-family:var(--serif);font-weight:600;line-height:1.02;
+  font-size:calc(2.9rem * var(--fs));margin-bottom:6px;
+}
+.hero h1 .sub{display:block;font-style:italic;font-weight:400;font-size:.42em;color:var(--gold-soft);letter-spacing:.04em;margin-top:10px}
+.hero .lat{
+  font-family:var(--serif);font-style:italic;font-size:calc(1.15rem * var(--fs));
+  color:var(--paper);opacity:.85;margin-top:18px;
+}
+.hero-illu{margin:6px auto 0;max-width:340px}
+.scroll-cue{margin-top:14px;color:var(--gold-soft);font-size:1.4rem;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ---------- Secciones ---------- */
+main{padding:0 0 60px}
+.section{padding:34px 20px 8px;max-width:720px;margin:0 auto;scroll-margin-top:64px}
+.kicker{
+  font-family:var(--serif);letter-spacing:.24em;text-transform:uppercase;
+  font-size:calc(.72rem * var(--fs));color:var(--garnet-soft);font-weight:600;
+  display:flex;align-items:center;gap:10px;margin-bottom:6px;
+}
+.kicker .num{
+  font-variant-numeric:tabular-nums;background:var(--garnet);color:var(--gold-soft);
+  border-radius:3px;padding:1px 7px;font-size:.9em;letter-spacing:.05em;
+}
+h2{
+  font-family:var(--serif);font-weight:600;color:var(--garnet-soft);
+  font-size:calc(2.1rem * var(--fs));line-height:1.08;margin-bottom:4px;
+}
+.rule{width:58px;height:3px;background:var(--gold);margin:12px 0 20px;border-radius:2px}
+h3{
+  font-family:var(--serif);font-weight:600;color:var(--ink);
+  font-size:calc(1.5rem * var(--fs));margin:26px 0 8px;line-height:1.15;
+}
+p{margin-bottom:15px;text-align:justify;hyphens:auto}
+p .lead{font-size:1.05em}
+em{color:var(--garnet-soft);font-style:italic}
+strong{color:var(--ink);font-weight:600}
+a.inline{color:var(--garnet-soft);text-decoration:underline;text-decoration-color:var(--gold)}
+
+/* Tarjeta / recuadro */
+.card{
+  background:var(--paper-card);border:1px solid var(--rule);
+  border-left:4px solid var(--gold);border-radius:8px;
+  padding:16px 18px;margin:20px 0;box-shadow:0 1px 4px var(--shadow);
+}
+.card .card-t{font-family:var(--serif);color:var(--garnet-soft);font-weight:600;font-size:calc(1.2rem * var(--fs));margin-bottom:4px}
+
+/* Cita / dato destacado */
+.pull{
+  font-family:var(--serif);font-style:italic;font-size:calc(1.5rem * var(--fs));
+  color:var(--garnet-soft);line-height:1.3;text-align:center;
+  padding:22px 10px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  margin:26px 0;
+}
+
+/* Cronología */
+.timeline{list-style:none;margin:18px 0;border-left:2px solid var(--rule);padding-left:0}
+.timeline li{position:relative;padding:0 0 20px 26px}
+.timeline li::before{
+  content:"";position:absolute;left:-7px;top:5px;width:12px;height:12px;
+  background:var(--gold);border:2px solid var(--paper);border-radius:50%;
+}
+.timeline .yr{font-family:var(--serif);color:var(--garnet-soft);font-weight:600;font-size:calc(1.25rem * var(--fs));display:block}
+
+/* Ficha de datos */
+.facts{list-style:none;margin:18px 0}
+.facts li{display:flex;gap:12px;padding:9px 0;border-bottom:1px dotted var(--rule);align-items:baseline}
+.facts .k{flex:0 0 42%;font-family:var(--serif);color:var(--garnet-soft);font-weight:600}
+.facts .v{flex:1}
+
+/* Figura con ilustración */
+figure{margin:24px 0}
+figure svg{margin:0 auto;filter:drop-shadow(0 4px 10px var(--shadow))}
+figcaption{
+  text-align:center;font-family:var(--serif);font-style:italic;
+  color:var(--ink-soft);font-size:calc(1rem * var(--fs));margin-top:10px;
+  padding:0 16px;line-height:1.4;
+}
+.figframe{background:var(--paper-card);border:1px solid var(--rule);border-radius:10px;padding:18px 12px}
+
+/* Consejo / práctico */
+.tip{
+  background:linear-gradient(135deg,rgba(201,162,39,.12),rgba(109,26,46,.06));
+  border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:18px 0;
+  font-size:.97em;
+}
+.tip b{color:var(--garnet-soft);font-family:var(--serif);font-size:1.1em}
+
+/* Separador ornamental */
+.orn{text-align:center;color:var(--gold);font-size:1.3rem;letter-spacing:.5em;margin:30px 0 6px;opacity:.8}
+
+/* Pie */
+footer{
+  background:var(--garnet-deep);color:var(--paper);text-align:center;
+  padding:30px 22px;padding-bottom:calc(30px + env(safe-area-inset-bottom));
+}
+footer .fc{font-family:var(--serif);color:var(--gold-soft);letter-spacing:.06em;font-size:calc(1.1rem * var(--fs))}
+footer .fs{opacity:.6;font-size:.82em;margin-top:8px;line-height:1.5}
+
+/* Botón subir */
+.up{
+  position:fixed;right:16px;bottom:16px;z-index:35;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--garnet);color:var(--gold-soft);font-size:1.2rem;
+  box-shadow:0 3px 12px var(--shadow);opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.up.show{opacity:1;pointer-events:auto}
+
+@media(min-width:680px){
+  .hero h1{font-size:calc(3.6rem * var(--fs))}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;scroll-behavior:auto!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">Tibidabo</span>
+  <div class="tools">
+    <button class="tool" id="btnMenu" aria-label="Indice">☰</button>
+    <button class="tool" id="btnMinus" aria-label="Riduci testo">A−</button>
+    <button class="tool" id="btnPlus" aria-label="Aumenta testo">A+</button>
+    <button class="tool" id="btnTheme" aria-label="Modalità scura">☾</button>
+  </div>
+</div>
+
+<nav class="menu" id="menu">
+  <a href="#nombre"><span class="n">01</span>Il nome: «Tibi dabo»</a>
+  <a href="#montana"><span class="n">02</span>La montagna di Barcellona</a>
+  <a href="#llegar"><span class="n">03</span>Come arrivare</a>
+  <a href="#historia"><span class="n">04</span>Storia del Tempio</a>
+  <a href="#arquitectura"><span class="n">05</span>Architettura</a>
+  <a href="#estatua"><span class="n">06</span>La statua del Sacro Cuore</a>
+  <a href="#arte"><span class="n">07</span>Mosaici, vetrate e scultura</a>
+  <a href="#parque"><span class="n">08</span>Il parco divertimenti</a>
+  <a href="#torre"><span class="n">09</span>La Torre di Collserola</a>
+  <a href="#mirador"><span class="n">10</span>Il belvedere della città</a>
+  <a href="#practico"><span class="n">11</span>Informazioni pratiche</a>
+</nav>
+
+<!-- ============ PORTADA ============ -->
+<header class="hero">
+  <div class="eyebrow">Guida alla visita · Barcellona</div>
+  <h1>Tibidabo
+    <span class="sub">Il Tempio Espiatorio del Sacro Cuore</span>
+  </h1>
+
+  <figure class="hero-illu" aria-label="Sagoma del Tempio del Tibidabo sormontato dalla statua del Sacro Cuore">
+  <svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg" role="img">
+    <defs>
+      <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e8c96a"/>
+        <stop offset="1" stop-color="#c9a227"/>
+      </linearGradient>
+    </defs>
+    <!-- rayos -->
+    <g stroke="#e8c96a" stroke-width="1" opacity=".5">
+      <line x1="170" y1="42" x2="170" y2="8"/>
+      <line x1="170" y1="42" x2="140" y2="16"/>
+      <line x1="170" y1="42" x2="200" y2="16"/>
+      <line x1="170" y1="42" x2="120" y2="34"/>
+      <line x1="170" y1="42" x2="220" y2="34"/>
+    </g>
+    <!-- estatua Sagrado Corazón -->
+    <g fill="url(#hg)">
+      <circle cx="170" cy="52" r="9"/>
+      <path d="M170 60 q-13 4 -13 22 l0 20 q0 5 5 5 l16 0 q5 0 5 -5 l0 -20 q0 -18 -13 -22z"/>
+      <!-- brazos abiertos -->
+      <path d="M160 70 q-16 6 -22 20 l4 3 q7 -12 20 -16z"/>
+      <path d="M180 70 q16 6 22 20 l-4 3 q-7 -12 -20 -16z"/>
+    </g>
+    <!-- torre / templo neogótico -->
+    <g fill="#f6f1e7" opacity=".95">
+      <rect x="150" y="112" width="40" height="70"/>
+      <polygon points="150,112 170,96 190,112"/>
+      <rect x="158" y="128" width="8" height="18" fill="url(#hg)"/>
+      <rect x="174" y="128" width="8" height="18" fill="url(#hg)"/>
+      <!-- cuatro torretas -->
+      <rect x="132" y="150" width="14" height="32"/><polygon points="132,150 139,138 146,150"/>
+      <rect x="194" y="150" width="14" height="32"/><polygon points="194,150 201,138 208,150"/>
+    </g>
+    <!-- cripta / base -->
+    <g fill="#f6f1e7" opacity=".9">
+      <rect x="112" y="182" width="116" height="46"/>
+      <path d="M124 182 a12 12 0 0 1 24 0z"/>
+      <path d="M158 182 a12 12 0 0 1 24 0z"/>
+      <path d="M192 182 a12 12 0 0 1 24 0z"/>
+    </g>
+    <!-- montaña -->
+    <path d="M0 300 L0 250 Q80 210 170 228 Q260 210 340 250 L340 300 Z" fill="#54121f"/>
+    <path d="M0 300 L0 268 Q90 244 170 250 Q250 244 340 268 L340 300 Z" fill="#3a0e18" opacity=".7"/>
+  </svg>
+  </figure>
+
+  <p class="lat">«Haec ómnia tibi dabo…»</p>
+  <div class="scroll-cue">⌄</div>
+</header>
+
+<main>
+
+<!-- ============ 01 NOMBRE ============ -->
+<section class="section" id="nombre">
+  <div class="kicker"><span class="num">01</span> Il nome</div>
+  <h2>«Tibi dabo»: ti darò</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Il nome della montagna deriva da due parole latine, <em>tibi dabo</em>, «ti darò». La tradizione le riprende dal racconto evangelico delle tentazioni di Gesù, quando il tentatore lo conduce su un monte altissimo, gli mostra tutti i regni del mondo e gli dice: <em>«Tutto questo ti darò se, prostrandoti, mi adorerai»</em> (Matteo 4, 9; nella Vulgata, <em>«Haec omnia tibi dabo, si cadens adoraveris me»</em>).</p>
+
+  <p>L'associazione tra questa cima di Barcellona e il passo evangelico è documentata almeno dal XIX secolo e si diffuse proprio quando la montagna cominciò a essere destinata a un grande tempio. È preferibile considerarla una <strong>lettura devota e toponomastica consacrata dall'uso</strong>, più che un'etimologia storicamente accertata: ciò che la rende eloquente è il contrasto. Dove il racconto evangelico offre tutti i regni in cambio di un'adorazione idolatra, la montagna si corona con un tempio in cui è Cristo a ricevere l'adorazione.</p>
+
+  <div class="pull">Dove furono offerti i regni del mondo,<br>si innalzò un tempio a Cristo Re.</div>
+</section>
+
+<!-- ============ 02 MONTAÑA ============ -->
+<section class="section" id="montana">
+  <div class="kicker"><span class="num">02</span> La montagna</div>
+  <h2>Il tetto di Barcellona</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Il Tibidabo è la vetta più alta della catena di Collserola, il polmone verde che chiude Barcellona a nord-ovest. Con i suoi <strong>512 metri</strong> sul livello del mare, domina l'intera città, il litorale mediterraneo e, nelle giornate limpide, un orizzonte che arriva fino a Montserrat e ai Pirenei.</p>
+
+  <p>La sua cima riunisce tre punti di riferimento che convivono in modo singolare: il <strong>Tempio Espiatorio del Sacro Cuore</strong>, che la corona; il <strong>Parco Divertimenti</strong>, uno dei più antichi d'Europa; e l'esile <strong>Torre di Collserola</strong>, per le telecomunicazioni. Fede, svago popolare e tecnica contemporanea condividono la stessa montagna.</p>
+
+  <figure>
+  <div class="figframe">
+  <svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Profilo della cima del Tibidabo con il tempio, la torre delle telecomunicazioni e il parco divertimenti">
+    <!-- cielo -->
+    <rect width="360" height="200" fill="none"/>
+    <!-- montaña -->
+    <path d="M0 200 L0 150 Q120 90 200 120 Q290 95 360 150 L360 200 Z" fill="var(--garnet)"/>
+    <path d="M0 200 L0 170 Q120 140 200 150 Q290 140 360 170 L360 200 Z" fill="var(--garnet-deep)" opacity=".65"/>
+    <!-- Torre Collserola (derecha) -->
+    <g stroke="var(--ink-soft)" stroke-width="2" fill="none">
+      <line x1="300" y1="118" x2="300" y2="30"/>
+    </g>
+    <ellipse cx="300" cy="72" rx="9" ry="16" fill="var(--ink-soft)"/>
+    <line x1="300" y1="30" x2="300" y2="10" stroke="var(--gold)" stroke-width="1.5"/>
+    <!-- Templo (centro) -->
+    <g fill="var(--paper-card)" stroke="var(--rule)" stroke-width="1">
+      <rect x="150" y="96" width="26" height="30"/>
+      <polygon points="150,96 163,78 176,96"/>
+      <rect x="138" y="110" width="10" height="16"/>
+      <rect x="178" y="110" width="10" height="16"/>
+    </g>
+    <circle cx="163" cy="70" r="4" fill="var(--gold)"/>
+    <!-- Parque: noria (izquierda) -->
+    <g stroke="var(--gold)" stroke-width="1.5" fill="none">
+      <circle cx="70" cy="118" r="18"/>
+      <line x1="52" y1="118" x2="88" y2="118"/>
+      <line x1="70" y1="100" x2="70" y2="136"/>
+      <line x1="57" y1="105" x2="83" y2="131"/>
+      <line x1="83" y1="105" x2="57" y2="131"/>
+    </g>
+    <line x1="70" y1="118" x2="64" y2="140" stroke="var(--ink-soft)" stroke-width="1.5"/>
+    <line x1="70" y1="118" x2="76" y2="140" stroke="var(--ink-soft)" stroke-width="1.5"/>
+  </svg>
+  </div>
+  <figcaption>Da sinistra a destra: la ruota panoramica del parco divertimenti, il Tempio del Sacro Cuore e la Torre di Collserola.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 03 LLEGAR ============ -->
+<section class="section" id="llegar">
+  <div class="kicker"><span class="num">03</span> Come arrivare</div>
+  <h2>Il viaggio verso la cima</h2>
+  <div class="rule"></div>
+
+  <p>Buona parte del fascino del Tibidabo sta nel modo di arrivarci, che conserva un sapore d'inizio Novecento. L'itinerario classico combina tre tratti:</p>
+
+  <ul class="facts">
+    <li><span class="k">Ferrovia</span><span class="v">FGC fino alla stazione di <em>Av. Tibidabo</em>.</span></li>
+    <li><span class="k">Tram Blu</span><span class="v">Lo storico <em>Tramvia Blau</em> (o l'autobus sostitutivo) risale il viale fino a plaça del Doctor Andreu.</span></li>
+    <li><span class="k">Funicolare</span><span class="v">Da lì, la <em>funicolare del Tibidabo</em>, in servizio dal 1901, supera la forte pendenza fino alla cima.</span></li>
+  </ul>
+
+  <div class="tip"><b>Consiglio.</b> Esistono anche linee di autobus che salgono direttamente in cima (il cosiddetto <em>Tibibus</em> e altre) quando il parco è aperto. Conviene verificare gli orari prima di partire, poiché variano molto a seconda della stagione.</div>
+</section>
+
+<!-- ============ 04 HISTORIA ============ -->
+<section class="section" id="historia">
+  <div class="kicker"><span class="num">04</span> Storia</div>
+  <h2>Sessant'anni di lavori</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Il tempio nasce dallo slancio devozionale verso il Sacro Cuore che percorse la Chiesa alla fine del XIX secolo. Un episodio gli diede radice locale: nel <strong>1886</strong>, san Giovanni Bosco visitò Barcellona. Un gruppo di barcellonesi, desiderosi di dedicare la cima del Tibidabo a un tempio del Sacro Cuore, pose il terreno sotto il suo patrocinio; l'opera sarebbe rimasta legata ai salesiani, che ancora oggi la custodiscono.</p>
+
+  <p>Su una prima cappella provvisoria, l'architetto <strong>Enric Sagnier i Villavecchia</strong> progettò un complesso monumentale a due livelli. I lavori si protrassero per sei decenni, attraversando la Guerra Civile, e furono portati a termine dal figlio, <strong>Josep Maria Sagnier i Vidal</strong>.</p>
+
+  <ul class="timeline">
+    <li><span class="yr">1886</span>Visita di san Giovanni Bosco a Barcellona; la cima viene destinata a un tempio al Sacro Cuore.</li>
+    <li><span class="yr">1902</span>Iniziano i lavori del tempio monumentale su progetto di Enric Sagnier.</li>
+    <li><span class="yr">1911</span>Viene consacrata la <em>cripta</em>, il livello inferiore, in stile neobizantino.</li>
+    <li><span class="yr">Dal 1915</span>Si innalza la chiesa superiore, in stile neogotico, sopra la cripta.</li>
+    <li><span class="yr">Guerra Civile</span>I lavori si interrompono e il complesso subisce danni.</li>
+    <li><span class="yr">1961</span>Il tempio viene dichiarato concluso e coronato dalla grande statua del Sacro Cuore.</li>
+  </ul>
+
+  <div class="card">
+    <div class="card-t">Un tempio «espiatorio»</div>
+    <p style="margin-bottom:0">Il termine non allude a una punizione, ma a una tradizione di pietà: un tempio innalzato come atto di riparazione e offerta espiatoria, sostenuto spesso dal contributo popolare. Nella stessa Barcellona, la Sagrada Família condivide questa condizione di <em>temple expiatori</em>.</p>
+  </div>
+</section>
+
+<!-- ============ 05 ARQUITECTURA ============ -->
+<section class="section" id="arquitectura">
+  <div class="kicker"><span class="num">05</span> Architettura</div>
+  <h2>Due chiese sovrapposte</h2>
+  <div class="rule"></div>
+
+  <p class="lead">La grande originalità dell'edificio è la sua composizione in <strong>due livelli di stili diversi</strong>, uno sopra l'altro, coronati dalla statua. È, in pratica, un tempio innalzato sopra un altro tempio.</p>
+
+  <figure>
+  <div class="figframe">
+  <svg viewBox="0 0 240 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sezione schematica del tempio: cripta neobizantina in basso, chiesa neogotica al centro e statua del Sacro Cuore in alto">
+    <defs>
+      <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--paper-card)"/>
+        <stop offset="1" stop-color="var(--rule)"/>
+      </linearGradient>
+    </defs>
+    <!-- ESTATUA -->
+    <g fill="var(--gold)">
+      <circle cx="120" cy="34" r="8"/>
+      <path d="M120 41 q-11 3 -11 18 l0 14 q0 4 4 4 l14 0 q4 0 4 -4 l0 -14 q0 -15 -11 -18z"/>
+      <path d="M111 50 q-13 5 -18 16 l3 3 q6 -10 16 -13z"/>
+      <path d="M129 50 q13 5 18 16 l-3 3 q-6 -10 -16 -13z"/>
+    </g>
+    <text x="165" y="60" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">Statua</text>
+    <line x1="120" y1="84" x2="120" y2="96" stroke="var(--gold)" stroke-width="1.5"/>
+    <!-- terraza mirador -->
+    <rect x="96" y="96" width="48" height="8" fill="var(--gold)" opacity=".7"/>
+    <text x="150" y="104" fill="var(--ink-soft)" font-family="var(--serif)" font-style="italic" font-size="10">terrazza</text>
+
+    <!-- IGLESIA SUPERIOR neogótica -->
+    <g fill="url(#stone)" stroke="var(--rule)" stroke-width="1">
+      <rect x="98" y="104" width="44" height="86"/>
+      <!-- torretas -->
+      <rect x="80" y="120" width="14" height="70"/><polygon points="80,120 87,104 94,120" fill="var(--garnet-soft)"/>
+      <rect x="146" y="120" width="14" height="70"/><polygon points="146,120 153,104 160,120" fill="var(--garnet-soft)"/>
+    </g>
+    <!-- ventanas ojivales -->
+    <g fill="var(--garnet)">
+      <path d="M108 130 q4 -8 12 -8 q8 0 12 8 l0 22 l-24 0 z" opacity=".85"/>
+    </g>
+    <path d="M112 160 q4 -6 8 -6 q4 0 8 6 l0 16 l-16 0z" fill="var(--gold-soft)" opacity=".8"/>
+    <text x="170" y="150" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">Chiesa</text>
+    <text x="170" y="164" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">neogotica</text>
+
+    <!-- CRIPTA neobizantina -->
+    <g fill="url(#stone)" stroke="var(--rule)" stroke-width="1">
+      <rect x="60" y="190" width="120" height="120"/>
+      <!-- arcos de medio punto -->
+    </g>
+    <g fill="var(--garnet)" opacity=".85">
+      <path d="M74 250 a13 13 0 0 1 26 0 l0 60 l-26 0 z"/>
+      <path d="M107 250 a13 13 0 0 1 26 0 l0 60 l-26 0 z"/>
+      <path d="M140 250 a13 13 0 0 1 26 0 l0 60 l-26 0 z"/>
+    </g>
+    <!-- cúpula bizantina insinuada -->
+    <path d="M96 190 a24 12 0 0 1 48 0 z" fill="var(--gold)" opacity=".55"/>
+    <text x="8" y="240" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">Cripta</text>
+    <text x="8" y="254" fill="var(--garnet-soft)" font-family="var(--serif)" font-style="italic" font-size="12">neobizantina</text>
+
+    <!-- roca -->
+    <path d="M40 310 L200 310 L210 340 L30 340 Z" fill="var(--garnet-deep)"/>
+    <rect x="30" y="340" width="180" height="14" fill="var(--garnet-deep)" opacity=".7"/>
+  </svg>
+  </div>
+  <figcaption>Schema dell'insieme: la cripta ad archi a tutto sesto sorregge la chiesa neogotica, coronata dalla terrazza-belvedere e dalla statua.</figcaption>
+  </figure>
+
+  <h3>La cripta neobizantina</h3>
+  <p>Il livello inferiore, il primo a essere costruito e consacrato (1911), adotta un linguaggio <strong>neobizantino e romanico</strong>, con archi a tutto sesto, muri massicci e una penombra raccolta. È la parte più calda e ornata del complesso: nel corso del tempo, diverse cappelle sono state rivestite di mosaici e vetrate. La sua atmosfera contrasta deliberatamente con la verticalità luminosa del piano superiore.</p>
+
+  <h3>La chiesa neogotica</h3>
+  <p>Sopra la cripta si eleva la chiesa alta, in <strong>stile neogotico</strong>, costruita in pietra. Qui domina la verticalità: archi ogivali, ampie vetrate, pinnacoli e quattro <strong>torrette angolari</strong> che incorniciano il corpo centrale. Questo è il volume che, visto dalla città, disegna la sagoma riconoscibile del Tibidabo ancor prima di distinguere la figura che lo corona.</p>
+</section>
+
+<!-- ============ 06 ESTATUA ============ -->
+<section class="section" id="estatua">
+  <div class="kicker"><span class="num">06</span> L'immagine che corona</div>
+  <h2>Il Sacro Cuore sulla città</h2>
+  <div class="rule"></div>
+
+  <p class="lead">L'intero edificio culmina nella grande statua del <strong>Sacro Cuore di Gesù</strong>, in bronzo, con le braccia aperte verso Barcellona. È opera dello scultore <strong>Josep Miret i Llopart</strong> e fu collocata al termine dei lavori, verso il 1961. Un'immagine precedente non riuscì a sopravvivere a causa delle vicende della Guerra Civile.</p>
+
+  <p>La figura, con le braccia distese e lo sguardo rivolto verso la città, è stata spesso paragonata al <em>Cristo Redentore</em> di Rio de Janeiro e al <em>Sacré-Cœur</em> di Montmartre, a Parigi. Il gesto non è di dominio, ma di accoglienza: le braccia aperte che ricevono la città distesa ai suoi piedi.</p>
+
+  <div class="tip"><b>Sali sulla terrazza.</b> Un ascensore interno conduce fino alla terrazza situata sotto la statua. Da lì, a oltre cinquecento metri d'altezza, si apre uno dei <strong>panorami più completi di Barcellona</strong>, con il Mediterraneo sullo sfondo.</div>
+
+  <div class="orn">✦ ✦ ✦</div>
+</section>
+
+<!-- ============ 07 ARTE ============ -->
+<section class="section" id="arte">
+  <div class="kicker"><span class="num">07</span> Le arti</div>
+  <h2>Mosaici, vetrate e pietra</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Al di là dell'architettura, il tempio è un compendio di arti al servizio del culto. Vale la pena soffermarsi su tre aspetti.</p>
+
+  <h3>Il mosaico</h3>
+  <p>La cripta e diverse cappelle ospitano insiemi di <strong>mosaico</strong> di ispirazione bizantina, con fondi dorati e figure dal contorno netto, propri della sensibilità di inizio Novecento. L'oro delle tessere risponde a un'intenzione teologica: la luce che non proviene dal sole, ma emana dalle stesse figure sacre.</p>
+
+  <h3>La vetrata</h3>
+  <p>Le <strong>vetrate</strong>, soprattutto nella chiesa alta, filtrano la luce mediterranea e la colorano, sottolineando la verticalità dello spazio neogotico. La vetrata assolve qui la sua funzione medievale: trasformare il muro in una soglia di luce e la pietra in racconto.</p>
+
+  <h3>La scultura</h3>
+  <p>Il programma scultoreo si dispiega su facciate, torri e coronamento. Alla figura maggiore del Sacro Cuore si aggiungono immagini di <strong>apostoli ed evangelisti</strong> e motivi allusivi al culto del Cuore di Cristo, che ordinano la lettura simbolica dell'insieme dal basso verso l'alto: dalla comunità degli apostoli alla figura di Cristo che tutto culmina.</p>
+
+  <figure>
+  <div class="figframe">
+  <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dettaglio ornamentale: rosone di vetrata con motivo del Sacro Cuore">
+    <circle cx="150" cy="75" r="62" fill="none" stroke="var(--gold)" stroke-width="2"/>
+    <circle cx="150" cy="75" r="50" fill="none" stroke="var(--rule)" stroke-width="1"/>
+    <g stroke="var(--garnet-soft)" stroke-width="1.5" opacity=".8">
+      <line x1="150" y1="13" x2="150" y2="137"/>
+      <line x1="88" y1="75" x2="212" y2="75"/>
+      <line x1="106" y1="31" x2="194" y2="119"/>
+      <line x1="194" y1="31" x2="106" y2="119"/>
+    </g>
+    <g fill="var(--garnet)">
+      <path d="M150 60 q-9 -12 -18 -2 q-6 8 2 16 l16 16 l16 -16 q8 -8 2 -16 q-9 -10 -18 2z"/>
+    </g>
+    <g stroke="var(--gold)" stroke-width="1"><line x1="150" y1="52" x2="150" y2="44"/><line x1="150" y1="44" x2="146" y2="38"/><line x1="150" y1="44" x2="154" y2="38"/></g>
+    <circle cx="150" cy="75" r="62" fill="none" stroke="var(--garnet-deep)" stroke-width="6" opacity=".15"/>
+  </svg>
+  </div>
+  <figcaption>Motivo del Cuore di Cristo, ricorrente nel programma artistico del tempio.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 08 PARQUE ============ -->
+<section class="section" id="parque">
+  <div class="kicker"><span class="num">08</span> L'altro Tibidabo</div>
+  <h2>Il parco divertimenti</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Accanto al tempio, e quasi altrettanto antico, si estende il <strong>Parco Divertimenti del Tibidabo</strong>, inaugurato all'inizio del Novecento (attorno al 1901–1905). È uno dei <strong>parchi in funzione più antichi d'Europa</strong>, e conserva un'aria romantica che lo distingue dai parchi moderni.</p>
+
+  <p>Tra le sue attrazioni storiche spicca <strong>«L'Avió»</strong>, una replica di aereo che ruota sospesa nel vuoto, in servizio dal 1928; il <strong>Museo degli Automi</strong>, con figure meccaniche da fiera; e l'<strong>Atalaya</strong>, un belvedere girevole. Molti di questi pezzi hanno un valore storico-patrimoniale in sé.</p>
+
+  <div class="card">
+    <div class="card-t">Sacro e popolare, fianco a fianco</div>
+    <p style="margin-bottom:0">La convivenza del grande tempio con il parco di divertimenti è uno dei tratti più caratteristici del Tibidabo: la stessa cima riunisce il raccoglimento del santuario e l'allegria popolare della montagna delle attrazioni, senza che l'uno ostacoli l'altro.</p>
+  </div>
+</section>
+
+<!-- ============ 09 TORRE ============ -->
+<section class="section" id="torre">
+  <div class="kicker"><span class="num">09</span> Il punto di riferimento contemporaneo</div>
+  <h2>La Torre di Collserola</h2>
+  <div class="rule"></div>
+
+  <p class="lead">A breve distanza si erge la <strong>Torre di Collserola</strong>, una torre per le telecomunicazioni progettata dall'architetto britannico <strong>Norman Foster</strong> in occasione dei Giochi Olimpici di Barcellona del <strong>1992</strong>. Il suo fusto slanciato, sostenuto da tiranti, contrasta radicalmente con la massa lapidea del tempio.</p>
+
+  <p>Dispone di un <strong>belvedere vetrato</strong> in quota che, unito alla sua collocazione sulla montagna, offre un'altra prospettiva privilegiata sulla città. Tempio, parco e torre riassumono, ciascuno a suo modo, oltre un secolo di storia di Barcellona.</p>
+</section>
+
+<!-- ============ 10 MIRADOR ============ -->
+<section class="section" id="mirador">
+  <div class="kicker"><span class="num">10</span> La vista</div>
+  <h2>Barcellona ai piedi</h2>
+  <div class="rule"></div>
+
+  <p class="lead">Sia dalla terrazza del tempio, sia dalla torre o dalle piazze della cima, il Tibidabo offre il <strong>grande balcone di Barcellona</strong>. La città si dispiega nella sua trama, con il mare a chiudere l'orizzonte e, verso l'entroterra, il profilo inconfondibile di Montserrat.</p>
+
+  <div class="tip"><b>Il momento migliore.</b> Le ore di luce radente — primo mattino o tramonto — regalano le vedute più nitide e una fotografia memorabile della statua stagliata contro il cielo. Nei giorni di tramontana, dopo la pioggia, la visibilità può raggiungere decine di chilometri.</div>
+</section>
+
+<!-- ============ 11 PRÁCTICO ============ -->
+<section class="section" id="practico">
+  <div class="kicker"><span class="num">11</span> In sintesi</div>
+  <h2>Informazioni pratiche</h2>
+  <div class="rule"></div>
+
+  <ul class="facts">
+    <li><span class="k">Cos'è</span><span class="v">Tempio Espiatorio del Sacro Cuore di Gesù, sulla cima del Tibidabo.</span></li>
+    <li><span class="k">Dove</span><span class="v">Catena di Collserola, Barcellona. 512 m di altitudine.</span></li>
+    <li><span class="k">Architetto</span><span class="v">Enric Sagnier i Villavecchia; concluso da Josep Maria Sagnier.</span></li>
+    <li><span class="k">Date</span><span class="v">Lavori 1902–1961; cripta consacrata nel 1911.</span></li>
+    <li><span class="k">Stili</span><span class="v">Cripta neobizantina; chiesa superiore neogotica.</span></li>
+    <li><span class="k">Statua</span><span class="v">Sacro Cuore, in bronzo, di Josep Miret i Llopart.</span></li>
+    <li><span class="k">Custodia</span><span class="v">Congregazione salesiana.</span></li>
+    <li><span class="k">Come arrivare</span><span class="v">FGC + Tramvia Blau + funicolare; oppure autobus fino alla cima.</span></li>
+    <li><span class="k">Da non dimenticare</span><span class="v">Salire con l'ascensore fino alla terrazza sotto la statua.</span></li>
+  </ul>
+
+  <div class="tip"><b>Prima di andare.</b> Gli orari del tempio, della funicolare e del parco variano molto a seconda del periodo dell'anno e possono cambiare. Conviene verificarli lo stesso giorno della visita.</div>
+
+  <div class="orn">✦</div>
+</section>
+
+</main>
+
+<footer>
+  <div class="fc">«Haec omnia tibi dabo»</div>
+  <div class="fs">
+    Guida alla visita del Tibidabo e del Tempio Espiatorio del Sacro Cuore di Gesù · Barcellona<br>
+    Illustrazioni schematiche indicative. Verificare gli orari e gli accessi prima della visita.
+  </div>
+</footer>
+
+<button class="up" id="btnUp" aria-label="Torna su">↑</button>
+
+<script>
+(function(){
+  var root=document.documentElement, fs=1;
+  function load(){
+    try{
+      var t=localStorage.getItem('tibi_theme'); if(t){root.setAttribute('data-theme',t);syncTheme();}
+      var f=parseFloat(localStorage.getItem('tibi_fs')); if(f){fs=f;root.style.setProperty('--fs',fs);}
+    }catch(e){}
+  }
+  function syncTheme(){
+    var dark=root.getAttribute('data-theme')==='dark';
+    document.getElementById('btnTheme').textContent=dark?'☀':'☾';
+  }
+  document.getElementById('btnPlus').onclick=function(){fs=Math.min(1.5,fs+0.1);root.style.setProperty('--fs',fs);try{localStorage.setItem('tibi_fs',fs)}catch(e){}};
+  document.getElementById('btnMinus').onclick=function(){fs=Math.max(0.8,fs-0.1);root.style.setProperty('--fs',fs);try{localStorage.setItem('tibi_fs',fs)}catch(e){}};
+  document.getElementById('btnTheme').onclick=function(){
+    var dark=root.getAttribute('data-theme')==='dark';
+    if(dark){root.removeAttribute('data-theme');try{localStorage.setItem('tibi_theme','light')}catch(e){}}
+    else{root.setAttribute('data-theme','dark');try{localStorage.setItem('tibi_theme','dark')}catch(e){}}
+    syncTheme();
+  };
+  var menu=document.getElementById('menu');
+  document.getElementById('btnMenu').onclick=function(){menu.classList.toggle('open')};
+  menu.querySelectorAll('a').forEach(function(a){a.onclick=function(){menu.classList.remove('open')}});
+
+  var up=document.getElementById('btnUp');
+  up.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>500)up.classList.add('show');else up.classList.remove('show');
+  },{passive:true});
+
+  load();
+})();
+</script>
+</body>
+</html>
