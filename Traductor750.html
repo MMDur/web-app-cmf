@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traductor 750</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f3f5f7;margin:0;padding:20px}
+.container{max-width:900px;margin:auto}
+.card{background:white;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 3px 10px #ddd}
+h1{text-align:center}
+textarea{width:100%;box-sizing:border-box;min-height:120px;padding:12px;border-radius:10px;border:1px solid #ccc;font-size:15px}
+button{background:#2563eb;color:white;border:0;padding:12px 20px;border-radius:10px;cursor:pointer;margin-top:10px}
+.counter{text-align:right;color:#666}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px}
+.small{font-size:13px;color:#666}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="card">
+<h1>🌐 Traductor 750</h1>
+<p style="text-align:center">Español → Catalán · Francés · Italiano · Euskera</p>
+
+<textarea id="texto" maxlength="750" placeholder="Escribe o pega aquí el texto en español..."></textarea>
+<div class="counter"><span id="contador">0</span> / 750 caracteres</div>
+
+<button onclick="traducir()">Traducir</button>
+<p class="small">Versión sencilla para GitHub Pages. Usa un servicio externo de traducción.</p>
+</div>
+
+<div class="grid">
+<div class="card"><h3>🇨🇦 Catalán</h3><textarea id="ca" readonly></textarea></div>
+<div class="card"><h3>🇫🇷 Francés</h3><textarea id="fr" readonly></textarea></div>
+<div class="card"><h3>🇮🇹 Italiano</h3><textarea id="it" readonly></textarea></div>
+<div class="card"><h3>🟢 Euskera</h3><textarea id="eu" readonly></textarea></div>
+</div>
+
+</div>
+
+<script>
+document.getElementById("texto").addEventListener("input",e=>{
+ document.getElementById("contador").textContent=e.target.value.length;
+});
+
+async function traducirTexto(texto, idioma){
+ const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(texto)+"&langpair=es|"+idioma;
+ const respuesta=await fetch(url);
+ const datos=await respuesta.json();
+ return datos.responseData.translatedText || "Sin resultado";
+}
+
+async function traducir(){
+ const texto=document.getElementById("texto").value.trim();
+
+ if(!texto){
+  alert("Introduce un texto");
+  return;
+ }
+
+ document.querySelectorAll(".grid textarea").forEach(x=>x.value="Traduciendo...");
+
+ try{
+  ca.value=await traducirTexto(texto,"ca");
+  fr.value=await traducirTexto(texto,"fr");
+  it.value=await traducirTexto(texto,"it");
+  eu.value=await traducirTexto(texto,"eu");
+ }catch(e){
+  alert("No se pudo conectar con el servicio de traducción.");
+ }
+}
+</script>
+
+</body>
+</html>
