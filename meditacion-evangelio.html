@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meditación del Evangelio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;1,7..72,300;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ───────────────────────────────────────────────── */
+:root {
+  --g:  #7C1D2B;
+  --gd: #4E0F1B;
+  --gl: #9E2537;
+  --au: #B8933E;
+  --al: #D4AD5C;
+  --p0: #F7F2EA;
+  --p1: #EDE5D2;
+  --sf: #FFFFFF;
+  --tx: #1E1410;
+  --tm: #6B5B52;
+  --bd: #D5C8B5;
+  --fs: 1rem;
+  --rr: 3px;
+}
+[data-theme=dark] {
+  --p0: #190D13;
+  --p1: #221020;
+  --sf: #2A1220;
+  --tx: #F0E6DA;
+  --tm: #A08878;
+  --bd: #4A2838;
+}
+
+/* ── RESET ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: var(--fs); scroll-behavior: smooth; }
+body {
+  font-family: 'Literata', Georgia, serif;
+  background: var(--p0); color: var(--tx);
+  min-height: 100vh; display: flex; flex-direction: column;
+  transition: background .3s, color .3s;
+}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+header {
+  background: var(--gd);
+  padding: .7rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 99;
+  box-shadow: 0 2px 10px rgba(0,0,0,.38);
+}
+.htitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 500; font-style: italic;
+  color: var(--al); letter-spacing: .02em;
+}
+.hctrls { display: flex; gap: .35rem; align-items: center; }
+.cb {
+  background: transparent;
+  border: 1px solid rgba(212,173,92,.3);
+  color: var(--al); padding: .18rem .46rem;
+  border-radius: var(--rr); cursor: pointer;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .8rem; transition: .2s; line-height: 1.3;
+}
+.cb:hover { background: rgba(212,173,92,.14); border-color: var(--al); }
+
+/* ── STEP BAR ─────────────────────────────────────────────── */
+.sbar { background: var(--p1); padding: .62rem .8rem; border-bottom: 1px solid var(--bd); display: flex; justify-content: center; }
+.sinner { display: flex; align-items: flex-start; max-width: 540px; width: 100%; }
+.si { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.si::before { content: ''; position: absolute; top: 10px; left: 50%; width: 100%; height: 1px; background: var(--bd); z-index: 0; }
+.si:last-child::before { display: none; }
+.si.done::before { background: var(--au); }
+.sid {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--bd); background: var(--sf);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: .65rem;
+  color: var(--tm); position: relative; z-index: 1; transition: .25s;
+}
+.si.act .sid { border-color: var(--g); background: var(--g); color: #F0E6DA; }
+.si.done .sid { border-color: var(--au); background: var(--au); color: #fff; }
+.si.done, .si.act { cursor: pointer; }
+.sil { font-family: 'Cormorant Garamond', serif; font-size: .56rem; color: var(--tm); margin-top: 3px; text-align: center; line-height: 1.2; }
+@media (max-width: 420px) { .sil { display: none; } }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+main { flex: 1; padding: 1.6rem 1rem .5rem; max-width: 660px; width: 100%; margin: 0 auto; }
+.pn { display: none; animation: fu .32s ease; }
+.pn.on { display: block; }
+@keyframes fu { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.ptit {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem; font-weight: 500; font-style: italic;
+  color: var(--g); line-height: 1.2; margin-bottom: .15rem;
+}
+[data-theme=dark] .ptit { color: var(--al); }
+.dv { width: 52px; height: 2px; background: linear-gradient(90deg, var(--g), var(--au)); margin: .6rem 0 1.5rem; }
+.into { font-size: .94rem; line-height: 1.82; margin-bottom: 1.4rem; }
+
+/* ── STEP 0: BREATHING ────────────────────────────────────── */
+.bwrap { display: flex; flex-direction: column; align-items: center; padding: 1rem 0; }
+.bsvg { margin-bottom: 1.3rem; }
+@keyframes rpulse { 0%,100% { opacity:.3; } 50% { opacity:.65; } }
+.briing { animation: rpulse 3s ease-in-out infinite; }
+.btxt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem; font-style: italic; color: var(--g);
+  min-height: 2rem; text-align: center; margin-bottom: .25rem;
+  transition: opacity .2s;
+}
+[data-theme=dark] .btxt { color: var(--al); }
+.bcyc { font-size: .8rem; color: var(--tm); font-style: italic; margin-bottom: 1rem; min-height: 1.2em; }
+.bdots { display: flex; gap: 7px; margin-bottom: 1.3rem; }
+.bdot { width: 8px; height: 8px; border-radius: 50%; background: var(--bd); transition: background .4s; }
+.bdot.lit { background: var(--g); }
+[data-theme=dark] .bdot.lit { background: var(--au); }
+.skipb {
+  background: none; border: 1px solid var(--bd); color: var(--tm);
+  padding: .32rem .9rem; border-radius: var(--rr); cursor: pointer;
+  font-family: 'Literata', serif; font-size: .82rem; transition: .2s;
+}
+.skipb:hover { border-color: var(--g); color: var(--g); }
+
+/* ── STEP 1: GOSPEL ───────────────────────────────────────── */
+.drow { display: flex; gap: .45rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.1rem; }
+input[type=date] {
+  padding: .28rem .5rem; border: 1px solid var(--bd); border-radius: var(--rr);
+  background: var(--sf); color: var(--tx);
+  font-family: 'Literata', serif; font-size: .82rem;
+}
+.fb {
+  background: var(--g); color: #F0E6DA; border: none;
+  padding: .32rem .8rem; border-radius: var(--rr); cursor: pointer;
+  font-family: 'Cormorant Garamond', serif; font-size: .88rem; font-style: italic; transition: .2s;
+}
+.fb:hover { background: var(--gl); }
+.fb.go { background: var(--au); color: var(--gd); }
+.fb.go:hover { background: var(--al); }
+.gldr { text-align: center; padding: 2.2rem 0; }
+.spnr {
+  width: 34px; height: 34px; border: 2px solid var(--bd);
+  border-top-color: var(--g); border-radius: 50%;
+  animation: spin .7s linear infinite; margin: 0 auto .7rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.ltxt { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--tm); font-size: .9rem; }
+.gerr {
+  background: rgba(124,29,43,.07); border: 1px solid rgba(124,29,43,.18);
+  border-radius: var(--rr); padding: .8rem .95rem; margin-bottom: .8rem;
+  font-size: .86rem; color: var(--g); line-height: 1.65;
+}
+[data-theme=dark] .gerr { background: rgba(184,147,62,.07); border-color: rgba(184,147,62,.2); color: var(--al); }
+.gmeta { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .25rem; margin-bottom: .4rem; }
+.gref { font-family: 'Cormorant Garamond', serif; font-size: .85rem; font-style: italic; color: var(--tm); }
+.gdt  { font-size: .76rem; color: var(--tm); }
+.gtit { font-family: 'Cormorant Garamond', serif; font-size: 1.02rem; font-weight: 500; font-style: italic; color: var(--tx); margin-bottom: 1.1rem; }
+.gbody { font-size: .95rem; line-height: 1.9; }
+.gbody p { margin-bottom: .85em; }
+.fback { display: none; }
+.flbl { font-size: .84rem; color: var(--tm); margin-bottom: .45rem; font-style: italic; }
+
+/* ── SHARED INPUTS ────────────────────────────────────────── */
+textarea, .winput {
+  width: 100%; padding: .7rem .95rem;
+  border: 1px solid var(--bd); border-radius: var(--rr);
+  background: var(--sf); color: var(--tx);
+  font-family: 'Literata', serif; font-size: .93rem; line-height: 1.75;
+  resize: vertical; transition: border-color .2s;
+}
+textarea:focus, .winput:focus { outline: none; border-color: var(--g); }
+.shint {
+  font-size: .72rem; color: var(--tm); font-style: italic;
+  text-align: right; margin-top: .28rem; min-height: 1em;
+  opacity: 0; transition: opacity .3s;
+}
+.shint.on { opacity: 1; }
+
+/* ── STEP 2: RESONANT WORD ────────────────────────────────── */
+.gmini {
+  background: var(--p1); border-left: 3px solid var(--au);
+  padding: .8rem 1rem; border-radius: 0 var(--rr) var(--rr) 0;
+  margin-bottom: 1.4rem; font-size: .84rem; color: var(--tm);
+  font-style: italic; line-height: 1.7;
+  max-height: 108px; overflow-y: auto;
+}
+.winput {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-style: italic;
+  border-bottom: 2px solid var(--g);
+  border-radius: var(--rr) var(--rr) 0 0;
+  padding: .8rem 1rem;
+  resize: none;
+}
+.whint { font-size: .83rem; color: var(--tm); font-style: italic; text-align: center; margin-top: .7rem; line-height: 1.6; }
+
+/* ── STEP 3: QUESTIONS ────────────────────────────────────── */
+.qs { display: flex; flex-direction: column; gap: 1.2rem; }
+.qcard {
+  background: var(--sf); border: 1px solid var(--bd);
+  border-left: 3px solid var(--g);
+  border-radius: 0 var(--rr) var(--rr) 0; padding: 1rem 1rem .9rem;
+}
+[data-theme=dark] .qcard { border-left-color: var(--au); }
+.qnum { font-family: 'Cormorant Garamond', serif; font-size: .7rem; color: var(--au); letter-spacing: .08em; text-transform: uppercase; margin-bottom: .3rem; }
+[data-theme=dark] .qnum { color: var(--al); }
+.qtxt { font-size: .9rem; line-height: 1.65; color: var(--tx); margin-bottom: .65rem; }
+.qcard textarea { min-height: 52px; font-size: .87rem; padding: .45rem .65rem; }
+
+/* ── STEP 4: DIALOGUE ─────────────────────────────────────── */
+.dia-intro { font-size: .93rem; line-height: 1.82; margin-bottom: 1.2rem; }
+#dText { min-height: 210px; }
+.dprompt { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: .88rem; color: var(--tm); text-align: center; margin-top: .6rem; }
+
+/* ── STEP 5: SILENCE ──────────────────────────────────────── */
+.swrap { text-align: center; padding: 1rem 0; }
+.bellb {
+  width: 90px; height: 90px; border-radius: 50%;
+  border: 2px solid var(--au);
+  background: linear-gradient(135deg, var(--gd), var(--g));
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; margin: 0 auto .9rem;
+  transition: transform .2s, box-shadow .2s;
+  font-size: 2.4rem;
+  box-shadow: 0 4px 16px rgba(78,15,27,.32);
+  user-select: none;
+}
+.bellb:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(78,15,27,.42); }
+.bellb:active { transform: scale(.96); }
+.bellb.ring { animation: br .55s ease; }
+@keyframes br {
+  0%  { transform: rotate(0); }
+  15% { transform: rotate(-14deg); }
+  30% { transform: rotate(14deg); }
+  45% { transform: rotate(-9deg); }
+  60% { transform: rotate(9deg); }
+  75% { transform: rotate(-4deg); }
+  100%{ transform: rotate(0); }
+}
+.bhint { font-size: .76rem; color: var(--tm); margin-bottom: 1.8rem; font-style: italic; }
+.sprayer {
+  background: linear-gradient(135deg, var(--gd), var(--g));
+  color: #F0E6DA; padding: 1.5rem;
+  border-radius: var(--rr);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-style: italic; line-height: 1.9;
+  margin-top: .8rem; text-align: center;
+}
+.sprayer .gw { color: var(--al); }
+.actrow { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.4rem; }
+.acb {
+  background: none; border: 1px solid var(--bd); color: var(--tm);
+  padding: .35rem .9rem; border-radius: var(--rr); cursor: pointer;
+  font-family: 'Literata', serif; font-size: .8rem; transition: .2s;
+}
+.acb:hover { border-color: var(--g); color: var(--g); }
+
+/* ── NAV FOOTER ───────────────────────────────────────────── */
+.nfoot {
+  position: sticky; bottom: 0; background: var(--p0);
+  border-top: 1px solid var(--bd);
+  padding: .8rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background .3s; z-index: 50;
+}
+.nb {
+  padding: .48rem 1.2rem; border-radius: var(--rr);
+  cursor: pointer; font-family: 'Cormorant Garamond', serif;
+  font-size: .97rem; font-style: italic; transition: .2s;
+}
+.nprev { background: transparent; border: 1px solid var(--bd); color: var(--tm); }
+.nprev:hover { border-color: var(--g); color: var(--g); }
+.nnext { background: var(--g); border: 1px solid transparent; color: #F0E6DA; }
+.nnext:hover { background: var(--gl); }
+.nb:disabled { opacity: .3; cursor: not-allowed; pointer-events: none; }
+.ninf { font-family: 'Cormorant Garamond', serif; font-size: .76rem; color: var(--tm); font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="htitle" id="hTitle">Meditación del Evangelio</div>
+  <div class="hctrls">
+    <button class="cb" id="langBtn" onclick="toggleLang()">CA</button>
+    <button class="cb" id="themeBtn" onclick="toggleTheme()">☽</button>
+    <button class="cb" onclick="adjFont(-1)" title="Reducir texto">A−</button>
+    <button class="cb" onclick="adjFont(1)"  title="Aumentar texto">A+</button>
+  </div>
+</header>
+
+<!-- STEP BAR -->
+<div class="sbar"><div class="sinner" id="sbar"></div></div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- P0: PACIFICATION -->
+  <div class="pn on" id="p0">
+    <h1 class="ptit" id="t00">Pacificación interior</h1>
+    <div class="dv"></div>
+    <p class="into" id="t01">Antes de acercarnos a la Palabra, detente un momento. Deja que el cuerpo y el espíritu se aquieten. Respira despacio, con confianza.</p>
+    <div class="bwrap">
+      <svg class="bsvg" viewBox="0 0 200 200" width="176" height="176" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="rg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#B8933E" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="#7C1D2B" stop-opacity=".06"/>
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="88" fill="url(#rg)"/>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="#B8933E" stroke-width=".7" class="briing"/>
+        <circle id="bc"  cx="100" cy="100" r="34" fill="#7C1D2B" opacity=".9"/>
+        <circle id="brc" cx="100" cy="100" r="34" fill="none" stroke="#B8933E" stroke-width="1.8"/>
+      </svg>
+      <div class="btxt" id="btxt">…</div>
+      <div class="bcyc" id="bcyc"></div>
+      <div class="bdots" id="bdots"></div>
+      <button class="skipb" id="tSkip" onclick="skipBreath()">Omitir ejercicio</button>
+    </div>
+  </div>
+
+  <!-- P1: GOSPEL -->
+  <div class="pn" id="p1">
+    <h1 class="ptit" id="t10">El Evangelio</h1>
+    <div class="dv"></div>
+    <div class="drow">
+      <input type="date" id="gDate">
+      <button class="fb"    id="tFetch"  onclick="doFetch()">Obtener evangelio</button>
+      <button class="fb go" id="tManual" onclick="toggleFback()">Manual</button>
+    </div>
+    <div id="gLoader" class="gldr" style="display:none">
+      <div class="spnr"></div>
+      <div class="ltxt" id="tLoad">Cargando el evangelio del día…</div>
+    </div>
+    <div id="gErr" class="gerr" style="display:none"></div>
+    <div id="gDisp" style="display:none">
+      <div class="gmeta">
+        <span class="gref" id="gRef"></span>
+        <span class="gdt"  id="gDt"></span>
+      </div>
+      <div class="gtit"  id="gTit"></div>
+      <div class="gbody" id="gBody"></div>
+    </div>
+    <div class="fback" id="gFback">
+      <p class="flbl" id="tPaste">Pega aquí el texto del evangelio:</p>
+      <textarea id="gMan" rows="9" placeholder="In illo tempore…"></textarea>
+      <div class="shint" id="gSaved"></div>
+    </div>
+  </div>
+
+  <!-- P2: RESONANT WORD -->
+  <div class="pn" id="p2">
+    <h1 class="ptit" id="t20">La palabra que resuena</h1>
+    <div class="dv"></div>
+    <p class="into" id="t21">Relee el evangelio lentamente. ¿Qué palabra, imagen o frase te ha llamado la atención? No busques con la cabeza: deja que algo llegue solo.</p>
+    <div class="gmini" id="gMini">—</div>
+    <input type="text" class="winput" id="wInput" maxlength="120" placeholder="…" autocomplete="off">
+    <p class="whint" id="t22">Escríbela o cópiala del texto. Una sola palabra, o unas pocas.</p>
+  </div>
+
+  <!-- P3: QUESTIONS -->
+  <div class="pn" id="p3">
+    <h1 class="ptit" id="t30">Meditación</h1>
+    <div class="dv"></div>
+    <p class="into" id="t31">Tómate tiempo con cada pregunta. No hay respuestas correctas. Es un diálogo entre tú y el Señor.</p>
+    <div class="qs">
+      <div class="qcard">
+        <div class="qnum">I</div>
+        <p class="qtxt" id="q1t"></p>
+        <textarea id="q1a" rows="2" placeholder="…"></textarea>
+        <div class="shint" id="q1s"></div>
+      </div>
+      <div class="qcard">
+        <div class="qnum">II</div>
+        <p class="qtxt" id="q2t"></p>
+        <textarea id="q2a" rows="2" placeholder="…"></textarea>
+        <div class="shint" id="q2s"></div>
+      </div>
+      <div class="qcard">
+        <div class="qnum">III</div>
+        <p class="qtxt" id="q3t"></p>
+        <textarea id="q3a" rows="2" placeholder="…"></textarea>
+        <div class="shint" id="q3s"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P4: INNER DIALOGUE -->
+  <div class="pn" id="p4">
+    <h1 class="ptit" id="t40">Diálogo interior</h1>
+    <div class="dv"></div>
+    <p class="dia-intro" id="t41">Ahora habla con el Señor. Escribe lo que quieras decirle: tu gratitud, tus preguntas, tus resistencias, tu deseo. Este espacio es solo tuyo.</p>
+    <textarea id="dText" rows="9" placeholder="Señor…"></textarea>
+    <div class="dprompt" id="t42">¿Qué te pide este evangelio hoy?</div>
+    <div class="shint" id="dSaved"></div>
+  </div>
+
+  <!-- P5: FINAL SILENCE -->
+  <div class="pn" id="p5">
+    <h1 class="ptit" id="t50">Silencio final</h1>
+    <div class="dv"></div>
+    <div class="swrap">
+      <p class="into" id="t51" style="margin-bottom:1.8rem">Has recorrido el camino de la Palabra. Permanece ahora en silencio, dejándote mirar por Aquel que te ha hablado.</p>
+      <div class="bellb" id="bellBtn" onclick="ringBell()" role="button" tabindex="0" aria-label="Campana">🔔</div>
+      <p class="bhint" id="tBell">Toca la campana para el silencio</p>
+      <div class="sprayer" id="sPray"></div>
+      <div class="actrow">
+        <button class="acb" id="tExport" onclick="doExport()">Guardar retiro</button>
+        <button class="acb" id="tNew"    onclick="newSession()">Nueva sesión</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- NAV FOOTER -->
+<div class="nfoot">
+  <button class="nb nprev" id="prevBtn" onclick="nav(-1)" disabled>← Anterior</button>
+  <span  class="ninf"      id="navInf">1 de 6</span>
+  <button class="nb nnext" id="nextBtn" onclick="nav(1)">Siguiente →</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════ */
+let S     = 0;
+let lang  = localStorage.getItem('ev-lang')  || 'es';
+let theme = localStorage.getItem('ev-theme') || 'light';
+let fs    = parseFloat(localStorage.getItem('ev-fs') || '1');
+let gospel = { ref: '', title: '', text: '' };
+
+/* ═══════════════════════════════════════════════════════════
+   TRANSLATIONS
+   ═══════════════════════════════════════════════════════════ */
+const T = {
+  es: {
+    hTitle: 'Meditación del Evangelio', langBtn: 'CA',
+    t00: 'Pacificación interior',
+    t01: 'Antes de acercarnos a la Palabra, detente un momento. Deja que el cuerpo y el espíritu se aquieten. Respira despacio, con confianza.',
+    t10: 'El Evangelio',
+    t20: 'La palabra que resuena',
+    t21: 'Relee el evangelio lentamente. ¿Qué palabra, imagen o frase te ha llamado la atención? No busques con la cabeza: deja que algo llegue solo.',
+    t22: 'Escríbela o cópiala del texto. Una sola palabra, o unas pocas.',
+    t30: 'Meditación',
+    t31: 'Tómate tiempo con cada pregunta. No hay respuestas correctas. Es un diálogo entre tú y el Señor.',
+    t40: 'Diálogo interior',
+    t41: 'Ahora habla con el Señor. Escribe lo que quieras decirle: tu gratitud, tus preguntas, tus resistencias, tu deseo. Este espacio es solo tuyo.',
+    t42: '¿Qué te pide este evangelio hoy?',
+    t50: 'Silencio final',
+    t51: 'Has recorrido el camino de la Palabra. Permanece ahora en silencio, dejándote mirar por Aquel que te ha hablado.',
+    tBell: 'Toca la campana para el silencio',
+    tFetch: 'Obtener evangelio', tManual: 'Manual',
+    tLoad: 'Cargando el evangelio del día…',
+    tPaste: 'Pega aquí el texto del evangelio:',
+    tSkip: 'Omitir ejercicio',
+    tExport: 'Guardar retiro', tNew: 'Nueva sesión',
+    sLabels: ['Pac.', 'Evang.', 'Palabra', 'Medit.', 'Diálogo', 'Silencio'],
+    stepOf: (a, b) => `${a} de ${b}`,
+    saved: 'Guardado ✓', prev: '← Anterior', next: 'Siguiente →', finish: 'Amén',
+    inhale: 'Inhala…', hold: 'Sostén…', exhale: 'Exhala…',
+    cycOf: (n, t) => `Ciclo ${n} de ${t}`,
+    errFetch: 'No se pudo obtener el evangelio (conexión o API no disponible). Introdúcelo manualmente.',
+    q1: '¿Qué imagen, personaje o acción del evangelio te ha llamado más la atención?',
+    q2: '¿Qué dice este texto sobre Jesús, sobre Dios o sobre ti? ¿Qué te revela?',
+    q3: '¿Qué actitud concreta te pide este evangelio hoy?',
+    thanks: w => `Gracias, Señor, por tu Palabra.${w ? '\n«' + w + '»' : ''}\nQue haga camino en mí.`,
+    dlgPH: 'Señor…',
+    expTitle: '— Retiro del Evangelio —',
+    copied: '¡Copiado!',
+    newConfirm: '¿Borrar todas las anotaciones de esta sesión?',
+  },
+  ca: {
+    hTitle: "Meditació de l'Evangeli", langBtn: 'ES',
+    t00: 'Pacificació interior',
+    t01: "Abans d'apropar-nos a la Paraula, atura't un moment. Deixa que el cos i l'esperit s'aquietin. Respira a poc a poc, amb confiança.",
+    t10: "L'Evangeli",
+    t20: 'La paraula que ressona',
+    t21: "Torna a llegir l'evangeli a poc a poc. Quina paraula, imatge o frase t'ha cridat l'atenció? No ho busquis amb el cap: deixa que arribi sol.",
+    t22: "Escriu-la o copia-la del text. Una sola paraula, o unes poques.",
+    t30: 'Meditació',
+    t31: "Pren-te temps amb cada pregunta. No hi ha respostes correctes. És un diàleg entre tu i el Senyor.",
+    t40: 'Diàleg interior',
+    t41: "Ara parla amb el Senyor. Escriu el que vulguis dir-li: la teva gratitud, les teves preguntes, les teves resistències, el teu desig. Aquest espai és només teu.",
+    t42: "Què et demana aquest evangeli avui?",
+    t50: 'Silenci final',
+    t51: "Has recorregut el camí de la Paraula. Romàn ara en silenci, deixant-te mirar per Aquell que t'ha parlat.",
+    tBell: 'Toca la campana per al silenci',
+    tFetch: "Obtenir l'evangeli", tManual: 'Manual',
+    tLoad: "Carregant l'evangeli del dia…",
+    tPaste: "Enganxa aquí el text de l'evangeli:",
+    tSkip: 'Ometre exercici',
+    tExport: 'Guardar el retir', tNew: 'Nova sessió',
+    sLabels: ['Pac.', 'Evang.', 'Paraula', 'Medit.', 'Diàleg', 'Silenci'],
+    stepOf: (a, b) => `${a} de ${b}`,
+    saved: 'Desat ✓', prev: '← Anterior', next: 'Següent →', finish: 'Amén',
+    inhale: 'Inspira…', hold: 'Sosté…', exhale: 'Expira…',
+    cycOf: (n, t) => `Cicle ${n} de ${t}`,
+    errFetch: "No s'ha pogut obtenir l'evangeli (connexió o API no disponible). Introdueix-lo manualment.",
+    q1: "Quina imatge, personatge o acció de l'evangeli t'ha cridat més l'atenció?",
+    q2: "Què diu aquest text sobre Jesús, sobre Déu o sobre tu? Què et revela?",
+    q3: "Quina actitud concreta et demana aquest evangeli avui?",
+    thanks: w => `Gràcies, Senyor, per la teva Paraula.${w ? '\n«' + w + '»' : ''}\nQue faci camí en mi.`,
+    dlgPH: 'Senyor…',
+    expTitle: "— Retir de l'Evangeli —",
+    copied: 'Copiat!',
+    newConfirm: "Esborrar totes les anotacions d'aquesta sessió?",
+  }
+};
+const t = k => T[lang][k] ?? T.es[k] ?? k;
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+function init() {
+  applyTheme(theme);
+  applyLang(lang);
+  applyFs(fs);
+  document.getElementById('gDate').value = new Date().toISOString().split('T')[0];
+  restoreTexts();
+  buildBar();
+  updateNav();
+  startBreath();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THEME / LANG / FONT
+   ═══════════════════════════════════════════════════════════ */
+function toggleTheme() {
+  theme = theme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('ev-theme', theme);
+  applyTheme(theme);
+}
+function applyTheme(th) {
+  document.documentElement.setAttribute('data-theme', th);
+  document.getElementById('themeBtn').textContent = th === 'dark' ? '☀' : '☽';
+}
+
+function toggleLang() {
+  lang = lang === 'es' ? 'ca' : 'es';
+  localStorage.setItem('ev-lang', lang);
+  applyLang(lang);
+}
+function applyLang(l) {
+  document.documentElement.lang = l;
+  ['hTitle','t00','t01','t10','t20','t21','t22','t30','t31',
+   't40','t41','t42','t50','t51','tBell','tFetch','tManual',
+   'tLoad','tPaste','tSkip','tExport','tNew','langBtn']
+  .forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.textContent = T[l][k] ?? T.es[k] ?? k;
+  });
+  document.getElementById('prevBtn').textContent = t('prev');
+  document.getElementById('dText').placeholder = t('dlgPH');
+  ['q1','q2','q3'].forEach(q => {
+    document.getElementById(q + 't').textContent = T[l][q];
+  });
+  buildBar();
+  updateNav();
+  updatePrayer();
+}
+
+function adjFont(d) {
+  fs = Math.max(.85, Math.min(1.32, fs + d * .1));
+  localStorage.setItem('ev-fs', fs);
+  applyFs(fs);
+}
+function applyFs(f) { document.documentElement.style.setProperty('--fs', f + 'rem'); }
+
+/* ═══════════════════════════════════════════════════════════
+   STEP BAR
+   ═══════════════════════════════════════════════════════════ */
+function buildBar() {
+  const bar = document.getElementById('sbar');
+  bar.innerHTML = '';
+  T[lang].sLabels.forEach((lbl, i) => {
+    const cls = i < S ? 'si done' : i === S ? 'si act' : 'si';
+    const div = document.createElement('div');
+    div.className = cls;
+    div.innerHTML = `<div class="sid">${i < S ? '✓' : i + 1}</div><div class="sil">${lbl}</div>`;
+    if (i <= S) div.addEventListener('click', () => goTo(i));
+    bar.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════════ */
+function nav(d) { const nx = S + d; if (nx < 0 || nx > 5) return; goTo(nx); }
+
+function goTo(n) {
+  document.getElementById('p' + S).classList.remove('on');
+  S = n;
+  document.getElementById('p' + S).classList.add('on');
+  buildBar(); updateNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Side effects per step
+  if (n === 0) { if (bRAF) cancelAnimationFrame(bRAF); startBreath(); }
+  if (n === 1 && !gospel.text && !document.getElementById('gMan').value) doFetch();
+  if (n === 2) updateMini();
+  if (n === 5) updatePrayer();
+}
+
+function updateNav() {
+  document.getElementById('prevBtn').disabled = S === 0;
+  const nb = document.getElementById('nextBtn');
+  nb.textContent = S === 5 ? t('finish') : t('next');
+  nb.onclick = S === 5 ? () => {} : () => nav(1);
+  document.getElementById('navInf').textContent = T[lang].stepOf(S + 1, 6);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BREATHING  —  4s inhale · 4s hold · 6s exhale · 4 cycles
+   ═══════════════════════════════════════════════════════════ */
+const INH = 4000, HLD = 4000, EXH = 6000;
+const CYC = INH + HLD + EXH;   // 14 000 ms
+const R0 = 30, R1 = 72, NC = 4;
+let bStart = null, bRAF = null, bLastCyc = -1;
+
+function startBreath() {
+  document.getElementById('bdots').innerHTML = Array(NC).fill('<div class="bdot"></div>').join('');
+  bStart = performance.now(); bLastCyc = -1;
+  document.getElementById('bcyc').textContent = T[lang].cycOf(1, NC);
+  bRAF = requestAnimationFrame(animB);
+}
+
+function animB(ts) {
+  const elapsed = ts - bStart;
+  const cyc = Math.floor(elapsed / CYC);
+  const ph  = elapsed % CYC;
+
+  // Update dots and cycle label at each new cycle
+  if (cyc !== bLastCyc && cyc < NC) {
+    bLastCyc = cyc;
+    document.querySelectorAll('.bdot').forEach((d, i) => d.classList.toggle('lit', i < cyc));
+    document.getElementById('bcyc').textContent = T[lang].cycOf(cyc + 1, NC);
+  }
+
+  // Compute radius and phase label
+  let r, txt;
+  if (ph < INH) {
+    r = R0 + (R1 - R0) * ez(ph / INH); txt = T[lang].inhale;
+  } else if (ph < INH + HLD) {
+    r = R1; txt = T[lang].hold;
+  } else {
+    r = R1 - (R1 - R0) * ez((ph - INH - HLD) / EXH); txt = T[lang].exhale;
+  }
+
+  document.getElementById('bc').setAttribute('r',  r.toFixed(1));
+  document.getElementById('brc').setAttribute('r', r.toFixed(1));
+  document.getElementById('btxt').textContent = txt;
+
+  if (elapsed < CYC * (NC + .5)) {
+    bRAF = requestAnimationFrame(animB);
+  } else {
+    // All cycles done — mark complete and auto-advance
+    document.querySelectorAll('.bdot').forEach(d => d.classList.add('lit'));
+    document.getElementById('btxt').textContent = '✦';
+    document.getElementById('bcyc').textContent = '';
+    setTimeout(() => { if (S === 0) goTo(1); }, 1000);
+  }
+}
+
+function ez(t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+function skipBreath() { if (bRAF) cancelAnimationFrame(bRAF); goTo(1); }
+
+/* ═══════════════════════════════════════════════════════════
+   GOSPEL FETCH
+   Tries Evangelizo.org through three CORS proxies in sequence.
+   On any failure → auto-opens manual textarea.
+   ═══════════════════════════════════════════════════════════ */
+
+// Three independent CORS proxies — first success wins
+const PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+];
+
+async function doFetch() {
+  const dv = document.getElementById('gDate').value;
+  if (!dv) return;
+  const df = dv.replace(/-/g, '');
+  const langCodes = lang === 'ca' ? ['CAT', 'ESP'] : ['ESP'];
+
+  setLoader(true); hideErr();
+
+  let raw = null;
+  outer:
+  for (const lc of langCodes) {
+    const baseUrl = `https://evangelizo.org/ws/ro/getData.php?date=${df}&language=${lc}&content=gospel`;
+    for (const mkProxy of PROXIES) {
+      raw = await fetchOne(mkProxy(baseUrl));
+      if (raw && raw.length > 80) break outer;
+    }
+  }
+
+  setLoader(false);
+
+  if (!raw) {
+    showErr(t('errFetch'));
+    showFback();      // auto-open manual textarea
+    return;
+  }
+
+  try {
+    parseG(raw, dv);
+  } catch (e) {
+    console.warn('Gospel parse error:', e, '\nRaw:', raw.slice(0, 300));
+    showErr(t('errFetch'));
+    showFback();
+  }
+}
+
+async function fetchOne(url) {
+  const ctrl = new AbortController();
+  const tid  = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    return await r.text();
+  } catch (_) { clearTimeout(tid); return null; }
+}
+
+function parseG(raw, dateVal) {
+  let ref = '', title = '', text = '';
+
+  // ── Try JSON ────────────────────────────────────────────
+  try {
+    const j = JSON.parse(raw);
+    text  = j?.gospel?.text  || j?.content?.text  || j?.text  || '';
+    ref   = j?.gospel?.ref   || j?.content?.ref   || j?.ref   || '';
+    title = j?.gospel?.name  || j?.content?.name  || j?.title || '';
+  } catch (_) {}
+
+  // ── Try XML (Evangelizo response format) ────────────────
+  if (!text) {
+    try {
+      const doc = new DOMParser().parseFromString(raw, 'text/xml');
+
+      // <content><text>…</text></content>
+      // Evangelizo also has <text_latin/> (empty) — skip short elements
+      const allTexts = Array.from(doc.getElementsByTagName('text'));
+      const textEl   = allTexts.find(el => el.textContent.trim().length > 50);
+      text  = textEl?.textContent.trim() || '';
+
+      ref   = doc.querySelector('ref')?.textContent?.trim()   || '';
+      // Prefer <content><title> over document <title>
+      const contentEl = doc.querySelector('content');
+      title = (contentEl
+        ? contentEl.querySelector('title')?.textContent
+        : doc.querySelector('title')?.textContent
+      )?.trim() || '';
+    } catch (_) {}
+  }
+
+  if (!text) throw new Error('no gospel text parsed');
+
+  gospel = { ref, title, text };
+
+  document.getElementById('gRef').textContent = ref;
+  document.getElementById('gTit').textContent = title;
+
+  const body = document.getElementById('gBody');
+  body.innerHTML = '';
+  text.split(/\n+/).filter(l => l.trim()).forEach(l => {
+    const p = document.createElement('p');
+    p.textContent = l.trim().replace(/<[^>]+>/g, '');
+    body.appendChild(p);
+  });
+
+  if (dateVal) {
+    const d = new Date(dateVal + 'T00:00:00');
+    document.getElementById('gDt').textContent = d.toLocaleDateString(
+      lang === 'ca' ? 'ca-ES' : 'es-ES',
+      { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+    );
+  }
+  document.getElementById('gDisp').style.display  = 'block';
+  document.getElementById('gFback').style.display = 'none';
+  hideErr();
+}
+
+function setLoader(v)  { document.getElementById('gLoader').style.display = v ? 'block' : 'none'; }
+function showErr(m)    { const e = document.getElementById('gErr'); e.textContent = m; e.style.display = 'block'; }
+function hideErr()     { document.getElementById('gErr').style.display = 'none'; }
+function showFback()   { document.getElementById('gFback').style.display = 'block'; }
+function toggleFback() {
+  const el = document.getElementById('gFback');
+  el.style.display = (!el.style.display || el.style.display === 'none') ? 'block' : 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GOSPEL MINI (step 2 preview)
+   ═══════════════════════════════════════════════════════════ */
+function updateMini() {
+  const src = gospel.text || document.getElementById('gMan').value || '';
+  const el  = document.getElementById('gMini');
+  el.textContent = src ? src.slice(0, 270) + (src.length > 270 ? '…' : '') : '—';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CLOSING PRAYER (step 5)
+   ═══════════════════════════════════════════════════════════ */
+function updatePrayer() {
+  const w   = (document.getElementById('wInput')?.value || '').trim();
+  const raw = T[lang].thanks(w);
+  document.getElementById('sPray').innerHTML = raw.split('\n').map((l, i) =>
+    (w && i === 1) ? `<span class="gw">${l}</span>` : l
+  ).join('<br>');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BELL  (Web Audio — church bell harmonics)
+   ═══════════════════════════════════════════════════════════ */
+function ringBell() {
+  const btn = document.getElementById('bellBtn');
+  btn.classList.remove('ring');
+  void btn.offsetWidth; // force reflow to restart animation
+  btn.classList.add('ring');
+  setTimeout(() => btn.classList.remove('ring'), 600);
+
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // [frequency, gain, decay_seconds]
+    [[220,.48,5],[330,.18,4.2],[440,.32,4],[880,.16,3],[1320,.09,2.5],[2200,.04,1.8]]
+    .forEach(([f, g, d]) => {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(g, ctx.currentTime);
+      gn.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d);
+      o.connect(gn); gn.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + d);
+    });
+  } catch (_) {}
+}
+
+// Keyboard support for bell button
+document.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'Enter') &&
+       document.activeElement?.id === 'bellBtn') {
+    e.preventDefault(); ringBell();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   PERSISTENCE  (localStorage, debounced auto-save)
+   ═══════════════════════════════════════════════════════════ */
+function restoreTexts() {
+  ['wInput','q1a','q2a','q3a','dText','gMan'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = localStorage.getItem('ev-' + id) || '';
+  });
+}
+
+const saveTimers = {};
+function autoSave(id, hintId) {
+  clearTimeout(saveTimers[id]);
+  saveTimers[id] = setTimeout(() => {
+    localStorage.setItem('ev-' + id, document.getElementById(id).value);
+    if (hintId) {
+      const h = document.getElementById(hintId);
+      h.textContent = t('saved'); h.classList.add('on');
+      setTimeout(() => { h.classList.remove('on'); setTimeout(() => h.textContent = '', 300); }, 1500);
+    }
+  }, 600);
+}
+
+function setupSave() {
+  [['wInput', null], ['q1a','q1s'], ['q2a','q2s'], ['q3a','q3s'],
+   ['dText','dSaved'], ['gMan','gSaved']].forEach(([id, hint]) => {
+    document.getElementById(id)?.addEventListener('input', () => autoSave(id, hint));
+  });
+  document.getElementById('wInput').addEventListener('input', updatePrayer);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EXPORT  (copy to clipboard)
+   ═══════════════════════════════════════════════════════════ */
+function doExport() {
+  const date = new Date().toLocaleDateString(lang === 'ca' ? 'ca-ES' : 'es-ES');
+  const gref = gospel.ref || '—';
+  const w    = (document.getElementById('wInput').value || '').trim();
+  const txt  = [
+    t('expTitle'), `${date}  ·  ${gref}`,
+    '', `[ ${t('t20')} ]`, w || '—',
+    '', `[ ${t('q1')} ]`, document.getElementById('q1a').value || '—',
+    '', `[ ${t('q2')} ]`, document.getElementById('q2a').value || '—',
+    '', `[ ${t('q3')} ]`, document.getElementById('q3a').value || '—',
+    '', `[ ${t('t40')} ]`, document.getElementById('dText').value || '—',
+  ].join('\n');
+
+  navigator.clipboard?.writeText(txt).then(() => {
+    const btn  = document.getElementById('tExport');
+    const orig = btn.textContent;
+    btn.textContent = t('copied');
+    setTimeout(() => btn.textContent = orig, 1800);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NEW SESSION  (clear notes)
+   ═══════════════════════════════════════════════════════════ */
+function newSession() {
+  if (!confirm(t('newConfirm'))) return;
+  ['wInput','q1a','q2a','q3a','dText','gMan'].forEach(id => {
+    localStorage.removeItem('ev-' + id);
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  gospel = { ref: '', title: '', text: '' };
+  document.getElementById('gDisp').style.display  = 'none';
+  document.getElementById('gFback').style.display = 'none';
+  document.getElementById('gMini').textContent = '—';
+  updatePrayer();
+  goTo(0);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => { init(); setupSave(); });
+</script>
+</body>
+</html>
