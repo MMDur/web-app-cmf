@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordinario de la Misa · CMF Província Sant Pau</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --garnet:#8B1A1A; --garnet-dk:#6B1212; --garnet-lt:#B84040;
+  --gold:#C09020; --gold-lt:#E0B840;
+  --bg:#FDFCF8; --bg2:#F5F0E8; --bg3:#EDE6D8;
+  --tx:#2A1E1E; --tx2:#6A4E4E; --tx3:#9A7878;
+  --bdr:#DDD0C0; --rbg:#F0EAE0;
+  --font-size: 17px;
+}
+[data-theme=dark]{
+  --garnet:#E85858; --garnet-dk:#CC4040; --garnet-lt:#FFA090;
+  --gold:#DDB830; --gold-lt:#F0D050;
+  --bg:#1C1714; --bg2:#272018; --bg3:#32281E;
+  --tx:#F8F2EA; --tx2:#D4B898; --tx3:#B09878;
+  --bdr:#463826; --rbg:#2A211A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Cormorant Garamond',Georgia,serif;font-size:var(--font-size);font-weight:400;background:var(--bg);color:var(--tx);line-height:1.85;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+[data-theme=dark] body{font-weight:500}
+
+/* ── TOP BAR ── */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--garnet);display:flex;align-items:center;gap:.5rem;padding:.45rem .8rem;box-shadow:0 2px 10px rgba(0,0,0,.4);min-height:50px;flex-wrap:wrap}
+#topbar .brand{font-size:.85rem;font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.9);white-space:nowrap;margin-right:.25rem}
+.sep{color:rgba(255,255,255,.3);margin:0 .1rem}
+.lang-tabs{display:flex;gap:.2rem;flex-wrap:wrap}
+.lt{padding:.2rem .65rem;border:1px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.75);cursor:pointer;font-family:inherit;font-size:.82rem;border-radius:2px;transition:all .15s;white-space:nowrap}
+.lt.on{background:var(--gold);color:#1A0808;border-color:var(--gold);font-weight:700}
+.lt:hover:not(.on){background:rgba(255,255,255,.12)}
+.controls{display:flex;gap:.2rem;margin-left:auto;align-items:center}
+.cbtn{padding:.2rem .55rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;cursor:pointer;font-family:inherit;font-size:.8rem;border-radius:2px;transition:background .15s;white-space:nowrap}
+.cbtn:hover{background:rgba(255,255,255,.22)}
+.cbtn.on{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5)}
+#menu-btn{display:none}
+
+/* ── PARALLEL LANG SELECT ── */
+#par-bar{display:none;background:var(--bg2);border-bottom:1px solid var(--bdr);padding:.4rem 1rem;align-items:center;gap:.75rem;font-size:.85rem;color:var(--tx2);position:fixed;top:50px;left:240px;right:0;z-index:150}
+#par-bar.on{display:flex}
+#par-bar select{font-family:inherit;font-size:.85rem;padding:.15rem .4rem;background:var(--bg);border:1px solid var(--bdr);color:var(--tx);border-radius:2px}
+.par-top{top:50px}
+
+/* ── LAYOUT ── */
+#layout{display:flex;padding-top:50px;min-height:100vh}
+
+/* ── SIDEBAR ── */
+#sidebar{width:240px;min-width:240px;background:var(--bg2);border-right:1px solid var(--bdr);position:fixed;top:50px;left:0;height:calc(100vh - 50px);overflow-y:auto;padding:.4rem 0 2rem;transition:transform .25s}
+.sb-sec-hd{padding:.45rem 1rem .2rem;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--garnet);cursor:pointer;display:flex;align-items:center;gap:.3rem}
+.sb-sec-hd::before{content:'▾';font-size:.6rem;transition:transform .2s}
+.sb-sec-hd.closed::before{transform:rotate(-90deg)}
+.sb-items{}
+.sb-items.hidden{display:none}
+.sbl{display:block;padding:.28rem 1rem .28rem 1.6rem;font-size:.82rem;color:var(--tx2);text-decoration:none;cursor:pointer;transition:all .1s;border-left:2px solid transparent}
+.sbl:hover{background:var(--bg3);color:var(--garnet)}
+.sbl.on{background:var(--bg3);color:var(--garnet);border-left-color:var(--gold)}
+
+/* ── MAIN ── */
+#main{margin-left:240px;flex:1;padding:2rem 2.5rem 4rem;max-width:780px}
+#par-mode #main{max-width:none;padding:1.5rem 1.5rem 4rem}
+
+/* ── SECTION HEADING ── */
+.sec-hd{margin:2.5rem 0 1.2rem;padding-bottom:.4rem;border-bottom:2px solid var(--garnet);font-size:.95rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--garnet)}
+.sec-hd:first-child{margin-top:.5rem}
+
+/* ── MOMENT ── */
+.moment{margin-bottom:2rem;scroll-margin-top:62px}
+.mom-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tx2);margin-bottom:.6rem;padding-bottom:.25rem;border-bottom:1px solid var(--bdr)}
+
+/* ── BLOCKS ── */
+.blk{margin-bottom:.65rem}
+.blk-priest{color:var(--tx)}
+.blk-resp{margin-left:1.2rem;padding-left:.7rem;border-left:2px solid var(--gold);font-style:italic;color:var(--garnet-lt)}
+.blk-all{padding:.55rem .85rem;background:var(--rbg);border-radius:2px;margin-bottom:.5rem;color:var(--tx)}
+.blk-cons{padding:.7rem .9rem;border:1px solid var(--gold);background:var(--rbg);border-radius:2px;font-weight:600;letter-spacing:.02em;line-height:1.65;color:var(--tx)}
+.blk-note{font-size:.9rem;color:var(--tx2);font-style:italic;padding:.4rem .7rem;background:var(--bg3);border-radius:2px}
+.rlbl{font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:.08rem}
+[data-theme=dark] .blk-cons{font-weight:700}
+
+/* ── PARALLEL COLUMNS ── */
+#par-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-left:240px}
+.par-col{padding:1.5rem 2rem 4rem;border-right:1px solid var(--bdr)}
+.par-col:last-child{border-right:none}
+.par-col-hd{position:sticky;top:92px;background:var(--garnet);color:white;padding:.35rem .8rem;font-size:.8rem;font-weight:700;letter-spacing:.07em;z-index:10;text-align:center;border-radius:2px;margin-bottom:1rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0);z-index:190}
+  #main{margin-left:0;padding:1rem 1rem 3rem}
+  #par-bar{left:0}
+  #par-cols{margin-left:0;grid-template-columns:1fr}
+  .par-col{border-right:none;padding:1rem 1rem 2rem}
+  #menu-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;cursor:pointer;border-radius:2px;font-size:1.1rem}
+  .brand{display:none}
+}
+@media print{
+  #topbar,#sidebar,#par-bar{display:none!important}
+  #main,#par-cols{margin-left:0!important;padding:1cm!important}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <button id="menu-btn" onclick="toggleMenu()" aria-label="Menú">☰</button>
+  <span class="brand">Ordinario de la Misa · CMF</span>
+  <span class="sep">|</span>
+  <div class="lang-tabs" id="lang-tabs">
+    <button class="lt on" data-l="es" onclick="setLang('es')">ES</button>
+    <button class="lt" data-l="ca" onclick="setLang('ca')">CA</button>
+    <button class="lt" data-l="eu" onclick="setLang('eu')">EU</button>
+    <button class="lt" data-l="fr" onclick="setLang('fr')">FR</button>
+    <button class="lt" data-l="it" onclick="setLang('it')">IT</button>
+  </div>
+  <div class="controls">
+    <button class="cbtn" onclick="adjFont(-1)" title="Reducir texto">A−</button>
+    <button class="cbtn" onclick="adjFont(1)" title="Aumentar texto">A+</button>
+    <button class="cbtn" id="par-btn" onclick="togglePar()" title="Vista paralela">⟺</button>
+    <button class="cbtn" id="dark-btn" onclick="toggleDark()" title="Modo oscuro">◑</button>
+    <button class="cbtn" onclick="window.print()" title="Imprimir">⎙</button>
+  </div>
+</div>
+
+<!-- PARALLEL LANG BAR -->
+<div id="par-bar">
+  <span>Comparar:</span>
+  <select id="par-lang1" onchange="renderAll()">
+    <option value="es">Español</option>
+    <option value="ca">Català</option>
+    <option value="eu">Euskera</option>
+    <option value="fr">Français</option>
+    <option value="it">Italiano</option>
+  </select>
+  <span>y</span>
+  <select id="par-lang2" onchange="renderAll()">
+    <option value="ca">Català</option>
+    <option value="es">Español</option>
+    <option value="eu">Euskera</option>
+    <option value="fr">Français</option>
+    <option value="it">Italiano</option>
+  </select>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar"></nav>
+
+<!-- MAIN (single lang) -->
+<div id="layout">
+  <main id="main"></main>
+</div>
+
+<!-- PARALLEL COLUMNS -->
+<div id="par-cols" style="display:none"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+
+const LANGS = {
+  es:'Español', ca:'Català', eu:'Euskera', fr:'Français', it:'Italiano'
+};
+
+// Sections (for sidebar grouping)
+const SECTIONS = [
+  { id:'ritos-iniciales', lbl:{es:'Ritos Iniciales',ca:'Inici de la Celebració',eu:'Hasierako Ohikuneak',fr:'Rites Initiaux',it:'Riti di Introduzione'},
+    moments:['signo-cruz','saludo','acto-penitencial','kyrie','gloria'] },
+  { id:'liturgia-palabra', lbl:{es:'Liturgia de la Palabra',ca:'Liturgia de la Paraula',eu:'Hitzaren Liturgia',fr:'Liturgie de la Parole',it:'Liturgia della Parola'},
+    moments:['colecta','primera-lectura','salmo','segunda-lectura','evangelio','credo','oracion-fieles'] },
+  { id:'liturgia-eucaristica', lbl:{es:'Liturgia Eucarística',ca:'Liturgia Eucarística',eu:'Eukaristiaren Liturgia',fr:'Liturgie Eucharistique',it:'Liturgia Eucaristica'},
+    moments:['ofrendas-pan','ofrendas-vino','orate-fratres','prefacio','plegaria-II','sanctus','consagracion-pan','consagracion-caliz','misterio-fe','memorial','doxologia'] },
+  { id:'comunion', lbl:{es:'Rito de la Comunión',ca:'Ritus de la Comunió',eu:'Jaunartezeko Ohikunea',fr:'Rite de la Communion',it:'Riti di Comunione'},
+    moments:['padrenuestro','embolismo','doxologia-pn','paz-oracion','paz-senor','cordero-dios','invitacion-comunion','no-soy-digno','comunion'] },
+  { id:'conclusion', lbl:{es:'Rito de Conclusión',ca:'Ritus de Conclusió',eu:'Bukaerako Ohikunea',fr:'Rite de Conclusion',it:'Riti di Conclusione'},
+    moments:['saludo-final','bendicion','despedida'] }
+];
+
+// ── HELPER: block builder
+const P  = (t) => ({role:'priest',   texts:t});
+const R  = (t) => ({role:'resp',     texts:t});
+const A  = (t) => ({role:'all',      texts:t});
+const C  = (t) => ({role:'cons',     texts:t});
+const N  = (t) => ({role:'note',     texts:t});
+
+const MOMENTS = {
+
+'signo-cruz':{
+  lbl:{es:'Signo de la Cruz',ca:'Senyal de la Creu',eu:'Gurutzeko Seinalea',fr:'Signe de Croix',it:'Segno della Croce'},
+  blks:[
+    P({es:'En el nombre del Padre, y del Hijo, y del Espíritu Santo.',ca:'En el nom del Pare i del Fill i de l\'Esperit Sant.',eu:'Aitaren, eta Semearen, eta Espiritu Santuaren izenean.',fr:'Au nom du Père et du Fils et du Saint-Esprit.',it:'Nel nome del Padre e del Figlio e dello Spirito Santo.'}),
+    R({es:'Amén.',ca:'Amén.',eu:'Amen.',fr:'R. Amen.',it:'Amen.'})
+  ]
+},
+
+'saludo':{
+  lbl:{es:'Saludo',ca:'Salutació',eu:'Agurra',fr:'Salutation',it:'Saluto'},
+  blks:[
+    P({es:'La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo estén con todos vosotros.',ca:'Que la gràcia de nostre Senyor Jesucrist, l\'amor de Déu Pare i la comunió de l\'Esperit Sant siguin amb tots vosaltres.',eu:'Jesu Kristo gure Jaunaren grazia, eta Jainko Aitaren maitasuna, eta Espiritu Santuaren batasuna izan bedi zuekin.',fr:'La grâce de Jésus, le Christ, notre Seigneur, l\'amour de Dieu le Père, et la communion de l\'Esprit Saint soient toujours avec vous.',it:'La grazia del Signore nostro Gesù Cristo, l\'amore di Dio Padre e la comunione dello Spirito Santo sia con tutti voi.'}),
+    R({es:'Y con tu espíritu.',ca:'I amb el vostre esperit.',eu:'Eta zure espirituarekin.',fr:'R. Et avec votre esprit.',it:'E con il tuo spirito.'})
+  ]
+},
+
+'acto-penitencial':{
+  lbl:{es:'Acto Penitencial',ca:'Acte Penitencial',eu:'Damu Otoitza',fr:'Acte Pénitentiel',it:'Atto Penitenziale'},
+  blks:[
+    A({es:'Yo confieso ante Dios todopoderoso y ante vosotros, hermanos, que he pecado mucho de pensamiento, palabra, obra y omisión. Por mi culpa, por mi culpa, por mi gran culpa. Por eso ruego a santa María, siempre Virgen, a los ángeles, a los santos y a vosotros, hermanos, que intercedáis por mí ante Dios, nuestro Señor.',ca:'Jo confesso a Déu totpoderós i a vosaltres, germans, que he pecat, per culpa meva, de pensament, paraula, obra i omissió. Per això, demano a la Verge Maria, Mare de Déu, als àngels i als sants, i a vosaltres, germans, que pregueu per mi a Déu, nostre Senyor.',eu:'Aitortzen diot Jainko guztiz ahaltsuari, eta zuei ere bai, nire senideoi, bekatu egin dudala, gogapen, hitz eta egitez, eta eginbeharrak ez eginez; bai, bekatari naiz. Horregatik eskatzen diet Andre Maria beti Birjinari, aingeru eta santu guztiei, eta zuei ere bai, nere senideoi, otoitz egin diezaiozuela nire alde Jainko gure Jaunari.',fr:'Je confesse à Dieu tout-puissant, je reconnais devant vous, frères et sœurs, que j\'ai péché en pensée, en parole, par action et par omission ; oui, j\'ai vraiment péché. C\'est pourquoi je supplie la bienheureuse Vierge Marie, les anges et tous les saints, et vous aussi, frères et sœurs, de prier pour moi le Seigneur notre Dieu.',it:'Confesso a Dio onnipotente e a voi, fratelli, che ho molto peccato in pensieri, parole, opere e omissioni, per mia colpa, mia colpa, mia grandissima colpa. E supplico la beata sempre vergine Maria, gli angeli, i santi e voi, fratelli, di pregare per me il Signore Dio nostro.'}),
+    P({es:'Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.',ca:'Que Déu omnipotent s\'apiadi de nosaltres, ens perdoni els pecats i ens dugui a la vida eterna.',eu:'Erruki dakigula Jainko guztiz ahaltsua eta, gure bekatuak barkaturik, eraman gaitzala betiko bizitzara.',fr:'Que Dieu tout-puissant nous fasse miséricorde ; qu\'il nous pardonne nos péchés et nous conduise à la vie éternelle.',it:'Dio onnipotente abbia misericordia di noi, perdoni i nostri peccati e ci conduca alla vita eterna.'}),
+    R({es:'Amén.',ca:'Amén.',eu:'Amen.',fr:'Amen.',it:'Amen.'})
+  ]
+},
+
+'kyrie':{
+  lbl:{es:'Señor, ten piedad',ca:'Kyrie',eu:'Kyrie',fr:'Kyrie',it:'Kyrie'},
+  blks:[
+    P({es:'Señor, ten piedad.',ca:'Senyor, tingueu pietat.',eu:'Erruki, Jauna.',fr:'V. Kyrie, eleison.',it:'V. Signore, pietà.'}),
+    R({es:'Señor, ten piedad.',ca:'Senyor, tingueu pietat.',eu:'Erruki, Jauna.',fr:'R. Kyrie, eleison.',it:'R. Signore, pietà.'}),
+    P({es:'Cristo, ten piedad.',ca:'Crist, tingueu pietat.',eu:'Kristo, erruki.',fr:'V. Christe, eleison.',it:'V. Cristo, pietà.'}),
+    R({es:'Cristo, ten piedad.',ca:'Crist, tingueu pietat.',eu:'Kristo, erruki.',fr:'R. Christe, eleison.',it:'R. Cristo, pietà.'}),
+    P({es:'Señor, ten piedad.',ca:'Senyor, tingueu pietat.',eu:'Erruki, Jauna.',fr:'V. Kyrie, eleison.',it:'V. Signore, pietà.'}),
+    R({es:'Señor, ten piedad.',ca:'Senyor, tingueu pietat.',eu:'Erruki, Jauna.',fr:'R. Kyrie, eleison.',it:'R. Signore, pietà.'})
+  ]
+},
+
+'gloria':{
+  lbl:{es:'Gloria',ca:'Glòria',eu:'Aintza',fr:'Gloire à Dieu',it:'Gloria'},
+  blks:[
+    A({es:'Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo, Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.',ca:'Glòria a Déu a dalt del cel, i a la terra pau als homes que estima el Senyor. Us lloem, us beneïm, us adorem, us glorifiquem, us donem gràcies, per la vostra immensa glòria, Senyor Déu, Rei celestial, Déu Pare omnipotent. Senyor, Fill unigènit, Jesucrist, Senyor Déu, Anyell de Déu, Fill del Pare, vós, que lleveu el pecat del món, tingueu pietat de nosaltres; vós, que lleveu el pecat del món, acolliu la nostra súplica, vós que seieu a la dreta del Pare, tingueu pietat de nosaltres. Perquè vós sou l\'únic Sant, vós l\'únic Senyor, vós l\'únic Altíssim, Jesucrist, amb l\'Esperit Sant, en la glòria de Déu Pare. Amén.',eu:'Aintza zeruetan Jaungoikoari eta pakea lurrean Haren gogoko gizonei. Hain haundi eta eder zaitugulako: gora Zu, bedeinkatua Zu, gorespen Zuri, auspez agur, eskerrak Zuri, Jainko Jauna, zeruko Errege, Jaungoiko Aita guztiahalduna. Jauna, Seme bakar, Jesu Kristo, Jainko Jauna, Jainkoaren Bildots, Aitaren Seme: Zuk kentzen duzu munduko bekatua, erruki, Jauna; Zuk kentzen duzu munduko bekatua, entzun gure deia; Aitaren eskuin aldean jarririk zaude Zu, erruki, Jauna. Zu bakarrik Santua, Zu bakarrik Jauna, Zu bakarrik Goi-goikoa, JesuKristo, Espiritu Santuarekin Jainko Aitaren argitan. Amen.',fr:'Gloire à Dieu, au plus haut des cieux, et paix sur la terre aux hommes qu\'il aime. Nous te louons, nous te bénissons, nous t\'adorons, nous te glorifions, nous te rendons grâce, pour ton immense gloire, Seigneur Dieu, Roi du ciel, Dieu le Père tout-puissant. Seigneur Fils unique, Jésus Christ, Seigneur Dieu, Agneau de Dieu, le Fils du Père ; toi qui enlèves les péchés du monde, prends pitié de nous ; toi qui enlèves les péchés du monde, reçois notre prière ; toi qui es assis à la droite du Père, prends pitié de nous. Car toi seul es Saint, toi seul es Seigneur, toi seul es le Très-Haut : Jésus-Christ, avec le Saint-Esprit dans la gloire de Dieu le Père. Amen.',it:'Gloria a Dio nell\'alto dei cieli e pace in terra agli uomini di buona volontà. Noi ti lodiamo, ti benediciamo, ti adoriamo, ti glorifichiamo, ti rendiamo grazie per la tua gloria immensa, Signore Dio, Re del cielo, Dio Padre onnipotente. Signore, Figlio unigenito, Gesù Cristo, Signore Dio, Agnello di Dio, Figlio del Padre; tu che togli i peccati del mondo, abbi pietà di noi; tu che togli i peccati del mondo, accogli la nostra supplica; tu che siedi alla destra del Padre, abbi pietà di noi. Perché tu solo il Santo, tu solo il Signore, tu solo l\'Altissimo: Gesù Cristo, con lo Spirito Santo: nella gloria di Dio Padre. Amen.'})
+  ]
+},
+
+'colecta':{
+  lbl:{es:'Oración Colecta',ca:'Oració Col·lecta',eu:'Mezako Otoitza',fr:'La Collecte',it:'Colletta'},
+  blks:[
+    N({es:'El sacerdote proclama la oración propia del día.',ca:'El sacerdot proclama l\'oració pròpia del dia.',eu:'Apaizak eguneko otoitza irakurtzen du.',fr:'Le célébrant proclame la collecte propre du jour.',it:'Il celebrante proclama la colletta del giorno.'}),
+    R({es:'Amén.',ca:'Amén.',eu:'Amen.',fr:'Amen.',it:'Amen.'})
+  ]
+},
+
+'primera-lectura':{
+  lbl:{es:'Primera Lectura',ca:'Primera Lectura',eu:'Lehen Irakurgaia',fr:'Première Lecture',it:'Prima Lettura'},
+  blks:[
+    N({es:'[Lectura del Antiguo Testamento o Hechos de los Apóstoles]',ca:'[Lectura de l\'Antic Testament o dels Fets dels Apòstols]',eu:'[Itun Zaharreko edo Apostoluen Egintzetako irakurgaia]',fr:'[Lecture de l\'Ancien Testament ou des Actes des Apôtres]',it:'[Lettura dell\'Antico Testamento o degli Atti degli Apostoli]'}),
+    P({es:'Palabra de Dios.',ca:'Paraula de Déu.',eu:'Jaunak esana.',fr:'Parole du Seigneur.',it:'Parola di Dio.'}),
+    R({es:'Te alabamos, Señor.',ca:'Us lloem, Senyor.',eu:'Eskerrak Zuri, Jauna.',fr:'R. Nous rendons grâce à Dieu.',it:'Rendiamo grazie a Dio.'})
+  ]
+},
+
+'salmo':{
+  lbl:{es:'Salmo Responsorial',ca:'Salm Responsorial',eu:'Erantzun-Salmoa',fr:'Psaume Responsorial',it:'Salmo Responsoriale'},
+  blks:[
+    N({es:'[Se canta o recita el salmo responsorial con su antífona]',ca:'[Es canta o recita el salm responsorial amb la seva antífona]',eu:'[Erantzun-salmoa kantatzen edo errezatzen da]',fr:'[On chante ou récite le psaume responsorial avec son antienne]',it:'[Si canta o recita il salmo con la sua antifona]'})
+  ]
+},
+
+'segunda-lectura':{
+  lbl:{es:'Segunda Lectura',ca:'Segona Lectura',eu:'Bigarren Irakurgaia',fr:'Deuxième Lecture',it:'Seconda Lettura'},
+  blks:[
+    N({es:'[Lectura de las Epístolas — sólo en domingos y solemnidades]',ca:'[Lectura de les Epístoles — només diumenges i solemnitats]',eu:'[Epistolaren irakurgaia — igande eta solemnitate egunetan]',fr:'[Lecture des Épîtres — seulement les dimanches et solennités]',it:'[Lettura delle Epistole — solo domeniche e solennità]'}),
+    P({es:'Palabra de Dios.',ca:'Paraula de Déu.',eu:'Jaunak esana.',fr:'Parole du Seigneur.',it:'Parola di Dio.'}),
+    R({es:'Te alabamos, Señor.',ca:'Us lloem, Senyor.',eu:'Eskerrak Zuri, Jauna.',fr:'R. Nous rendons grâce à Dieu.',it:'Rendiamo grazie a Dio.'})
+  ]
+},
+
+'evangelio':{
+  lbl:{es:'Evangelio',ca:'Evangeli',eu:'Ebanjelioa',fr:'Évangile',it:'Vangelo'},
+  blks:[
+    P({es:'El Señor esté con vosotros.',ca:'El Senyor sigui amb vosaltres.',eu:'Jauna zuekin.',fr:'Le Seigneur soit avec vous.',it:'Il Signore sia con voi.'}),
+    R({es:'Y con tu espíritu.',ca:'I amb el vostre Esperit.',eu:'Eta zure espirituarekin.',fr:'R. Et avec votre esprit.',it:'E con il tuo spirito.'}),
+    P({es:'Lectura del santo Evangelio según san N.',ca:'Lectura de l\'evangeli segons sant N.',eu:'Jesu Kristoren Ebanjelioa San N.(r)en liburutik.',fr:'Évangile de Jésus Christ selon saint N.',it:'Dal Vangelo secondo N.'}),
+    R({es:'Gloria a ti, Señor.',ca:'Glòria a vós, o Crist.',eu:'Aintza Zuri, Jauna.',fr:'R. Gloire à toi, Seigneur !',it:'Gloria a te, o Signore.'}),
+    N({es:'[Proclamación del Evangelio]',ca:'[Proclamació de l\'Evangeli]',eu:'[Ebanjelioaren irakurketa]',fr:'[Proclamation de l\'Évangile]',it:'[Proclamazione del Vangelo]'}),
+    P({es:'Palabra del Señor.',ca:'Paraula del Senyor.',eu:'Jaunak esana.',fr:'Acclamons la Parole de Dieu.',it:'Parola del Signore.'}),
+    R({es:'Gloria a ti, Señor Jesús.',ca:'Lloança a vós, o Crist.',eu:'Eskerrak Zuri, Jauna.',fr:'R. Louange à toi, Seigneur Jésus !',it:'Lode a te, o Cristo.'})
+  ]
+},
+
+'credo':{
+  lbl:{es:'Credo',ca:'Professió de Fe',eu:'Sinesmenaren Aitormena',fr:'Profession de Foi',it:'Professione di Fede'},
+  blks:[
+    A({es:'Creo en Dios, Padre Todopoderoso, Creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, Nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo, nació de Santa María Virgen, padeció bajo el poder de Poncio Pilato, fue crucificado, muerto y sepultado, descendió a los infiernos, al tercer día resucitó de entre los muertos, subió a los cielos y está sentado a la derecha de Dios, Padre todopoderoso. Desde allí ha de venir a juzgar a vivos y muertos. Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.',
+      ca:'Crec en un sol Déu, Pare totpoderós, creador del cel i de la terra. I en Jesucrist, el seu Fill únic, Senyor nostre; que fou concebut per obra de l\'Esperit Sant, nasqué de la Verge Maria; patí en temps de Ponç Pilat, fou crucificat, mort i sepultat; davallà als inferns, el tercer dia ressuscità d\'entre els morts; se\'n pujà al cel, on seu a la dreta de Déu Pare totpoderós; i tornarà a jutjar els vius i els morts. Crec en l\'Esperit Sant; la santa Església catòlica, la comunió dels sants, la remissió dels pecats, la resurrecció dels morts, i la vida eterna. Amén.',
+      eu:'Sinesten dut Jaungoiko Aita ahalguztidunarengan, zeru-lurren egile. Sinesten dut Haren Seme bakar Jesu Kristo gure Jaunarengan, Espiritu Santuaren egitez sortu eta Andre Maria Birjinagandik jaio zena; Pontzio Pilatoren menpean nekaldua; gurutzean iltzatua, hila eta hobiratua izan zena; infernutara jaitsi eta hirugarren egunean hilen artetik piztu zena; zeruetara igo eta Aita Jaungoikoaren eskuin aldean jarririk dagoena; handik biziak eta hilak epaitzera etorriko dena. Sinesten dut Espiritu Santuarengan, Eliza santu katolikua, santuen elkartasuna, bekatuen barkamena, hildakoen piztuera eta betiko bizitza. Amen.',
+      fr:'Je crois en Dieu, le Père tout-puissant, créateur du ciel et de la terre. Et en Jésus Christ, son Fils unique, notre Seigneur, qui a été conçu du Saint-Esprit, est né de la Vierge Marie, a souffert sous Ponce Pilate, a été crucifié, est mort et a été enseveli, est descendu aux enfers, le troisième jour est ressuscité des morts, est monté aux cieux, est assis à la droite de Dieu le Père tout-puissant, d\'où il viendra juger les vivants et les morts. Je crois en l\'Esprit Saint, à la sainte Église catholique, à la communion des saints, à la rémission des péchés, à la résurrection de la chair, à la vie éternelle. Amen.',
+      it:'Io credo in Dio, Padre onnipotente, creatore del cielo e della terra; e in Gesù Cristo, suo unico Figlio, nostro Signore, il quale fu concepito di Spirito Santo, nacque da Maria Vergine, patì sotto Ponzio Pilato, fu crocifisso, morì e fu sepolto; discese agli inferi; il terzo giorno risuscitò da morte; salì al cielo, siede alla destra di Dio Padre onnipotente; di là verrà a giudicare i vivi e i morti. Credo nello Spirito Santo, la santa Chiesa cattolica, la comunione dei santi, la remissione dei peccati, la risurrezione della carne, la vita eterna. Amen.'})
+  ]
+},
+
+'oracion-fieles':{
+  lbl:{es:'Oración de los Fieles',ca:'Pregària dels Fidels',eu:'Jainko-Herriaren Otoitza',fr:'Prières Universelles',it:'Preghiera dei Fedeli'},
+  blks:[
+    N({es:'[Intenciones proclamadas por el diácono o un fiel]',ca:'[Intencions proclamades pel diaca o un fidel]',eu:'[Diakonoak edo fidelak esandako interpelazioak]',fr:'[Intentions proclamées par le diacre ou un fidèle]',it:'[Intenzioni proclamate dal diacono o da un fedele]'})
+  ]
+},
+
+'ofrendas-pan':{
+  lbl:{es:'Presentación del pan',ca:'Presentació del pa',eu:'Ogiaren Eskaintza',fr:'Présentation du pain',it:'Offerta del pane'},
+  blks:[
+    P({es:'Bendito seas, Señor, Dios del universo, por este pan, fruto de la tierra y del trabajo del hombre, que recibimos de tu generosidad y ahora te presentamos; él será para nosotros pan de vida.',ca:'Us beneïm, Senyor, Déu de l\'univers, per aquest pa que hem rebut de la vostra bondat i que és fruit de la terra i del treball dels homes; el presentem perquè es converteixi per a nosaltres en pa de vida.',eu:'Bedeinkatua Zu, Jauna, zeru-lurren Jaungoikoa: zure esku zabaletik hartu dugu orain ekarri dizugun ogi hau, lurraren indarrak eta gizonaren lanak sortua: hauxe egingo zaigu biziaren ogi.',fr:'Tu es béni, Seigneur, Dieu de l\'univers : nous avons reçu de ta bonté le pain que nous te présentons, fruit de la terre et du travail des hommes ; il deviendra pour nous le pain de la vie.',it:'Benedetto sei tu, Signore, Dio dell\'universo: dalla tua bontà abbiamo ricevuto questo pane, frutto della terra e del lavoro dell\'uomo; lo presentiamo a te, perché diventi per noi cibo di vita eterna.'}),
+    R({es:'Bendito seas por siempre, Señor.',ca:'Que Déu sigui beneït per sempre.',eu:'Bedeinkatua Zu, Jauna, orain eta beti.',fr:'R. Béni soit Dieu, maintenant et toujours !',it:'Benedetto nei secoli il Signore.'})
+  ]
+},
+
+'ofrendas-vino':{
+  lbl:{es:'Presentación del vino',ca:'Presentació del vi',eu:'Ardoaren Eskaintza',fr:'Présentation du vin',it:'Offerta del vino'},
+  blks:[
+    P({es:'Bendito seas, Señor, Dios del universo, por este vino, fruto de la vid y del trabajo del hombre, que recibimos de tu generosidad y ahora te presentamos; él será para nosotros bebida de salvación.',ca:'Us beneïm, Senyor, Déu de l\'univers, per aquest vi que hem rebut de la vostra bondat i que és fruit de la vinya i del treball dels homes; el presentem perquè es converteixi per a nosaltres en beguda espiritual.',eu:'Bedeinkatua Zu, Jauna, zeru-lurren Jaungoikoa: zure esku zabaletik hartu dugu orain ekarri dizugun ardo hau, mahatsondoaren indarrak eta gizonaren lanak sortua: hauxe egingo zaigu betiko zorionaren edari.',fr:'Tu es béni, Seigneur, Dieu de l\'univers : nous avons reçu de ta bonté le vin que nous te présentons, fruit de la vigne et du travail des hommes ; il deviendra pour nous le vin du Royaume éternel.',it:'Benedetto sei tu, Signore, Dio dell\'universo: dalla tua bontà abbiamo ricevuto questo vino, frutto della vite e del lavoro dell\'uomo; lo presentiamo a te, perché diventi per noi bevanda di salvezza.'}),
+    R({es:'Bendito seas por siempre, Señor.',ca:'Que Déu sigui beneït per sempre.',eu:'Bedeinkatua Zu, Jauna, orain eta beti.',fr:'R. Béni soit Dieu, maintenant et toujours !',it:'Benedetto nei secoli il Signore.'})
+  ]
+},
+
+'orate-fratres':{
+  lbl:{es:'Orate Fratres',ca:'Orate Fratres',eu:'Orate Fratres',fr:'Orate Fratres',it:'Orate Fratres'},
+  blks:[
+    P({es:'Orad, hermanos, para que este sacrificio, mío y vuestro, sea agradable a Dios, Padre todopoderoso.',ca:'Pregueu, germans, perquè aquest sacrifici, meu i vostre, sigui agradable a Déu Pare omnipotent.',eu:'Senideok: egin dezagun otoitz, guztiok batean, Eliza osoaren oparia Jaungoikoari eskaintzerakoan.',fr:'Priez, frères et sœurs : que mon sacrifice, qui est aussi le vôtre, soit agréable à Dieu le Père tout-puissant.',it:'Pregate, fratelli, perché il mio e vostro sacrificio sia gradito a Dio, Padre onnipotente.'}),
+    R({es:'El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.',ca:'Que el Senyor rebi de mans vostres aquest sacrifici, a lloança i glòria del seu nom, i també per al nostre bé i de tota la seva santa Església.',eu:'Jainkoa goresteko eta gizona salbatzeko.',fr:'R. Que le Seigneur reçoive de vos mains ce sacrifice à la louange et à la gloire de son nom, pour notre bien et celui de toute l\'Église.',it:'Il Signore riceva dalle tue mani questo sacrificio a lode e gloria del suo nome, per il bene nostro e di tutta la sua santa Chiesa.'})
+  ]
+},
+
+'prefacio':{
+  lbl:{es:'Prefacio — diálogo',ca:'Prefaci — diàleg',eu:'Prefazioa — elkarrizketa',fr:'Préface — dialogue',it:'Prefazio — dialogo'},
+  blks:[
+    P({es:'El Señor esté con vosotros.',ca:'El Senyor sigui amb vosaltres.',eu:'Jauna zuekin.',fr:'Le Seigneur soit avec vous.',it:'Il Signore sia con voi.'}),
+    R({es:'Y con tu espíritu.',ca:'I amb el vostre esperit.',eu:'Eta zure espirituarekin.',fr:'R. Et avec votre esprit.',it:'E con il tuo spirito.'}),
+    P({es:'Levantemos el corazón.',ca:'Amunt el cors.',eu:'Gora bihotzak.',fr:'Élevons notre cœur.',it:'In alto i nostri cuori.'}),
+    R({es:'Lo tenemos levantado hacia el Señor.',ca:'Els elevem al Senyor.',eu:'Jaunagan dauzkagu.',fr:'R. Nous le tournons vers le Seigneur.',it:'Sono rivolti al Signore.'}),
+    P({es:'Demos gracias al Señor, nuestro Dios.',ca:'Donem gràcies al Senyor, Déu nostre.',eu:'Eskerrak Jaungoiko gure Jaunari.',fr:'Rendons grâce au Seigneur notre Dieu.',it:'Rendiamo grazie al Signore, nostro Dio.'}),
+    R({es:'Es justo y necesario.',ca:'Cal fer-ho i és de justícia.',eu:'Egoki da eta zuzen.',fr:'R. Cela est juste et bon.',it:'È cosa buona e giusta.'})
+  ]
+},
+
+'plegaria-II':{
+  lbl:{es:'Plegaria Eucarística II',ca:'Pregària Eucarística II',eu:'II Eukaristi Otoitza',fr:'Prière Eucharistique II',it:'Preghiera Eucaristica II'},
+  blks:[
+    P({es:'En verdad es justo y necesario, es nuestro deber y salvación, darte gracias, Padre Santo, siempre y en todo lugar, por Jesucristo, tu Hijo amado. Por él, que es tu Palabra, hiciste todas las cosas; tú nos lo enviaste para que, hecho hombre por obra del Espíritu Santo y nacido de María, la Virgen, fuera nuestro Salvador y Redentor. Él, en cumplimiento de tu voluntad, para destruir la muerte y manifestar la resurrección, extendió sus brazos en la cruz, y así adquirió para ti un pueblo santo. Por eso con los ángeles y los santos proclamamos tu gloria, diciendo:',
+      ca:'És realment just i necessari, és el nostre deure i és la nostra salvació, que sempre i en tot lloc, Pare Sant, us donem gràcies per Jesucrist, el vostre Fill estimat. Ell és la vostra Paraula, per la qual vau crear totes les coses. Vos ens l\'heu enviat com a salvador i redemptor, encarnat per obra de l\'Esperit Sant i nascut de la Verge Maria. Ell, per complir la vostra voluntat i guanyar per a vos un poble sant, estengué els braços a la creu: així destruïa la mort i ens feia conèixer la resurrecció. Per això, amb els àngels i amb els sants proclamem la vostra glòria, tot dient:',
+      eu:'Egoki da, bai, eta zuzen Zuri, Aita guztiz santu Horri, eskerrak ematea nonnai eta beti, Jesu Kristo zure Seme maitearen bitartez. Berau da zure Hitza, Beronen bidez egin dituzu diren guztiak; Berau bidali diguzu salbatzaile eta erosle, Espiritu Santuaren egitez gizon egina eta Birjinagandik jaioa. Berak, zure nahia betetzeko eta Zuretzat herri santu bat irabazteko, gurutzean besoak zabaldu zituen eta, heriotza ezereztuz, nagusi agertu piztuera. Horregatik, aingeru eta santu guztiekin, guk ere zure ospea eta aintza goresten ditugu, bihotz batez kantari:',
+      fr:'Vraiment, Père très saint, il est juste et bon, pour ta gloire et notre salut, de t\'offrir notre action de grâce, toujours et en tout lieu, par ton Fils bien-aimé, Jésus le Christ. Il est ta Parole par qui tu as créé toutes choses. C\'est lui que tu nous as envoyé comme Rédempteur et Sauveur, Dieu fait homme, conçu de l\'Esprit Saint, né de la Vierge Marie. Pour accomplir jusqu\'au bout ta volonté et rassembler un peuple saint qui t\'appartienne, il étendit les mains à l\'heure de sa passion, afin de briser la mort et de manifester la résurrection. C\'est pourquoi, avec les anges et tous les saints, nous chantons ta gloire et d\'une seule voix nous proclamons :',
+      it:'E\' veramente cosa buona e giusta, nostro dovere e fonte di salvezza, rendere grazie sempre e in ogni luogo a te, Padre santo, per Gesù Cristo, tuo dilettissimo Figlio. Egli è la tua Parola vivente, per mezzo di lui hai creato tutte le cose, e lo hai mandato a noi salvatore e redentore, fatto uomo per opera dello Spirito Santo e nato dalla Vergine Maria. Per compiere la tua volontà e acquistarti un popolo santo, egli stese le braccia sulla croce, morendo distrusse la morte e proclamò la risurrezione. Per questo mistero di salvezza, uniti agli angeli e ai santi, cantiamo a una sola voce la tua gloria:'})
+  ]
+},
+
+'sanctus':{
+  lbl:{es:'Santo',ca:'Sant',eu:'Santu',fr:'Saint',it:'Santo'},
+  blks:[
+    A({es:'Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de su gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.',
+      ca:'Sant, sant, sant és el Senyor, Déu de l\'univers. El cel i la terra son plens de la vostra glòria. Hosanna a dalt del cel. Beneït el qui ve en nom del Senyor. Hosanna a dalt del cel.',
+      eu:'Santu, Santu, Santua, diren guztien Jainko Jauna. Zeru-lurrak beterik dauzka zure diztirak. Hosanna zeru-goienetan! Bedeinkatua Jaunaren izenean datorrena. Hosanna zeru-goienetan!',
+      fr:'Saint ! Saint ! Saint, le Seigneur, Dieu de l\'univers ! Le ciel et la terre sont remplis de ta gloire. Hosanna au plus haut des cieux. Béni soit celui qui vient au nom du Seigneur. Hosanna au plus haut des cieux.',
+      it:'Santo, Santo, Santo il Signore Dio dell\'universo. I cieli e la terra sono pieni della tua gloria. Osanna nell\'alto dei cieli. Benedetto colui che viene nel nome del Signore. Osanna nell\'alto dei cieli.'})
+  ]
+},
+
+'consagracion-pan':{
+  lbl:{es:'Consagración — Pan',ca:'Consagració — Pa',eu:'Konsagrazioa — Ogia',fr:'Consécration — Pain',it:'Consacrazione — Pane'},
+  blks:[
+    P({es:'Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que sean para nosotros Cuerpo y Sangre de Jesucristo, nuestro Señor. El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan; dándote gracias, lo partió y lo dio a sus discípulos diciendo:',
+      ca:'Sou realment sant, Senyor, font de tota santedat. Santifiqueu, doncs, aquestes ofrenes fent que hi davalli el vostre Esperit, com la rosada, perquè es converteixin per a nosaltres en el Cos i en la Sang de Jesucrist, nostre Senyor. Ell, en oferir-se lliurement a la passió, prengué el pa i, dient l\'acció de gràcies, el partí, i el donà als seus deixebles, tot dient:',
+      eu:'Santu zera, bai, Jauna, eta santutasun guztiaren iturri. Santu egizkizu, bada, ogi eta ardo hauek, zure Espiritua isuriz, Jesu Kristo gure Jaunaren gorputz eta odol guretzat egin daitezen. Berak, saldu zutenean, eta bere gogoz gurutzera zihoala, ogia hartu eta, eskerrak emanez, zatitu zuen eta bere ikasleei eman zien, esanez:',
+      fr:'Toi qui es vraiment saint, toi qui es la source de toute sainteté, Seigneur, nous te prions : Sanctifie ces offrandes en répandant sur elles ton Esprit ; qu\'elles deviennent pour nous le corps et le sang de Jésus, le Christ, notre Seigneur. Au moment d\'être livré et d\'entrer librement dans sa passion, il prit le pain, il rendit grâce, il le rompit et le donna à ses disciples, en disant :',
+      it:'Padre veramente santo, fonte di ogni santità, santifica questi doni con l\'effusione del tuo Spirito perché diventino per noi il corpo e il sangue di Gesù Cristo nostro Signore. Egli, offrendosi liberamente alla sua passione, prese il pane e rese grazie, lo spezzò, lo diede ai suoi discepoli, e disse:'}),
+    C({es:'TOMAD Y COMED TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR VOSOTROS.',
+      ca:'PRENEU I MENGEU-NE TOTS, QUE AIXÒ ÉS EL MEU COS, ENTREGAT PER VOSALTRES.',
+      eu:'HARTZAZUE ETA JAN GUZTIOK HONTATIK: AU NIRE GORPUTZA DA-TA, ZUENTZAT EMANGO DENA.',
+      fr:'PRENEZ, ET MANGEZ-EN TOUS : CECI EST MON CORPS LIVRÉ POUR VOUS.',
+      it:'PRENDETE, E MANGIATENE TUTTI: QUESTO È IL MIO CORPO OFFERTO IN SACRIFICIO PER VOI.'})
+  ]
+},
+
+'consagracion-caliz':{
+  lbl:{es:'Consagración — Cáliz',ca:'Consagració — Calze',eu:'Konsagrazioa — Kaliza',fr:'Consécration — Coupe',it:'Consacrazione — Calice'},
+  blks:[
+    P({es:'Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo:',
+      ca:'Igualment, havent sopat, prengué el calze, i, novament donant-vos gràcies, el passà als seus deixebles, tot dient:',
+      eu:'Afal ondoan, berdin, kaliza harturik, berriz ere eskerrak emanez, bere ikasleei eman zien, esanez:',
+      fr:'De même, après le repas, il prit la coupe ; de nouveau il rendit grâce, et la donna à ses disciples, en disant :',
+      it:'Dopo la cena, allo stesso modo, prese il calice e rese grazie, lo diede ai suoi discepoli, e disse:'}),
+    C({es:'TOMAD Y BEBED TODOS DE ÉL, PORQUE ÉSTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR VOSOTROS Y POR TODOS LOS HOMBRES PARA EL PERDÓN DE LOS PECADOS. HACED ESTO EN CONMEMORACIÓN MÍA.',
+      ca:'PRENEU I BEVEU-NE TOTS, QUE AQUEST ÉS EL CALZE DE LA MEVA SANG, LA SANG DE L\'ALIANÇA NOVA I ETERNA, VESSADA PER VOSALTRES I PER TOTS ELS HOMES, EN REMISSIÓ DELS PECATS. FEU AIXÒ QUE ÉS EL MEU MEMORIAL.',
+      eu:'HARTZAZUE ETA EDAN GUZTIOK HONTATIK: HAU NIRE ODOLAREN KALIZA DA-TA, ITUN BERRI ETA BETIKOAREN ODOLA, ZUENTZAT ETA GUZTIENTZAT BEKATUAK BARKATZEKO ISURIKO DENA. EGIZUE HAU NIRE OROIGARRI.',
+      fr:'PRENEZ, ET BUVEZ-EN TOUS, CAR CECI EST LA COUPE DE MON SANG, LE SANG DE L\'ALLIANCE NOUVELLE ET ÉTERNELLE, QUI SERA VERSÉ POUR VOUS ET POUR LA MULTITUDE EN RÉMISSION DES PÉCHÉS. VOUS FEREZ CELA, EN MÉMOIRE DE MOI.',
+      it:'PRENDETE, E BEVETENE TUTTI: QUESTO È IL CALICE DEL MIO SANGUE PER LA NUOVA ED ETERNA ALLEANZA, VERSATO PER VOI E PER TUTTI IN REMISSIONE DEI PECCATI. FATE QUESTO IN MEMORIA DI ME.'})
+  ]
+},
+
+'misterio-fe':{
+  lbl:{es:'Misterio de la Fe',ca:'Misteri de la Fe',eu:'Sinesmenaren Misterioa',fr:'Mystère de la Foi',it:'Mistero della Fede'},
+  blks:[
+    P({es:'Éste es el Sacramento de nuestra fe:',ca:'Proclameu el misteri de la fe.',eu:'Hau da sinesmearen misterioa.',fr:'Il est grand, le mystère de la foi :',it:'Mistero della fede.'}),
+    R({es:'Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!',ca:'Anunciem la vostra mort, confessem la vostra resurrecció, esperem el vostre retorn, Senyor Jesús.',eu:'Hil eta piztu zarela, Jauna: Zu berriz etorri arte, hau dugu, hau, berri ona!',fr:'R. Nous annonçons ta mort, Seigneur Jésus, nous proclamons ta résurrection, nous attendons ta venue dans la gloire.',it:'Annunziamo la tua morte, Signore, proclamiamo la tua risurrezione, nell\'attesa della tua venuta.'})
+  ]
+},
+
+'memorial':{
+  lbl:{es:'Memorial y súplicas',ca:'Memorial i súpliques',eu:'Oroigarria eta erregutza',fr:'Mémorial et intercessions',it:'Memoriale e intercessioni'},
+  blks:[
+    P({es:'Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y Sangre de Cristo.\n\nAcuérdate, Señor, de tu Iglesia extendida por toda la tierra; y con el Papa N., con nuestro Obispo N. y todos los pastores que cuidan de tu pueblo, llévala a su perfección por la caridad.\n\nAcuérdate también de nuestros hermanos que durmieron en la esperanza de la resurrección, y de todos los que han muerto en tu misericordia; admítelos a contemplar la luz de tu rostro.\n\nTen misericordia de todos nosotros, y así, con María, la Virgen, Madre de Dios, los apóstoles y cuantos vivieron en tu amistad a través de los tiempos, merezcamos, por tu Hijo Jesucristo, compartir la vida eterna y cantar tus alabanzas.',
+      ca:'Per això, fent el memorial de la mort i de la resurrecció del vostre Fill, us oferim, oh Pare, el pa de la vida i el calze de la salvació, i us donem gràcies perquè ens heu fet dignes de servir-vos a la vostra presència. Us suplliquem humilment que l\'Esperit Sant uneixi en un sol cos els qui participem del Cos i de la Sang de Crist.\n\nRecordeu-vos, Senyor, de la vostra Església estesa per tot el món; feu-la perfecta en la caritat, juntament amb el papa N., amb el nostre bisbe N. i amb tots els pastors del vostre poble.\n\nRecordeu-vos també dels nostres germans que moriren en l\'esperança de la resurrecció, i de tots els difunts que descansen en el si de la vostra misericòrdia. Admeteu-los a contemplar la llum de la vostra mirada.\n\nUs preguem que tingueu pietat de tots nosaltres, i feu que, amb la Verge Maria, Mare de Déu, amb els apòstols, i els justos de tots els temps, que han viscut en la vostra amistat, tinguem part en la vida eterna, i puguem lloar-vos i glorificar-vos per Jesucrist, el vostre Fill.',
+      eu:'Horregatik, Jauna, zure Semearen heriotza eta piztuera gogora hartuz, biziaren ogia eta salbamenaren kaliza eskaintzen dizkizugu, Zuri eskerrak emanez, aldarean zure zerbitzari onartu gaituzulakoaren truk. Eta apalik eskatzen dizugu, Kristoren gorputz-odolak hartzen ditugunok Espiritu Santuak bat egin gaitzala.\n\nGogoan izan, Jauna, mundu guztian zabaldurik dagoen zure Eliza: Eramazu maitasun osora, I. gure Aita Santuarekin, I. gure Artzaiarekin eta elizgizon guztiekin batean.\n\nGogoan izan, Jauna, pizteko itxaropenean joan diren gure senideak eta hildako guztiak: har itzazu zeure aurpegiaren argitan.\n\nErruki zakizkigu, arren, guk guztiok betiko bizitza iritsi dezagun, Jaungoikoaren Ama Maria doatsuarekin, apostolu santuekin eta, gizaldi guztietan, zure adiskide izan diren santuekin: haiekin batean gores zaitzagun, Jesukristo gure Jaunaren bitartez.',
+      fr:'En faisant ici mémoire de la mort et de la résurrection de ton Fils, nous t\'offrons, Seigneur, le pain de la vie et la coupe du salut, et nous te rendons grâce, car tu nous as estimés dignes de nous tenir devant toi pour te servir. Humblement, nous te demandons qu\'en ayant part au Corps et au Sang du Christ, nous soyons rassemblés par l\'Esprit Saint en un seul corps.\n\nSouviens-toi, Seigneur, de ton Église répandue à travers le monde : fais-la grandir dans ta charité en union avec notre Pape N., notre évêque N., et tous les évêques, les prêtres et les diacres.\n\nSouviens-toi aussi de nos frères et sœurs qui se sont endormis dans l\'espérance de la résurrection, et souviens-toi dans ta miséricorde de tous les défunts : accueille-les dans la lumière de ton visage.\n\nSur nous tous enfin, nous implorons ta bonté : permets qu\'avec la Vierge Marie, la bienheureuse Mère de Dieu, avec les Apôtres et tous les saints qui ont fait ta joie au long des âges, nous ayons part à la vie éternelle et que nous chantions ta louange et ta gloire, par ton Fils Jésus, le Christ.',
+      it:'Celebrando il memoriale della morte e risurrezione del tuo Figlio, ti offriamo, Padre, il pane della vita e il calice della salvezza, e ti rendiamo grazie per averci ammessi alla tua presenza a compiere il servizio sacerdotale. Ti preghiamo umilmente: per la comunione al corpo e al sangue di Cristo lo Spirito Santo ci riunisca in un solo corpo.\n\nRicordati, Padre, della tua Chiesa diffusa su tutta la terra: rendila perfetta nell\'amore in unione con il nostro Papa N., il nostro Vescovo N., e tutto l\'ordine sacerdotale.\n\nRicòrdati dei nostri fratelli che si sono addormentati nella speranza della risurrezione, e di tutti i defunti che si affidano alla tua clemenza: ammettili a godere la luce del tuo volto.\n\nDi noi tutti abbi misericordia: donaci di aver parte alla vita eterna, insieme con la beata Maria, Vergine e Madre di Dio, con gli apostoli e tutti i santi, che in ogni tempo ti furono graditi: congiunge le mani e in Gesù Cristo tuo Figlio canteremo la tua gloria.'})
+  ]
+},
+
+'doxologia':{
+  lbl:{es:'Doxología',ca:'Doxologia',eu:'Doxologia',fr:'Doxologie',it:'Dossologia'},
+  blks:[
+    P({es:'Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.',ca:'Per ell, amb ell i en ell, vós, Déu Pare omnipotent, en la unitat de l\'Esperit Sant, rebeu tot honor i tota glòria pels segles dels segles.',eu:'Honen bitartez, Honekin eta Honengan, Zuri Aita Jaungoiko ahalguztidun Horri, Espiritu Santuarekin batean, ospe eta aintza guztia gizaldi eta gizaldi guztietan.',fr:'Par lui, avec lui et en lui, à toi, Dieu le Père tout-puissant, dans l\'unité du Saint-Esprit, tout honneur et toute gloire, pour les siècles des siècles.',it:'Per Cristo, con Cristo e in Cristo, a te, Dio Padre onnipotente, nell\'unità dello Spirito Santo, ogni onore e gloria per tutti i secoli dei secoli.'}),
+    R({es:'Amén.',ca:'Amén.',eu:'Amen.',fr:'R. Amen.',it:'Amen.'})
+  ]
+},
+
+'padrenuestro':{
+  lbl:{es:'Padrenuestro',ca:'Parenostre',eu:'Gure Aita',fr:'Notre Père',it:'Padre Nostro'},
+  blks:[
+    A({es:'Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.',
+      ca:'Pare nostre, que esteu en el cel: Sigui santificat el vostre nom. Vingui a nosaltres el vostre Regne. Faci\'s la vostra voluntat, així a la terra com es fa en el cel. El nostre pa de cada dia doneu-nos, Senyor, el dia d\'avui. I perdoneu les nostres culpes, així com nosaltres perdonem els nostres deutors. I no permeteu que nosaltres caiguem a la temptació. Ans deslliureu-nos de qualsevol mal.',
+      eu:'Gure Aita, zeruetan zarena: santu izan bedi zure izena, etor bedi zure erreinua, egin bedi zure nahia zeruan bezala lurrean ere. Emaiguzu gaur egun hontako ogia; barkatu gure zorrak, guk ere gure zordunei barkatzen diegunez gero; eta ez gu tentaldira eraman, baina atera gaitzazu gaitzetik.',
+      fr:'Notre Père qui es aux cieux, que ton nom soit sanctifié, que ton règne vienne, que ta volonté soit faite sur la terre comme au ciel. Donne-nous aujourd\'hui notre pain de ce jour. Pardonne-nous nos offenses, comme nous pardonnons aussi à ceux qui nous ont offensés. Et ne nous laisse pas entrer en tentation, mais délivre-nous du Mal.',
+      it:'Padre nostro, che sei nei cieli, sia santificato il tuo nome, venga il tuo regno, sia fatta la tua volontà, come in cielo così in terra. Dacci oggi il nostro pane quotidiano, e rimetti a noi i nostri debiti come noi li rimettiamo ai nostri debitori, e non ci indurre in tentazione, ma liberaci dal male.'})
+  ]
+},
+
+'embolismo':{
+  lbl:{es:'Embolismo',ca:'Embolisme',eu:'Embolismoa',fr:'Embolisme',it:'Embolismo'},
+  blks:[
+    P({es:'Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.',
+      ca:'Allibereu-nos, Senyor, de tots els mals; feu que hi hagi pau als nostres dies, i per la vostra misericòrdia, guardeu-nos de pecat i de qualsevol pertorbació: mentre esperem l\'acompliment de la nostra esperança, la manifestació de Jesucrist, el nostre Salvador.',
+      eu:'Atera gaitzazu, Jauna, gaitz guztitatik; emaiguzu pakea gure egunotan; zure errukiari esker bekatutik garbi bizi gaitezen eta estualdietan sendo, betiko zorionaren itxaropenean, Jesukristo gure salbatzailea noiz etorriko den zai gaudela.',
+      fr:'Délivre-nous de tout mal, Seigneur, et donne la paix à notre temps : soutenus par ta miséricorde, nous serons libérés de tout péché, à l\'abri de toute épreuve, nous qui attendons que se réalise cette bienheureuse espérance : l\'avènement de Jésus Christ notre Sauveur.',
+      it:'Liberaci, o Signore, da tutti i mali, concedi la pace ai nostri giorni; e con l\'aiuto della tua misericordia, vivremo sempre liberi dal peccato e sicuri da ogni turbamento, nell\'attesa che si compia la beata speranza e venga il nostro Salvatore Gesù Cristo.'})
+  ]
+},
+
+'doxologia-pn':{
+  lbl:{es:'Doxología del Padre Nuestro',ca:'Doxologia del Parenostre',eu:'Gure Aitaren Doxologia',fr:'Doxologie du Notre Père',it:'Dossologia del Padre Nostro'},
+  blks:[
+    R({es:'Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.',ca:'Perquè són vostres, per sempre, el regne, el poder i la glòria.',eu:'Zurea duzu erregetza, zureak ospe eta indarra orain eta beti.',fr:'R. Car c\'est à toi qu\'appartiennent le règne, la puissance et la gloire, pour les siècles des siècles !',it:'Tuo è il regno, tua la potenza e la gloria nei secoli.'})
+  ]
+},
+
+'paz-oracion':{
+  lbl:{es:'Oración por la paz',ca:'Oració per la pau',eu:'Pakearen otoitza',fr:'Prière pour la paix',it:'Preghiera per la pace'},
+  blks:[
+    P({es:'Señor Jesucristo, que dijiste a tus apóstoles: «La paz os dejo, mi paz os doy»; no tengas en cuenta nuestros pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.',ca:'Senyor nostre Jesucrist que diguéreu als apòstols: «Us deixo la pau, us dono la meva pau», no mireu els nostres pecats, sinó la fe de l\'Església, i doneu-li aquella pau i aquella unitat que vós vau demanar. Vós que viviu i regneu pels segles dels segles.',eu:'Jesu Kristo gure Jauna, Zuk esana da apostoluei: "Pakea uzten dizuet, nire pakea ematen": Begira zure Elizaren sinesmenari, eta ez gure bekatuei; eta, zure gogoa den bezala, emaiozu Elizari pakea, eman batasuna, Errege bizi baitzara gizaldi eta gizaldietan.',fr:'Seigneur Jésus Christ, tu as dit à tes Apôtres : « Je vous laisse la Paix, je vous donne ma paix ». Ne regarde pas nos péchés mais la foi de ton Église. Pour que ta volonté s\'accomplisse, donne-lui toujours cette paix et conduis-la vers l\'unité parfaite, toi qui vis et règnes pour les siècles des siècles !',it:'Signore Gesù Cristo, che hai detto ai tuoi apostoli: «Vi lascio la pace, vi do la mia pace», non guardare ai nostri peccati, ma alla fede della tua Chiesa, e donale unità e pace secondo la tua volontà. Tu che vivi e regni nei secoli dei secoli.'}),
+    R({es:'Amén.',ca:'Amen.',eu:'Amen.',fr:'R. Amen.',it:'Amen.'})
+  ]
+},
+
+'paz-senor':{
+  lbl:{es:'La paz del Señor',ca:'La pau del Senyor',eu:'Jaunaren Pakea',fr:'La Paix du Seigneur',it:'La Pace del Signore'},
+  blks:[
+    P({es:'La paz del Señor esté siempre con vosotros.',ca:'La pau del Senyor sigui amb vosaltres.',eu:'Jaunaren pakea beti zuekin.',fr:'Que la paix du Seigneur soit toujours avec vous.',it:'La pace del Signore sia sempre con voi.'}),
+    R({es:'Y con tu espíritu.',ca:'I amb el vostre esperit.',eu:'Eta zure espirituarekin.',fr:'R. Et avec votre esprit.',it:'E con il tuo spirito.'})
+  ]
+},
+
+'cordero-dios':{
+  lbl:{es:'Cordero de Dios',ca:'Anyell de Déu',eu:'Jaungoikoaren Bildotsa',fr:'Agneau de Dieu',it:'Agnello di Dio'},
+  blks:[
+    A({es:'Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.\nCordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.\nCordero de Dios, que quitas el pecado del mundo, danos la paz.',
+      ca:'Anyell de Déu, que lleveu el pecat del món, tingueu pietat de nosaltres.\nAnyell de Déu, que lleveu el pecat del món, tingueu pietat de nosaltres.\nAnyell de Déu, que lleveu el pecat del món, doneu-nos la pau.',
+      eu:'Jaungoikoaren Bildotsa, Zuk kentzen duzu munduko bekatua: erruki, Jauna.\nJaungoikoaren Bildotsa, Zuk kentzen duzu munduko bekatua: erruki, Jauna.\nJaungoikoaren Bildotsa, Zuk kentzen duzu munduko bekatua: emaiguzu pakea.',
+      fr:'Agneau de Dieu, qui enlèves les péchés du monde, prends pitié de nous.\nAgneau de Dieu, qui enlèves les péchés du monde, prends pitié de nous.\nAgneau de Dieu, qui enlèves les péchés du monde, donne-nous la paix.',
+      it:'Agnello di Dio, che togli i peccati del mondo, abbi pietà di noi.\nAgnello di Dio, che togli i peccati del mondo, abbi pietà di noi.\nAgnello di Dio, che togli i peccati del mondo, dona a noi la pace.'})
+  ]
+},
+
+'invitacion-comunion':{
+  lbl:{es:'Invitación a la Comunión',ca:'Invitació a la Comunió',eu:'Jaunartzeko Gonbidapena',fr:'Invitation à la Communion',it:'Invito alla Comunione'},
+  blks:[
+    P({es:'Éste es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.',ca:'Mireu l\'Anyell de Déu, mireu el qui lleva el pecat del món. Feliços els convidats a la seva taula.',eu:'Hona hemen Jaungoikoaren Bildotsa, hona munduko bekatua kentzen duena. Zoriontsuak Jaunaren mahaira deituak!',fr:'Voici l\'Agneau de Dieu, voici celui qui enlève les péchés du monde. Heureux les invités au repas des noces de l\'Agneau !',it:'Beati gli invitati alla Cena del Signore. Ecco l\'Agnello di Dio, che toglie i peccati del mondo.'})
+  ]
+},
+
+'no-soy-digno':{
+  lbl:{es:'No soy digno',ca:'No soc digne',eu:'Ez naiz inor',fr:'Je ne suis pas digne',it:'Non sono degno'},
+  blks:[
+    A({es:'Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.',ca:'Senyor, no soc digne que entreu a casa meva; digueu-ho només de paraula, i serà salva la meva ànima.',eu:'Jauna, ni ez naiz inor Zu nire etxean sartzeko, baina esazu hitz bat, eta sendatuko naiz.',fr:'R. Seigneur, je ne suis pas digne de te recevoir ; mais dis seulement une parole, et je serai guéri.',it:'O Signore, non sono degno di partecipare alla tua mensa: ma di\' soltanto una parola e io sarò salvato.'})
+  ]
+},
+
+'comunion':{
+  lbl:{es:'Comunión',ca:'Comunió',eu:'Jaunartzea',fr:'Communion',it:'Comunione'},
+  blks:[
+    N({es:'[Distribución de la Comunión]',ca:'[Distribució de la Comunió]',eu:'[Jaunartzea]',fr:'[Distribution de la Communion]',it:'[Distribuzione della Comunione]'})
+  ]
+},
+
+'saludo-final':{
+  lbl:{es:'Saludo',ca:'Salutació',eu:'Agurra',fr:'Salutation',it:'Saluto'},
+  blks:[
+    P({es:'El Señor esté con vosotros.',ca:'El Senyor sigui amb vosaltres.',eu:'Jauna zuekin.',fr:'Le Seigneur soit avec vous.',it:'Il Signore sia con voi.'}),
+    R({es:'Y con tu espíritu.',ca:'I amb el vostre esperit.',eu:'Eta zure espirituarekin.',fr:'R. Et avec votre esprit.',it:'E con il tuo spirito.'})
+  ]
+},
+
+'bendicion':{
+  lbl:{es:'Bendición',ca:'Benedicció',eu:'Bedeinkapena',fr:'Bénédiction',it:'Benedizione'},
+  blks:[
+    P({es:'La bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre vosotros.',ca:'Que un beneeixi Déu Pare totpoderós, Pare, Fill i Esperit Sant.',eu:'Bedeinka zaitzatela Jaungoiko ahalguztidunak: Aitak eta Semeak eta Espiritu Santuak.',fr:'Que Dieu tout-puissant vous bénisse, le Père, et le Fils, et le Saint-Esprit.',it:'Vi benedica Dio onnipotente, Padre e Figlio e Spirito Santo.'}),
+    R({es:'Amén.',ca:'Amén.',eu:'Amen.',fr:'R. Amen.',it:'Amen.'})
+  ]
+},
+
+'despedida':{
+  lbl:{es:'Despedida',ca:'Comiat',eu:'Agurra',fr:'Envoi',it:'Congedo'},
+  blks:[
+    P({es:'Podéis ir en paz.',ca:'Germans, aneu-vos-en en pau.',eu:'Zoazte Jaunaren pakean.',fr:'Allez dans la paix du Christ.',it:'La Messa è finita: andate in pace.'}),
+    R({es:'Demos gracias a Dios.',ca:'Donem gràcies a Déu.',eu:'Eskerrak Jainkoari.',fr:'R. Nous rendons grâce à Dieu.',it:'Rendiamo grazie a Dio.'})
+  ]
+}
+
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let lang = localStorage.getItem('missa-lang') || 'es';
+let dark = localStorage.getItem('missa-dark') === '1';
+let fontSize = parseInt(localStorage.getItem('missa-fs') || '17');
+let parallel = false;
+
+function init(){
+  applyTheme();
+  applyFont();
+  renderSidebar();
+  renderAll();
+  highlightActiveLang();
+  setupScrollSpy();
+}
+
+function setLang(l){
+  lang = l;
+  localStorage.setItem('missa-lang', l);
+  highlightActiveLang();
+  renderAll();
+}
+
+function toggleDark(){
+  dark = !dark;
+  localStorage.setItem('missa-dark', dark ? '1' : '0');
+  applyTheme();
+}
+
+function adjFont(d){
+  fontSize = Math.max(13, Math.min(24, fontSize + d));
+  localStorage.setItem('missa-fs', fontSize);
+  applyFont();
+}
+
+function togglePar(){
+  parallel = !parallel;
+  document.getElementById('par-btn').classList.toggle('on', parallel);
+  document.getElementById('par-bar').classList.toggle('on', parallel);
+  document.getElementById('main').style.display = parallel ? 'none' : '';
+  document.getElementById('par-cols').style.display = parallel ? '' : 'none';
+  if(parallel) renderParallel(); else renderAll();
+}
+
+function toggleMenu(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+
+function applyFont(){
+  document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════════
+function blockHTML(blk, l){
+  const txt = (blk.texts[l] || '').replace(/\n/g,'<br>');
+  if(!txt) return '';
+  switch(blk.role){
+    case 'priest':  return `<div class="blk blk-priest">${txt}</div>`;
+    case 'resp':    return `<div class="blk blk-resp">${txt}</div>`;
+    case 'all':     return `<div class="blk blk-all">${txt}</div>`;
+    case 'cons':    return `<div class="blk blk-cons">${txt}</div>`;
+    case 'note':    return `<div class="blk blk-note">${txt}</div>`;
+    default:        return `<div class="blk">${txt}</div>`;
+  }
+}
+
+function momentHTML(id, l){
+  const m = MOMENTS[id];
+  if(!m) return '';
+  const lbl = m.lbl[l] || m.lbl.es;
+  const blks = m.blks.map(b => blockHTML(b, l)).join('');
+  return `<div class="moment" id="mom-${id}">
+    <div class="mom-lbl">${lbl}</div>
+    ${blks}
+  </div>`;
+}
+
+function renderAll(){
+  if(parallel){ renderParallel(); return; }
+  let html = '';
+  for(const sec of SECTIONS){
+    const secLbl = sec.lbl[lang] || sec.lbl.es;
+    html += `<div class="sec-hd" id="sec-${sec.id}">${secLbl}</div>`;
+    for(const mid of sec.moments){
+      html += momentHTML(mid, lang);
+    }
+  }
+  document.getElementById('main').innerHTML = html;
+  renderSidebar();
+}
+
+function renderParallel(){
+  const l1 = document.getElementById('par-lang1').value;
+  const l2 = document.getElementById('par-lang2').value;
+  let h1 = `<div class="par-col-hd">${LANGS[l1]}</div>`;
+  let h2 = `<div class="par-col-hd">${LANGS[l2]}</div>`;
+  for(const sec of SECTIONS){
+    const lbl1 = sec.lbl[l1]||sec.lbl.es, lbl2 = sec.lbl[l2]||sec.lbl.es;
+    h1 += `<div class="sec-hd">${lbl1}</div>`;
+    h2 += `<div class="sec-hd">${lbl2}</div>`;
+    for(const mid of sec.moments){
+      h1 += momentHTML(mid, l1);
+      h2 += momentHTML(mid, l2);
+    }
+  }
+  document.getElementById('par-cols').innerHTML =
+    `<div class="par-col">${h1}</div><div class="par-col">${h2}</div>`;
+  renderSidebar();
+}
+
+function renderSidebar(){
+  const l = parallel ? (document.getElementById('par-lang1')||{}).value || lang : lang;
+  let html = '';
+  for(const sec of SECTIONS){
+    const lbl = sec.lbl[l] || sec.lbl.es;
+    html += `<div class="sb-sec-hd" onclick="toggleSbSec(this)">${lbl}</div>
+    <div class="sb-items">`;
+    for(const mid of sec.moments){
+      const m = MOMENTS[mid];
+      const ml = m.lbl[l] || m.lbl.es;
+      html += `<a class="sbl" id="sbl-${mid}" onclick="gotoMoment('${mid}')">${ml}</a>`;
+    }
+    html += '</div>';
+  }
+  document.getElementById('sidebar').innerHTML = html;
+}
+
+function toggleSbSec(el){
+  el.classList.toggle('closed');
+  const items = el.nextElementSibling;
+  items.classList.toggle('hidden');
+}
+
+function gotoMoment(id){
+  const el = document.getElementById('mom-'+id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  // close mobile menu
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function highlightActiveLang(){
+  document.querySelectorAll('.lt').forEach(b => {
+    b.classList.toggle('on', b.dataset.l === lang);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// SCROLL SPY
+// ═══════════════════════════════════════════════════════
+function setupScrollSpy(){
+  let ticking = false;
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){
+      requestAnimationFrame(updateActive);
+      ticking = true;
+      setTimeout(()=>ticking=false,100);
+    }
+  },{passive:true});
+}
+
+function updateActive(){
+  const moments = document.querySelectorAll('.moment');
+  let active = null;
+  for(const m of moments){
+    const r = m.getBoundingClientRect();
+    if(r.top <= 120) active = m.id.replace('mom-','');
+  }
+  document.querySelectorAll('.sbl').forEach(a=>{
+    const id = a.id.replace('sbl-','');
+    a.classList.toggle('on', id === active);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
