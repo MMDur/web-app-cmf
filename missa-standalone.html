@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f3eadb">
+<meta name="description" content="Missa — el Ordinario de la Misa en español, català, italiano, français y euskara. Síguela en tu idioma o en dos idiomas a la vez. Funciona sin internet.">
+<title>Missa · Ordinario de la Misa en 5 idiomas</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700;6..12,800&display=swap");
+
+:root{
+  --clay-ink:#3d3326;
+  --clay-ink-soft:#7d6f5a;
+  --clay-shadow:rgba(158,126,86,.32);
+  --clay-shadow-soft:rgba(158,126,86,.16);
+  --clay-white:rgba(255,255,255,.78);
+  --clay-face:#f5ebdb;
+  --clay-face-top:#fbf5ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Nunito Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  color:var(--clay-ink);
+  background-color:#f3eadb;
+  background-image:
+    radial-gradient(55rem 40rem at 112% -12%,rgba(232,137,107,.26),transparent 62%),
+    radial-gradient(48rem 34rem at -18% 18%,rgba(127,167,209,.2),transparent 60%),
+    radial-gradient(44rem 32rem at 52% 118%,rgba(164,143,208,.18),transparent 62%),
+    radial-gradient(26rem 20rem at 96% 52%,rgba(220,180,92,.14),transparent 60%);
+  background-attachment:fixed;
+  min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+button:disabled{cursor:not-allowed;opacity:.4}
+button:focus-visible,.lang-native:focus-visible{outline:2px solid #b05f3f;outline-offset:2px}
+ul{list-style:none}
+
+/* ------- clay surfaces ------- */
+.clay-raised{
+  border-radius:1.75rem;
+  background:linear-gradient(150deg,var(--clay-face-top) 0%,var(--clay-face) 100%);
+  box-shadow:12px 12px 28px var(--clay-shadow),-10px -10px 24px var(--clay-white),
+    inset 2px 2px 5px rgba(255,255,255,.8),inset -4px -4px 10px var(--clay-shadow-soft);
+}
+.clay-pressed{
+  border-radius:1.25rem;
+  background:linear-gradient(150deg,#eadfcd 0%,#f4eadb 100%);
+  box-shadow:inset 4px 4px 10px var(--clay-shadow-soft),inset -3px -3px 8px rgba(255,255,255,.7),
+    2px 2px 6px var(--clay-shadow-soft);
+}
+.clay-well{
+  border-radius:999px;
+  background:linear-gradient(150deg,#ece1cf 0%,#f2e9da 100%);
+  box-shadow:inset 3px 3px 8px var(--clay-shadow-soft),inset -2px -2px 6px rgba(255,255,255,.7);
+}
+.clay-pill{
+  border-radius:999px;
+  background:linear-gradient(150deg,#fdf8f0 0%,#f1e6d4 100%);
+  box-shadow:5px 5px 12px var(--clay-shadow),-4px -4px 10px var(--clay-white),
+    inset 1px 1px 2px rgba(255,255,255,.85),inset -2px -2px 4px var(--clay-shadow-soft);
+  transition:transform .14s ease,box-shadow .14s ease;
+}
+.clay-pill:hover{transform:translateY(-1px)}
+.clay-pill:active{transform:translateY(2px) scale(.98);box-shadow:inset 3px 3px 8px var(--clay-shadow-soft),inset -2px -2px 5px rgba(255,255,255,.6)}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;
+  border-radius:999px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+  background:linear-gradient(150deg,#fdf8f0 0%,#f1e6d4 100%);
+  box-shadow:5px 5px 12px var(--clay-shadow),-4px -4px 10px var(--clay-white),
+    inset 1px 1px 2px rgba(255,255,255,.85),inset -2px -2px 4px var(--clay-shadow-soft);
+  transition:transform .14s ease;
+}
+.pill:hover{transform:translateY(-1px)}
+.pill:active{transform:translateY(2px) scale(.98)}
+.dl-btn{
+  display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;
+  font-size:12px;font-weight:800;color:#51291a;white-space:nowrap;
+  background:linear-gradient(150deg,#f3b593 0%,#e8896b 100%);
+  box-shadow:6px 6px 14px rgba(172,104,66,.4),-4px -4px 10px rgba(255,255,255,.55),
+    inset 1px 1px 2px rgba(255,255,255,.55),inset -2px -2px 5px rgba(140,78,48,.28);
+  transition:transform .14s ease;
+}
+.dl-btn:hover{transform:translateY(-1px)}
+.dl-btn:active{transform:translateY(2px) scale(.98)}
+.dl-btn svg{width:15px;height:15px}
+
+/* ------- header ------- */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(246,238,222,.88);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(228,216,194,.7);
+}
+.topbar-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:10px;height:64px;padding:0 16px}
+@media(min-width:768px){.topbar-inner{padding:0 24px}}
+.mob-controls{
+  max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:8px;
+  padding:0 16px 12px;overflow-x:auto;flex-wrap:nowrap;
+}
+@media(min-width:1024px){.mob-controls{display:none}}
+.top-controls{display:none;margin-left:auto;align-items:center;gap:10px}
+@media(min-width:1024px){.top-controls{display:flex}}
+.mob-controls .fontctl{margin-left:auto}
+.sep{width:1px;height:28px;background:#d9cbb0;flex:0 0 auto}
+
+.icon-btn{
+  width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;color:var(--clay-ink);
+  background:linear-gradient(150deg,#fdf8f0 0%,#f1e6d4 100%);
+  box-shadow:5px 5px 12px var(--clay-shadow),-4px -4px 10px var(--clay-white),
+    inset 1px 1px 2px rgba(255,255,255,.85),inset -2px -2px 4px var(--clay-shadow-soft);
+  transition:transform .14s ease;
+}
+.icon-btn:hover{transform:translateY(-1px)}
+.icon-btn:active{transform:translateY(2px) scale(.97);box-shadow:inset 3px 3px 8px var(--clay-shadow-soft),inset -2px -2px 5px rgba(255,255,255,.6)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn--s{width:32px;height:32px}
+.icon-btn--s svg{width:16px;height:16px}
+.lg-hide{display:flex}
+.md-show{display:none}
+@media(min-width:1024px){.lg-hide{display:none}.md-show{display:flex}}
+
+.logo{
+  width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;color:#51291a;
+  background:linear-gradient(150deg,#f3b593 0%,#e8896b 100%);
+  box-shadow:6px 6px 14px rgba(172,104,66,.4),-4px -4px 10px rgba(255,255,255,.55),
+    inset 1px 1px 2px rgba(255,255,255,.55),inset -2px -2px 5px rgba(140,78,48,.28);
+}
+.logo svg{width:20px;height:20px}
+.brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand b{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.brand small{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--clay-ink-soft)}
+@media(max-width:640px){.brand small{display:none}}
+
+/* ------- language select ------- */
+.langsel{
+  position:relative;display:flex;align-items:center;gap:6px;height:36px;padding:0 22px 0 10px;
+  border-radius:999px;flex:0 0 auto;
+  background:linear-gradient(150deg,#fdf8f0 0%,#f1e6d4 100%);
+  box-shadow:5px 5px 12px var(--clay-shadow),-4px -4px 10px var(--clay-white),
+    inset 1px 1px 2px rgba(255,255,255,.85),inset -2px -2px 4px var(--clay-shadow-soft);
+}
+.langsel .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.langsel::after{
+  content:'';position:absolute;right:9px;top:50%;transform:translateY(-70%) rotate(45deg);
+  width:5px;height:5px;border-right:2px solid var(--clay-ink-soft);border-bottom:2px solid var(--clay-ink-soft);
+  pointer-events:none;
+}
+.lang-native{
+  appearance:none;-webkit-appearance:none;border:0;background:transparent;
+  font:inherit;font-size:14px;font-weight:800;color:var(--clay-ink);cursor:pointer;outline:none;
+}
+.langsel--sm{height:32px;padding-right:20px}
+.langsel--sm .lang-native{font-size:12px}
+
+.duo{
+  width:36px;height:36px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;transition:all .15s;
+}
+.duo svg{width:18px;height:18px}
+.duo[aria-pressed="true"]{
+  background:linear-gradient(150deg,#eadfcd 0%,#f4eadb 100%);
+  box-shadow:inset 4px 4px 10px var(--clay-shadow-soft),inset -3px -3px 8px rgba(255,255,255,.7);
+  color:var(--clay-ink);
+}
+.duo[aria-pressed="false"]{color:var(--clay-ink-soft)}
+
+.fontctl{
+  display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;flex:0 0 auto;
+  background:linear-gradient(150deg,#ece1cf 0%,#f2e9da 100%);
+  box-shadow:inset 3px 3px 8px var(--clay-shadow-soft),inset -2px -2px 6px rgba(255,255,255,.7);
+}
+.fontctl button{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:999px;color:var(--clay-ink-soft);transition:background .15s}
+.fontctl button:hover:not(:disabled){background:rgba(255,255,255,.55)}
+.fontctl button:active:not(:disabled){transform:scale(.92)}
+.fontctl button svg{width:16px;height:16px}
+.fontctl b{font-size:14px;padding:0 4px;font-weight:900}
+
+/* ------- layout ------- */
+.layout{max-width:1280px;margin:0 auto;display:flex;gap:24px;padding:24px 16px}
+@media(min-width:768px){.layout{padding:24px}}
+.sidebar{flex:0 0 288px;display:none}
+@media(min-width:1024px){.sidebar{display:block}}
+.sidebar-inner{
+  position:sticky;top:96px;max-height:calc(100dvh - 112px);overflow-y:auto;padding:20px;
+  border-radius:1.75rem;
+  background:linear-gradient(150deg,var(--clay-face-top) 0%,var(--clay-face) 100%);
+  box-shadow:12px 12px 28px var(--clay-shadow),-10px -10px 24px var(--clay-white),
+    inset 2px 2px 5px rgba(255,255,255,.8),inset -4px -4px 10px var(--clay-shadow-soft);
+}
+.content{flex:1;min-width:0}
+
+/* ------- part menu ------- */
+.sidebar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sidebar-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--clay-ink-soft)}
+.progress-chip{
+  font-size:10px;font-weight:800;color:var(--clay-ink-soft);padding:2px 8px;border-radius:999px;white-space:nowrap;
+  background:linear-gradient(150deg,#ece1cf 0%,#f2e9da 100%);
+  box-shadow:inset 3px 3px 8px var(--clay-shadow-soft),inset -2px -2px 6px rgba(255,255,255,.7);
+}
+.pm-section{margin-bottom:24px}
+.pm-section:last-child{margin-bottom:0}
+.pm-head{display:flex;align-items:center;gap:8px;margin:0 0 8px 6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--clay-ink-soft)}
+.pm-secdot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.pm-list{display:flex;flex-direction:column;gap:4px}
+.pm-item{
+  width:100%;display:flex;align-items:flex-start;gap:10px;text-align:left;padding:10px 14px;
+  border-radius:1rem;transition:background .15s,transform .12s;
+}
+.pm-item:hover{background:rgba(255,255,255,.5)}
+.pm-item:active{transform:scale(.99)}
+.pm-item.is-active{
+  background:linear-gradient(150deg,#eadfcd 0%,#f4eadb 100%);
+  box-shadow:inset 4px 4px 10px var(--clay-shadow-soft),inset -3px -3px 8px rgba(255,255,255,.7),
+    2px 2px 6px var(--clay-shadow-soft);
+}
+.pm-dot{width:6px;height:6px;border-radius:50%;margin-top:7px;flex:0 0 auto}
+.pm-item:not(.is-active) .pm-dot{opacity:.5}
+.pm-main{min-width:0}
+.pm-title{display:block;font-size:15px;font-weight:700;line-height:1.3}
+.pm-item:not(.is-active) .pm-title{color:rgba(61,51,38,.85)}
+.pm-sub{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--clay-ink-soft)}
+
+/* ------- part header ------- */
+.fade-in{animation:rise .28s ease}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.part-head{margin-bottom:20px}
+.part-eyebrow{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--clay-ink-soft)}
+.part-eyebrow .progress-chip{margin-left:auto}
+@media(min-width:768px){.part-eyebrow .progress-chip{display:none}}
+.part-title{font-family:'Fraunces',Georgia,serif;font-weight:600;margin-top:4px}
+.part-title2{margin-top:4px;font-size:15px;font-weight:700;color:var(--clay-ink-soft)}
+
+/* ------- columns ------- */
+.mob-switch{
+  display:inline-flex;gap:4px;padding:4px;margin:0 0 16px;border-radius:999px;
+  background:linear-gradient(150deg,#ece1cf 0%,#f2e9da 100%);
+  box-shadow:inset 3px 3px 8px var(--clay-shadow-soft),inset -2px -2px 6px rgba(255,255,255,.7);
+}
+@media(min-width:768px){.mob-switch{display:none}}
+.mob-switch button{display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:999px;font-size:12px;font-weight:800;transition:all .15s}
+.mob-switch button.is-active{
+  background:linear-gradient(150deg,#fdf8f0 0%,#f1e6d4 100%);
+  box-shadow:5px 5px 12px var(--clay-shadow),-4px -4px 10px var(--clay-white),
+    inset 1px 1px 2px rgba(255,255,255,.85),inset -2px -2px 4px var(--clay-shadow-soft);
+  color:var(--clay-ink);
+}
+.mob-switch button:not(.is-active){color:var(--clay-ink-soft)}
+.mob-switch .dot{width:8px;height:8px;border-radius:50%}
+
+.cols{display:grid;gap:20px}
+.cols-dual{grid-template-columns:1fr}
+@media(min-width:768px){.cols-dual{grid-template-columns:1fr 1fr;align-items:start}}
+.col-wrap{margin-bottom:20px}
+@media(min-width:768px){.col-wrap{margin-bottom:0}}
+.hidden-mobile{display:none}
+@media(min-width:768px){.hidden-mobile{display:block}}
+
+.col-card{display:flex;flex-direction:column;padding:24px 24px 28px}
+@media(min-width:768px){.col-card{padding:28px}}
+.col-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lang-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+  box-shadow:3px 3px 8px var(--clay-shadow),-2px -2px 6px rgba(255,255,255,.7),
+    inset 1px 1px 2px rgba(255,255,255,.7),inset -1px -1px 3px var(--clay-shadow-soft);
+}
+.lang-chip .c{width:6px;height:6px;border-radius:50%}
+.col-langname{font-size:12px;font-weight:700;color:var(--clay-ink-soft)}
+.col-title{font-family:'Fraunces',Georgia,serif;font-weight:600;margin-top:12px}
+.note{
+  display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px 16px;border-radius:1rem;
+  background:rgba(255,255,255,.5);font-size:13px;font-weight:600;line-height:1.55;color:var(--clay-ink-soft);
+}
+.note svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px;color:#b05f3f}
+.parts{margin-top:16px;display:flex;flex-direction:column;gap:16px}
+.part-text{font-weight:500;color:rgba(61,51,38,.95);white-space:pre-line}
+.role-chip{
+  display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;
+}
+.bg-priest{background:#f5e0cd;color:#8a4a28}
+.bg-assembly{background:#dfe9f6;color:#2f5d8f}
+.bg-all{background:#e3efdd;color:#3c6b33}
+.col-foot{margin-top:auto;padding-top:20px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:rgba(125,111,90,.7)}
+
+/* ------- typography sizes ------- */
+.fs-b0{font-size:15px;line-height:1.8}
+.fs-b1{font-size:17px;line-height:1.9}
+.fs-b2{font-size:19px;line-height:2}
+.fs-t0{font-size:22px}
+.fs-t1{font-size:27px}
+.fs-t2{font-size:30px}
+
+/* ------- pager ------- */
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;padding-bottom:32px}
+.pager button{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border-radius:999px;font-size:14px;font-weight:800;transition:transform .14s ease}
+.pager button:hover:not(:disabled){transform:translateY(-1px)}
+.pager button:active:not(:disabled){transform:translateY(2px) scale(.98)}
+.pager svg{width:16px;height:16px}
+.pager .prev{
+  background:linear-gradient(150deg,#fdf8f0 0%,#f1e6d4 100%);
+  box-shadow:5px 5px 12px var(--clay-shadow),-4px -4px 10px var(--clay-white),
+    inset 1px 1px 2px rgba(255,255,255,.85),inset -2px -2px 4px var(--clay-shadow-soft);
+}
+.pager .next{
+  color:#51291a;
+  background:linear-gradient(150deg,#f3b593 0%,#e8896b 100%);
+  box-shadow:6px 6px 14px rgba(172,104,66,.4),-4px -4px 10px rgba(255,255,255,.55),
+    inset 1px 1px 2px rgba(255,255,255,.55),inset -2px -2px 5px rgba(140,78,48,.28);
+}
+
+/* ------- drawer ------- */
+.drawer-backdrop{position:fixed;inset:0;z-index:50;background:rgba(93,70,40,.35);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;z-index:60;width:min(310px,88vw);
+  display:flex;flex-direction:column;background:#f3eadb;
+  box-shadow:14px 0 40px rgba(120,90,50,.3);animation:slide .25s ease;
+}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:none}}
+@media(min-width:1024px){.drawer,.drawer-backdrop{display:none}}
+.drawer-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(228,216,194,.7)}
+.drawer-head h2{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600}
+.drawer-head .icon-btn{margin-left:auto}
+.drawer-scroll{flex:1;overflow-y:auto;padding:20px 16px}
+.drawer-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--clay-ink-soft);margin:0 6px 12px}
+.drawer-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 20px;border-top:1px solid rgba(228,216,194,.7)}
+.drawer-note{font-size:10px;font-weight:600;color:rgba(125,111,90,.7);text-align:right;line-height:1.4}
+
+/* ------- scrollbars ------- */
+.sidebar-inner::-webkit-scrollbar,.drawer-scroll::-webkit-scrollbar,.mob-controls::-webkit-scrollbar{width:10px;height:10px}
+.sidebar-inner::-webkit-scrollbar-thumb,.drawer-scroll::-webkit-scrollbar-thumb,.mob-controls::-webkit-scrollbar-thumb{background:rgba(158,126,86,.35);border-radius:999px;border:3px solid transparent;background-clip:content-box}
+.sidebar-inner::-webkit-scrollbar-track,.drawer-scroll::-webkit-scrollbar-track,.mob-controls::-webkit-scrollbar-track{background:transparent}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<noscript><p style="padding:24px;text-align:center;font-weight:600">Missa necesita JavaScript para funcionar. Actívalo en los ajustes del navegador.</p></noscript>
+<div id="app"></div>
+<script>
+'use strict';
+/* ================= DATOS (inyectados por el generador) ================= */
+const DATA = {"LANGS":[{"code":"es","name":"Español","short":"ES","color":"#e8896b"},{"code":"ca","name":"Català","short":"CA","color":"#dcb45c"},{"code":"it","name":"Italiano","short":"IT","color":"#8fbf7f"},{"code":"fr","name":"Français","short":"FR","color":"#7fa7d1"},{"code":"eu","name":"Euskara","short":"EU","color":"#a48fd0"}],"ROLE_LABELS":{"priest":{"es":"Sacerdote","ca":"Sacerdot","it":"Sacerdote","fr":"Prêtre","eu":"Apaiza"},"assembly":{"es":"Asamblea","ca":"Assemblea","it":"Assemblea","fr":"Assemblée","eu":"Elkartea"},"all":{"es":"Todos","ca":"Tots","it":"Tutti","fr":"Tous","eu":"Denok"}},"UI":{"es":{"appName":"Missa","tagline":"Ordinario de la Misa en 5 idiomas","parts":"Partes de la Misa","menu":"Menú","font":"Letra","langA":"Idioma principal","langB":"Segundo idioma","oneCol":"Un idioma","twoCol":"Dos idiomas","prev":"Parte anterior","next":"Parte siguiente","home":"Inicio","note":"Nota","source":"Textos del Ordinario de la Misa (Misal Romano)","download":"Descargar"},"ca":{"appName":"Missa","tagline":"Ordinari de la Missa en 5 idiomes","parts":"Parts de la Missa","menu":"Menú","font":"Lletra","langA":"Idioma principal","langB":"Segon idioma","oneCol":"Un idioma","twoCol":"Dos idiomes","prev":"Part anterior","next":"Part següent","home":"Inici","note":"Nota","source":"Textos de l'Ordinari de la Missa (Missal Romà)","download":"Descarregar"},"it":{"appName":"Missa","tagline":"Ordinario della Messa in 5 lingue","parts":"Parti della Messa","menu":"Menu","font":"Carattere","langA":"Lingua principale","langB":"Seconda lingua","oneCol":"Una lingua","twoCol":"Due lingue","prev":"Parte precedente","next":"Parte successiva","home":"Home","note":"Nota","source":"Testi dell'Ordinario della Messa (Messale Romano)","download":"Scarica"},"fr":{"appName":"Missa","tagline":"Ordinaire de la Messe en 5 langues","parts":"Parties de la Messe","menu":"Menu","font":"Texte","langA":"Langue principale","langB":"Seconde langue","oneCol":"Une langue","twoCol":"Deux langues","prev":"Partie précédente","next":"Partie suivante","home":"Accueil","note":"Note","source":"Textes de l'Ordinaire de la Messe (Missel romain)","download":"Télécharger"},"eu":{"appName":"Missa","tagline":"Mezaren Ordinarioa 5 hizkuntzatan","parts":"Mezaren atalak","menu":"Menua","font":"Letra","langA":"Hizkuntza nagusia","langB":"Bigarren hizkuntza","oneCol":"Hizkuntza bat","twoCol":"Bi hizkuntza","prev":"Aurreko atala","next":"Hurrengo atala","home":"Hasiera","note":"Oharra","source":"Mezaren Ordinarioaren testuak (Erromatar Meza-liburua)","download":"Deskargatu"}},"MASS":[{"id":"intro","titles":{"es":"Ritos iniciales","ca":"Ritus inicials","it":"Riti di introduzione","fr":"Rites d'ouverture","eu":"Hasierako errituak"},"items":[{"id":"senyal","titles":{"es":"Señal de la cruz","ca":"El senyal de la creu","it":"Il segno di croce","fr":"Le signe de croix","eu":"Gurutzearen seinalea"},"parts":[{"who":"all","text":{"es":"En el nombre del Padre, y del Hijo, y del Espíritu Santo. Amén.","ca":"En el nom del Pare, i del Fill, i de l'Esperit Sant. Amén.","it":"Nel nome del Padre e del Figlio e dello Spirito Santo. Amen.","fr":"Au nom du Père, et du Fils, et du Saint-Esprit. Amen.","eu":"Aitaren eta Semearen eta Espiritu Santuaren izenean. Amen."}}]},{"id":"agurra","titles":{"es":"Saludo","ca":"Salutació","it":"Saluto","fr":"Salutation","eu":"Agurra"},"parts":[{"who":"priest","text":{"es":"El Señor esté con vosotros.","ca":"El Senyor sigui amb vosaltres.","it":"Il Signore sia con voi.","fr":"Le Seigneur soit avec vous.","eu":"Jauna zuekin."}},{"who":"assembly","text":{"es":"Y con tu espíritu.","ca":"I amb el teu esperit.","it":"E con il tuo spirito.","fr":"Et avec votre esprit.","eu":"Eta zure espirituarekin."}}]},{"id":"penitentziala","titles":{"es":"Acto penitencial","ca":"Acte penitencial","it":"Atto penitenziale","fr":"Acte pénitentiel","eu":"Damu-ekintza"},"parts":[{"who":"priest","text":{"es":"Hermanos, para celebrar dignamente estos sagrados misterios, reconozcamos nuestros pecados.","ca":"Germans, per celebrar dignament aquests sants misteris, reconeguem els nostres pecats.","it":"Fratelli e sorelle, per celebrare degnamente questi santi misteri, riconosciamo i nostri peccati.","fr":"Frères et sœurs, pour célébrer dignement les saints mystères, reconnaissons nos péchés.","eu":"Senideok, misterio santu hauek duintasunez ospatzeko, aitortu ditzagun gure bekatuak."}},{"who":"all","text":{"es":"Yo confieso ante Dios todopoderoso y ante vosotros, hermanos, que he pecado mucho de pensamiento, palabra, obra y omisión: por mi culpa, por mi culpa, por mi gran culpa. Por eso ruego a Santa María, siempre Virgen, a los ángeles, a los santos y a vosotros, hermanos, que intercedáis por mí ante Dios, nuestro Señor.","ca":"Jo confesso davant Déu totpoderós i davant vosaltres, germans, que he pecat molt de pensament, paraula, obra i omissió: per culpa meva, per culpa meva, per la meva gran culpa. Per això prego a santa Maria, sempre Verge, als àngels, als sants i a vosaltres, germans, que intercediu per mi davant Déu, nostre Senyor.","it":"Confesso a Dio onnipotente e a voi, fratelli e sorelle, che ho molto peccato in pensieri, parole, opere e omissioni, per mia colpa, mia colpa, mia grandissima colpa. E supplico la beata Maria sempre Vergine, tutti gli angeli e i santi, e voi, fratelli e sorelle, di pregare per me il Signore Dio nostro.","fr":"Je confesse à Dieu tout-puissant, je reconnais devant vous, mes frères et sœurs, que j'ai péché en pensée, en parole, par action et par omission ; oui, j'ai vraiment péché. C'est pourquoi je supplie la bienheureuse Vierge Marie, les anges et tous les saints, et vous aussi, mes frères et sœurs, de prier pour moi le Seigneur notre Dieu.","eu":"Aitortzen dut Jainko ahalguztidunaren aurrean, eta zuek, senideok, asko bekatu egin dudala pentsamenduz, hitzez, egitez eta utzikeriaz: nire erruagatik, nire erruagatik, nire erru handiagatik. Horregatik eskatzen diet Andre Maria Beti Birjinari, aingeruei eta santu guztiei, eta zuei, senideok, Jainko gure Jaunaren aurrean nitaz otoitz egitea."}},{"who":"priest","text":{"es":"Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.","ca":"Que Déu totpoderós tingui misericòrdia de nosaltres, perdoni els nostres pecats i ens porti a la vida eterna.","it":"Dio onnipotente abbia misericordia di noi, perdoni i nostri peccati e ci conduca alla vita eterna.","fr":"Que Dieu tout-puissant nous fasse miséricorde, qu'il nous pardonne nos péchés et nous conduise à la vie éternelle.","eu":"Jainko ahalguztidunak izan beza gurekin errukia, barka ditzala gure bekatuak eta eraman gaitzala betiko bizitzara."}},{"who":"assembly","text":{"es":"Amén.","ca":"Amén.","it":"Amen.","fr":"Amen.","eu":"Amen."}}]},{"id":"kyrie","titles":{"es":"Kyrie","ca":"Kyrie","it":"Kyrie","fr":"Kyrie","eu":"Kyrie"},"note":{"es":"«Señor, ten piedad» se repite tres veces: una por el Señor, una por Cristo y una de nuevo por el Señor.","ca":"«Senyor, tingueu pietat» es repeteix tres vegades: una pel Senyor, una per Crist i una altra pel Senyor.","it":"«Signore, pietà» si ripete tre volte: per il Signore, per Cristo e di nuovo per il Signore.","fr":"« Seigneur, prends pitié » se répète trois fois : pour le Seigneur, pour le Christ, et de nouveau pour le Seigneur.","eu":"«Jauna, erruki zakizkigu» hiru aldiz errepikatzen da: Jaunarengatik, Kristorengatik eta berriro Jaunarengatik."},"parts":[{"who":"all","text":{"es":"Señor, ten piedad.\nCristo, ten piedad.\nSeñor, ten piedad.","ca":"Senyor, tingueu pietat.\nCrist, tingueu pietat.\nSenyor, tingueu pietat.","it":"Signore, pietà.\nCristo, pietà.\nSignore, pietà.","fr":"Seigneur, prends pitié.\nChrist, prends pitié.\nSeigneur, prends pitié.","eu":"Jauna, erruki zakizkigu.\nKristo, erruki zakizkigu.\nJauna, erruki zakizkigu."}}]},{"id":"gloria","titles":{"es":"Gloria","ca":"Glòria","it":"Gloria","fr":"Gloire à Dieu","eu":"Gloria"},"note":{"es":"Se canta o recita los domingos y solemnidades, excepto en Adviento y Cuaresma.","ca":"Es canta o recita els diumenges i solemnitats, excepte en Advent i Quaresma.","it":"Si canta o si recita nelle domeniche e solennità, eccetto in Avvento e Quaresima.","fr":"On le chante ou récite les dimanches et solennités, sauf en Avent et en Carême.","eu":"Igande eta jaiegunetan kantatu edo errezatzen da, Abendualdian eta Garizuman izan ezik."},"parts":[{"who":"all","text":{"es":"Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo, Señor Dios, Cordero de Dios, Hijo del Padre: tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, recibe nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.","ca":"Glòria a Déu a dalt del cel, i a la terra pau als homes que estima el Senyor. Us lloem, us beneïm, us adorem, us glorifiquem, us donem gràcies per la vostra immensa glòria. Senyor Déu, Rei del cel, Déu Pare totpoderós. Senyor, Fill únic, Jesucrist; Senyor Déu, Anyell de Déu, Fill del Pare: vós que lleveu el pecat del món, tingueu pietat de nosaltres; vós que lleveu el pecat del món, acolliu la nostra súplica; vós que esteu assegut a la dreta del Pare, tingueu pietat de nosaltres. Perquè només vós sou Sant, només vós sou Senyor, només vós sou Altíssim, Jesucrist, amb l'Esperit Sant, en la glòria de Déu Pare. Amén.","it":"Gloria a Dio nell'alto dei cieli e pace in terra agli uomini di buona volontà. Noi ti lodiamo, ti benediciamo, ti adoriamo, ti glorifichiamo, ti rendiamo grazie per la tua gloria immensa, Signore Dio, Re del cielo, Dio Padre onnipotente. Signore, Figlio unigenito, Gesù Cristo, Signore Dio, Agnello di Dio, Figlio del Padre: tu che togli i peccati del mondo, abbi pietà di noi; tu che togli i peccati del mondo, accogli la nostra supplica; tu che siedi alla destra del Padre, abbi pietà di noi. Perché tu solo il Santo, tu solo il Signore, tu solo l'Altissimo, Gesù Cristo, con lo Spirito Santo nella gloria di Dio Padre. Amen.","fr":"Gloire à Dieu au plus haut des cieux, et paix sur la terre aux hommes qu'il aime. Nous te louons, nous te bénissons, nous t'adorons, nous te glorifions, nous te rendons grâce, pour ton immense gloire, Seigneur Dieu, Roi du ciel, Dieu le Père tout-puissant. Seigneur, Fils unique, Jésus-Christ, Seigneur Dieu, Agneau de Dieu, le Fils du Père : toi qui enlèves le péché du monde, prends pitié de nous ; toi qui enlèves le péché du monde, reçois notre prière ; toi qui es assis à la droite du Père, prends pitié de nous. Car toi seul es saint, toi seul es Seigneur, toi seul es le Très-Haut, Jésus-Christ, avec le Saint-Esprit dans la gloire de Dieu le Père. Amen.","eu":"Gloria Jainkoari goi-zeruetan, eta bakea lurrean Jainkoak maite dituen gizakiei. Zu laudatzen zaitugu, zu bedeinkatzen zaitugu, zu adoratzen zaitugu, zu goresten zaitugu, eskerrak zuri, zure aintza handiagatik. Jaun Jainko, zeruetako errege, Jainko Aita ahalguztiduna. Jaun, Seme bakarra, Jesukristo; Jainko Jaun, Jainkoaren Bildotsa, Aitaren Semea: zuk kentzen duzu munduaren bekatua, erruki zakizkigu; zuk kentzen duzu munduaren bekatua, onar ezazu gure otoitza; Aitaren eskuinaldean eserita zaude, erruki zakizkigu. Zuk bakarrik zara santu, zuk bakarrik Jaun, zuk bakarrik goi-goikoa, Jesukristo, Espiritu Santuarekin Jainko Aitaren aintzan. Amen."}}]},{"id":"bilduma","titles":{"es":"Oración colecta","ca":"Oración colecta","it":"Colletta","fr":"Collecte","eu":"Bilduma-otoitza"},"note":{"es":"El sacerdote reza la oración propia del día.","ca":"El sacerdot resa l'oració pròpia del dia.","it":"Il sacerdote recita la colletta propria del giorno.","fr":"Le prêtre récite la collecte propre du jour.","eu":"Apaizak eguneko otoitza errezatzen du."},"parts":[{"who":"priest","text":{"es":"Oremos.","ca":"Preguem.","it":"Preghiamo.","fr":"Prions.","eu":"Otoitz egin dezagun."}},{"who":"assembly","text":{"es":"Amén.","ca":"Amén.","it":"Amen.","fr":"Amen.","eu":"Amen."}}]}]},{"id":"hitzaren","titles":{"es":"Liturgia de la Palabra","ca":"Litúrgia de la Paraula","it":"Liturgia della Parola","fr":"Liturgie de la Parole","eu":"Hitzaren liturgia"},"items":[{"id":"irakurgaia","titles":{"es":"Lecturas del día","ca":"Lectures del dia","it":"Letture del giorno","fr":"Lectures du jour","eu":"Eguneko irakurgaiak"},"note":{"es":"Se proclaman: Primera lectura, Salmo responsorial, Segunda lectura, Aclamación al Evangelio (Aleluya) y Evangelio. Son propias de cada día y se encuentran en el leccionario o el misal diario.","ca":"Es proclamen: Primera lectura, Salm responsorial, Segona lectura, Aclamació a l'Evangeli (Al·leluia) i Evangeli. Són pròpies de cada dia i es troben al leccionari o al missal diari.","it":"Si proclamano: Prima lettura, Salmo responsoriale, Seconda lettura, Acclamazione al Vangelo (Alleluia) e Vangelo. Sono proprie di ogni giorno e si trovano nel lezionario o nel messale quotidiano.","fr":"Sont proclamés : première lecture, psaume responsorial, deuxième lecture, acclamation de l'Évangile (Alléluia) et Évangile. Ils sont propres à chaque jour et se trouvent dans le lectionnaire ou le missel quotidien.","eu":"Irakurtzen dira: Lehenengo irakurgaiak, Erantzun-salmoak, Bigarren irakurgaiak, Ebanjelioaren aklamazioa (Alleluja) eta Ebanjelioa. Egun bakoitzekoak dira eta irakurketa-liburuan edo eguneko misaletan aurkitzen dira."},"parts":[]},{"id":"homilia","titles":{"es":"Homilía","ca":"Homilia","it":"Omelia","fr":"Homélie","eu":"Homilia"},"note":{"es":"El sacerdote explica la Palabra de Dios proclamada.","ca":"El sacerdot explica la Paraula de Déu proclamada.","it":"Il sacerdote spiega la Parola di Dio proclamata.","fr":"Le prêtre commente la Parole de Dieu proclamée.","eu":"Apaizak iragarritako Jainkoaren Hitza azaltzen du."},"parts":[]},{"id":"kredoa","titles":{"es":"Credo","ca":"Credo","it":"Credo","fr":"Credo","eu":"Kredoa"},"note":{"es":"Credo niceno-constantinopolitano. Se recita los domingos y solemnidades.","ca":"Credo nicenoconstantinopolità. Es recita els diumenges i solemnitats.","it":"Credo niceno-costantinopolitano. Si recita nelle domeniche e solennità.","fr":"Credo de Nicée-Constantinople. Récité les dimanches et solennités.","eu":"Nizea-Konstantinopoliseko kredoa. Igande eta jaiegunetan errezatzen da."},"parts":[{"who":"all","text":{"es":"Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvación bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato; padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos, y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y el Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica y apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.","ca":"Creiem en un sol Déu, Pare totpoderós, creador del cel i de la terra, de tot el que és visible i invisible. Creiem en un sol Senyor, Jesucrist, Fill únic de Déu, nascut del Pare abans de tots els segles: Déu de Déu, Llum de Llum, Déu veritable de Déu veritable, engendrat, no creat, de la mateixa naturalesa que el Pare, per obra del qual tot fou creat; que per nosaltres, els homes, i per la nostra salvació baixà del cel, i per obra de l'Esperit Sant s'encarnà de Maria, la Verge, i es féu home; i per nosaltres fou crucificat sota el poder de Ponç Pilat; patí i fou sepultat, i ressuscità el tercer dia, d'acord amb les Escriptures, i pujà al cel, i està assegut a la dreta del Pare; i tornarà amb glòria a judicar els vius i els morts, i el seu regne no tindrà fi. Creiem en l'Esperit Sant, Senyor i donador de vida, que procedeix del Pare i del Fill, que amb el Pare i el Fill és adorat i glorificat, i que parlà per boca dels profetes. Creiem en l'Església, que és una, santa, catòlica i apostòlica. Confessem que hi ha un sol baptisme per al perdó dels pecats. Esperem la resurrecció dels morts i la vida del món que ha de venir. Amén.","it":"Credo in un solo Dio, Padre onnipotente, creatore del cielo e della terra, di tutte le cose visibili e invisibili. Credo in un solo Signore, Gesù Cristo, unigenito Figlio di Dio, nato dal Padre prima di tutti i secoli: Dio da Dio, Luce da Luce, Dio vero da Dio vero, generato, non creato, della stessa sostanza del Padre; per mezzo di lui tutte le cose sono state create. Per noi uomini e per la nostra salvezza discese dal cielo, e per opera dello Spirito Santo si è incarnato nel seno della Vergine Maria e si è fatto uomo. Fu crocifisso per noi sotto Ponzio Pilato, morì e fu sepolto. Il terzo giorno è risuscitato secondo le Scritture, è salito al cielo, siede alla destra del Padre. E di nuovo verrà nella gloria per giudicare i vivi e i morti, e il suo regno non avrà fine. Credo nello Spirito Santo, che è Signore e dà la vita, e procede dal Padre e dal Figlio. Con il Padre e il Figlio è adorato e glorificato, e ha parlato per mezzo dei profeti. Credo la Chiesa, una santa cattolica e apostolica. Professo un solo battesimo per il perdono dei peccati. Aspetto la risurrezione dei morti e la vita del mondo che verrà. Amen.","fr":"Je crois en un seul Dieu, le Père tout-puissant, créateur du ciel et de la terre, de l'univers visible et invisible. Je crois en un seul Seigneur, Jésus-Christ, le Fils unique de Dieu, né du Père avant tous les siècles : il est Dieu, né de Dieu, lumière, née de la lumière, vrai Dieu, né du vrai Dieu. Engendré, non pas créé, de même nature que le Père ; et par lui tout a été fait. Pour nous les hommes, et pour notre salut, il descendit du ciel ; par l'Esprit Saint, il a pris chair de la Vierge Marie, et s'est fait homme. Crucifié pour nous sous Ponce Pilate, il souffrit sa passion et fut mis au tombeau. Il ressuscita le troisième jour, conformément aux Écritures, et il monta au ciel ; il est assis à la droite du Père. Il reviendra dans la gloire, pour juger les vivants et les morts ; et son règne n'aura pas de fin. Je crois en l'Esprit Saint, qui est Seigneur et qui donne la vie ; il procède du Père et du Fils. Avec le Père et le Fils, il reçoit même adoration et même gloire ; il a parlé par les prophètes. Je crois en l'Église, une, sainte, catholique et apostolique. Je reconnais un seul baptême pour le pardon des péchés. J'attends la résurrection des morts, et la vie du monde à venir. Amen.","eu":"Sinesten dut Jainko Aita ahalguztidunean, zeruaren eta lurraren egilean, ikusgai eta ikusezin den guztiaren egilean. Eta sinesten dut Jaun bakarrean, Jesukristo, Jainkoaren Seme bakarra, Aitarengandik jaioa mende guztiak baino lehen: Jainkoa Jainkoarengandik, Argia Argitik, egiazko Jainkoa egiazko Jainkoarengandik; sortua, ez egina, Aitaren izate berekoa; beraren bidez egin zen dena. Guregatik, gizakiengatik eta gure salbazioarengatik jaitsi zen zerutik; eta haragiztatu zen Espiritu Santuaren egitez, Maria Birjinarengandik, eta gizaki egin zen. Guretzat gurutziltzatua ere izan zen Ponzio Pilatoren garaian; sufritu eta hobiratu egin zen. Hirugarren egunean piztu zen, Liburu Santuen arabera; eta zerura igo zen, eta Aitaren eskuinaldean eserita dago; eta aintzaz betea etorriko da berriro ere bizien eta hildakoen epaitzera; eta haren erreinuak ez du amaierarik. Eta sinesten dut Espiritu Santuan, Jaun eta bizia ematen duena, Aitarengandik eta Semearengandik datorrena, Aitarekin eta Semearekin batera gurtua eta goretsia, profeten bitartez hitz egin zuena. Eta sinesten dut Eliza bakarra, santua, katolikoa eta apostolikoa. Aitortzen dut bataio bakarra bekatuen barkamenerako. Eta espero dut hildakoen piztuera eta etorkizuneko mendearen bizitza. Amen."}}]},{"id":"fielak","titles":{"es":"Oración de los fieles","ca":"Oración dels fidels","it":"Preghiera dei fedeli","fr":"Prière universelle","eu":"Fedelien otoitza"},"note":{"es":"Se proponen las intenciones; la asamblea responde.","ca":"Es proposen les intencions; l'assemblea respon.","it":"Si propongono le intenzioni; l'assemblea risponde.","fr":"Les intentions sont proclamées ; l'assemblée répond.","eu":"Asmoak iragartzen dira; elkarteak erantzuten du."},"parts":[{"who":"priest","text":{"es":"Oremos, hermanos, por las necesidades de la Iglesia y del mundo.","ca":"Preguem, germans, per les necessitats de l'Església i del món.","it":"Preghiamo, fratelli e sorelle, per i bisogni della Chiesa e del mondo.","fr":"Prions, frères et sœurs, pour les besoins de l'Église et du monde.","eu":"Otoitz egin dezagun, senideok, Elizaren eta munduaren beharretan."}},{"who":"assembly","text":{"es":"Te rogamos, óyenos.","ca":"Us ho demanem, Senyor.","it":"Ti preghiamo, ascoltaci.","fr":"Nous t'en prions, Seigneur.","eu":"Entzun gaitzazu, Jauna."}}]}]},{"id":"eukaristia","titles":{"es":"Liturgia Eucarística","ca":"Litúrgia Eucarística","it":"Liturgia Eucaristica","fr":"Liturgie eucharistique","eu":"Eukaristiaren liturgia"},"items":[{"id":"opagaiak","titles":{"es":"Presentación de los dones","ca":"Presentació dels dons","it":"Presentazione dei doni","fr":"Présentation des offrandes","eu":"Opariei harrera"},"parts":[{"who":"priest","text":{"es":"Bendito seas, Señor, Dios del universo, por este pan, fruto de la tierra y del trabajo del hombre, que recibimos de tu generosidad y ahora te presentamos; él será para nosotros pan de vida.","ca":"Benet sigueu, Senyor, Déu de l'univers, per aquest pa, fruit de la terra i del treball de l'home, que rebem de la vostra bondat i us presentem; serà per a nosaltres pa de vida.","it":"Benedetto sei tu, Signore, Dio dell'universo: dalla tua bontà abbiamo ricevuto questo pane, frutto della terra e del lavoro dell'uomo; noi te lo presentiamo: esso diventerà per noi cibo di vita eterna.","fr":"Béni sois-tu, Seigneur, Dieu de l'univers, par ce pain, fruit de la terre et du travail des hommes, que nous recevons de ta bonté et que nous t'offrons : il deviendra pour nous le pain de la vie.","eu":"Zorionak zuri, Jaun, unibertsoaren Jainko: zure onginahiaz jaso dugu ogi hau, lurraren eta gizonaren lanaren fruitua; zuri eskaintzen dizugu; bizitzako ogi bihurtuko da guretzat."}},{"who":"assembly","text":{"es":"Bendito seas por siempre, Señor.","ca":"Benet sigueu per sempre, Senyor.","it":"Benedetto nei secoli il Signore.","fr":"Béni sois-tu, Seigneur, à jamais.","eu":"Zorionak zuri, Jaun, betiko."}},{"who":"priest","text":{"es":"Bendito seas, Señor, Dios del universo, por este vino, fruto de la vid y del trabajo del hombre, que recibimos de tu generosidad y ahora te presentamos; él será para nosotros bebida de salvación.","ca":"Benet sigueu, Senyor, Déu de l'univers, per aquest vi, fruit de la vinya i del treball de l'home, que rebem de la vostra bondat i us presentem; serà per a nosaltres beguda de salvació.","it":"Benedetto sei tu, Signore, Dio dell'universo: dalla tua bontà abbiamo ricevuto questo vino, frutto della vite e del lavoro dell'uomo; noi te lo presentiamo: esso diventerà per noi bevanda di salvezza.","fr":"Béni sois-tu, Seigneur, Dieu de l'univers, par ce vin, fruit de la vigne et du travail des hommes, que nous recevons de ta bonté et que nous t'offrons : il deviendra pour nous le vin du Royaume.","eu":"Zorionak zuri, Jaun, unibertsoaren Jainko: zure onginahiaz jaso dugu ardo hau, mahastiaren eta gizonaren lanaren fruitua; zuri eskaintzen dizugu; salbazioko edari bihurtuko da guretzat."}},{"who":"assembly","text":{"es":"Bendito seas por siempre, Señor.","ca":"Benet sigueu per sempre, Senyor.","it":"Benedetto nei secoli il Signore.","fr":"Béni sois-tu, Seigneur, à jamais.","eu":"Zorionak zuri, Jaun, betiko."}},{"who":"priest","text":{"es":"Orad, hermanos, para que este sacrificio, mío y vuestro, sea agradable a Dios, Padre todopoderoso.","ca":"Pregueu, germans, que aquest sacrifici, meu i vostre, sigui agradable a Déu, Pare totpoderós.","it":"Pregate, fratelli e sorelle, perché il mio e vostro sacrificio sia gradito a Dio Padre onnipotente.","fr":"Priez, frères et sœurs, que mon sacrifice, qui est aussi le vôtre, soit agréable à Dieu le Père tout-puissant.","eu":"Otoitz egin, senideok, sakrifizio hau, nirea eta zuena, Jainko Aita ahalguztidunari atsegina izan dakion."}},{"who":"assembly","text":{"es":"El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.","ca":"El Senyor rebi de les vostres mans aquest sacrifici, per a lloança i glòria del seu nom, per al nostre bé i el de tota la seva santa Església.","it":"Il Signore riceva dalle tue mani questo sacrificio a lode e gloria del suo nome, per il bene nostro e di tutta la sua santa Chiesa.","fr":"Que le Seigneur reçoive de tes mains ce sacrifice, à la louange et à la gloire de son nom, pour notre bien et celui de toute son Église sainte.","eu":"Jaunak har beza zure eskutik sakrifizio hau, bere izenaren goraipamen eta aintzarako, gure onerako eta bere Eliza santu guztiaren onerako."}}]},{"id":"prefazioa","titles":{"es":"Prefacio","ca":"Prefaci","it":"Prefazio","fr":"Préface","eu":"Prefazioa"},"note":{"es":"El sacerdote proclama el prefacio del día, que termina con el canto o recitación del Santo.","ca":"El sacerdot proclama el prefaci del dia, que acaba amb el cant o recitació del Sant.","it":"Il sacerdote proclama il prefazio del giorno, che termina con il canto o la recitazione del Santo.","fr":"Le prêtre proclame la préface du jour, qui s'achève par le chant ou la récitation du Saint.","eu":"Apaizak eguneko prefazioa iragartzen du, Santuaren kantuz edo errezituz amaitzen dena."},"parts":[]},{"id":"santua","titles":{"es":"Santo","ca":"Sant","it":"Santo","fr":"Saint","eu":"Santua"},"parts":[{"who":"all","text":{"es":"Santo, Santo, Santo es el Señor, Dios del universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.","ca":"Sant, Sant, Sant és el Senyor, Déu de l'univers. El cel i la terra són plens de la vostra glòria. Hosanna a dalt del cel. Beneït el qui ve en nom del Senyor. Hosanna a dalt del cel.","it":"Santo, Santo, Santo il Signore Dio dell'universo. I cieli e la terra sono pieni della tua gloria. Osanna nell'alto dei cieli. Benedetto colui che viene nel nome del Signore. Osanna nell'alto dei cieli.","fr":"Saint ! Saint ! Saint le Seigneur, Dieu de l'univers. Le ciel et la terre sont remplis de ta gloire. Hosanna au plus haut des cieux. Béni soit celui qui vient au nom du Seigneur. Hosanna au plus haut des cieux.","eu":"Santu, santu, santu da Jauna, unibertsoaren Jainkoa. Zure aintzaz beteak daude zeru-lurrak. Hosanna goi-zeruetan. Bedeinkatua Jaunaren izenean datorrena. Hosanna goi-zeruetan."}}]},{"id":"otoizka","titles":{"es":"Plegaria eucarística","ca":"Pregària eucarística","it":"Preghiera eucaristica","fr":"Prière eucharistique","eu":"Eukaristi-otoitza"},"note":{"es":"El sacerdote proclama la plegaria eucarística; en ella se realiza la consagración. La asamblea responde con el Santo y el Misterio de la fe.","ca":"El sacerdot proclama la pregària eucarística; en ella es realitza la consagració. L'assemblea respon amb el Sant i el Misteri de la fe.","it":"Il sacerdote proclama la preghiera eucaristica; in essa avviene la consacrazione. L'assemblea risponde con il Santo e il Mistero della fede.","fr":"Le prêtre proclame la prière eucharistique ; c'est là qu'a lieu la consécration. L'assemblée répond par le Saint et le Mystère de la foi.","eu":"Apaizak eukaristi-otoitza iragartzen du; bertan gertatzen da sagaratzea. Elkarteak Santuarekin eta Fedearen misterioarekin erantzuten du."},"parts":[]},{"id":"misterioa","titles":{"es":"Misterio de la fe","ca":"Misteri de la fe","it":"Mistero della fede","fr":"Mystère de la foi","eu":"Fedearen misterioa"},"parts":[{"who":"assembly","text":{"es":"Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!","ca":"Anunciem la vostra mort, proclamem la vostra resurrecció. Veniu, Senyor Jesús!","it":"Annunciamo la tua morte, Signore, proclamiamo la tua risurrezione, nell'attesa della tua venuta.","fr":"Nous proclamons ta mort, Seigneur, nous célébrons ta résurrection, nous attendons ta venue dans la gloire.","eu":"Kristo hil da, Kristo piztu da, Kristo berriro etorriko da."}}]},{"id":"gurea","titles":{"es":"Padre nuestro","ca":"Parenostre","it":"Padre nostro","fr":"Notre Père","eu":"Gure Aita"},"parts":[{"who":"priest","text":{"es":"Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atrevemos a decir:","ca":"Fidels a la recomanació del Salvador i seguint el seu ensenyament diví, gosem dir:","it":"Obbedienti alla parola del Salvatore e formati al suo divino insegnamento, osiamo dire:","fr":"Unis dans le même Esprit, et forts de la parole du Seigneur, nous osons dire :","eu":"Salbatzailearen gomendioari jarraituz eta haren irakaspen jainkotiarra bereganatuz, ausardiaz esaten dugu:"}},{"who":"all","text":{"es":"Padre nuestro, que estás en el cielo, santificado sea tu nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.","ca":"Pare nostre, que esteu en el cel, sigui santificat el vostre nom, vingui a nosaltres el vostre regne, faci's la vostra voluntat a la terra com es fa en el cel. El pa de cada dia doneu-nos, Senyor, avui, i perdoneu les nostres ofenses, com també nosaltres perdonem els qui ens ofenen. No ens deixeu caure en la temptació, i deslliureu-nos del mal.","it":"Padre nostro che sei nei cieli, sia santificato il tuo nome, venga il tuo regno, sia fatta la tua volontà, come in cielo così in terra. Dacci oggi il nostro pane quotidiano, e rimetti a noi i nostri debiti come noi li rimettiamo ai nostri debitori, e non ci indurre in tentazione, ma liberaci dal male.","fr":"Notre Père, qui es aux cieux, que ton nom soit sanctifié, que ton règne vienne, que ta volonté soit faite sur la terre comme au ciel. Donne-nous aujourd'hui notre pain de ce jour. Pardonne-nous nos offenses, comme nous pardonnons aussi à ceux qui nous ont offensés. Et ne nous laisse pas entrer en tentation, mais délivre-nous du Mal.","eu":"Gure Aita, zeruan zaudena: santutua izan bedi zure izena; etor bekigu zure erreinua; egin bedi zure nahia, zeruan bezala lurrean ere. Eman iezaguzu gaur eguneroko ogia; barkatu gure zorrak, guk ere gure zordunei barkatzen diegun bezala; ez gaitzazu utzi tentaldian sartzen, eta atera gaitzazu gaizkitik."}},{"who":"priest","text":{"es":"Líbranos, Señor, de todos los males, y concede la paz a nuestros días; para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.","ca":"Deslliureu-nos, Senyor, de tots els mals, i concediu la pau als nostres dies; perquè, ajudats per la vostra misericòrdia, visquem sempre lliures de pecat i protegits de tota pertorbació, mentre esperem la vinguda gloriosa del nostre Salvador Jesucrist.","it":"Liberaci, o Signore, da tutti i mali, concedi la pace ai nostri giorni, e con l'aiuto della tua misericordia saremo sempre liberi dal peccato e sicuri da ogni turbamento, nell'attesa che si compia la beata speranza e venga il nostro Salvatore Gesù Cristo.","fr":"Délivre-nous, Seigneur, de tout mal, donne la paix à notre temps. Par ta miséricorde, libère-nous du péché, rassure-nous devant les épreuves, tandis que nous attendons la bienheureuse espérance et la venue de notre Sauveur, Jésus-Christ.","eu":"Atera gaitzazu, Jauna, gaitz guztietatik, eta eman bakea gure egunetan; zure errukiaren laguntzaz, bizi gaitezen beti bekaturik gabe eta kezka guztietatik babesturik, gure Salbatzaile Jesukristoren etorrera gloriosoaren zain."}},{"who":"assembly","text":{"es":"Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.","ca":"Vostre és el regne, vostre el poder i la glòria, per sempre, Senyor.","it":"Tuo è il regno, tua la potenza e la gloria nei secoli.","fr":"Car c'est à toi qu'appartiennent le règne, la puissance et la gloire, pour les siècles des siècles.","eu":"Zurea da erreinua, zurea boterea eta aintza, betiko, Jauna."}}]},{"id":"bakea","titles":{"es":"Rito de la paz","ca":"Ritu de la pau","it":"Rito della pace","fr":"Rite de la paix","eu":"Bakearen erritua"},"note":{"es":"Después, los fieles se dan fraternalmente la paz.","ca":"Després, els fidels es donen fraternalment la pau.","it":"Poi i fedeli si scambiano fraternamente la pace.","fr":"Ensuite, les fidèles se donnent fraternellement la paix.","eu":"Gero, fededunek anaikiro ematen diote elkarri bakea."},"parts":[{"who":"priest","text":{"es":"La paz del Señor esté siempre con vosotros.","ca":"La pau del Senyor sigui sempre amb vosaltres.","it":"La pace del Signore sia sempre con voi.","fr":"La paix du Seigneur soit toujours avec vous.","eu":"Jaunaren bakea izan bedi beti zuekin."}},{"who":"assembly","text":{"es":"Y con tu espíritu.","ca":"I amb el teu esperit.","it":"E con il tuo spirito.","fr":"Et avec votre esprit.","eu":"Eta zure espirituarekin."}}]},{"id":"bildotsa","titles":{"es":"Cordero de Dios","ca":"Anyell de Déu","it":"Agnello di Dio","fr":"Agneau de Dieu","eu":"Jainkoaren Bildotsa"},"note":{"es":"Se canta o recita mientras se parte el pan.","ca":"Es canta o recita mentre es parteix el pa.","it":"Si canta o recita mentre si spezza il pane.","fr":"On le chante ou récite pendant la fraction du pain.","eu":"Ogia zatitzen den bitartean kantatu edo errezatzen da."},"parts":[{"who":"all","text":{"es":"Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.\nCordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.\nCordero de Dios, que quitas el pecado del mundo, danos la paz.","ca":"Anyell de Déu, que lleveu el pecat del món, tingueu pietat de nosaltres.\nAnyell de Déu, que lleveu el pecat del món, tingueu pietat de nosaltres.\nAnyell de Déu, que lleveu el pecat del món, doneu-nos la pau.","it":"Agnello di Dio, che togli i peccati del mondo, abbi pietà di noi.\nAgnello di Dio, che togli i peccati del mondo, abbi pietà di noi.\nAgnello di Dio, che togli i peccati del mondo, dona a noi la pace.","fr":"Agneau de Dieu, qui enlèves le péché du monde, prends pitié de nous.\nAgneau de Dieu, qui enlèves le péché du monde, prends pitié de nous.\nAgneau de Dieu, qui enlèves le péché du monde, donne-nous la paix.","eu":"Jainkoaren Bildotsa, munduaren bekatua kentzen duzuna, erruki zakizkigu.\nJainkoaren Bildotsa, munduaren bekatua kentzen duzuna, erruki zakizkigu.\nJainkoaren Bildotsa, munduaren bekatua kentzen duzuna, eman iezaguzu bakea."}}]},{"id":"bildotsa-hona","titles":{"es":"Invito a la comunión","ca":"Invitació a la comunió","it":"Invito alla comunione","fr":"Invitation à la communion","eu":"Jaunartera-deia"},"parts":[{"who":"priest","text":{"es":"Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.","ca":"Aquest és l'Anyell de Déu, que lleva el pecat del món. Benaurats els qui són convidats al sopar del Senyor.","it":"Ecco l'Agnello di Dio, ecco colui che toglie i peccati del mondo. Beati gli invitati alla cena dell'Agnello.","fr":"Voici l'Agneau de Dieu, voici celui qui enlève le péché du monde. Heureux les invités au repas du Seigneur.","eu":"Hona Jainkoaren Bildotsa, hona munduaren bekatua kentzen duena. Zoriontsuak Jaunaren afarira deituak."}},{"who":"all","text":{"es":"Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.","ca":"Senyor, no sóc digne que entreu a casa meva, però una paraula vostra n'hi ha prou per guarir-me.","it":"O Signore, non sono degno di partecipare alla tua mensa: ma di' soltanto una parola e io sarò salvato.","fr":"Seigneur, je ne suis pas digne de te recevoir ; mais dis seulement une parole et je serai guéri.","eu":"Jauna, ez naiz digne zure etxean sartzeko, baina esan ezazu hitz bat eta sendatuko naiz."}}]},{"id":"jaunartzea","titles":{"es":"Comunión","ca":"Comunió","it":"Comunione","fr":"Communion","eu":"Jaunartzea"},"note":{"es":"El sacerdote muestra la hostia y dice: «El Cuerpo de Cristo»; cada comulgante responde: «Amén».","ca":"El sacerdot mostra l'hòstia i diu: «El Cos de Crist»; cada combregant respon: «Amén».","it":"Il sacerdote mostra l'ostia e dice: «Il Corpo di Cristo»; ciascun comunicando risponde: «Amen».","fr":"Le prêtre montre l'hostie et dit : « Le Corps du Christ » ; chaque communiant répond : « Amen ».","eu":"Apaizak ostia erakusten du eta dio: «Kristoren Gorputza»; hartzaile bakoitzak erantzuten du: «Amen»."},"parts":[{"who":"priest","text":{"es":"El Cuerpo de Cristo.","ca":"El Cos de Crist.","it":"Il Corpo di Cristo.","fr":"Le Corps du Christ.","eu":"Kristoren Gorputza."}},{"who":"assembly","text":{"es":"Amén.","ca":"Amén.","it":"Amen.","fr":"Amen.","eu":"Amen."}}]}]},{"id":"amaiera","titles":{"es":"Ritos de conclusión","ca":"Ritus de conclusió","it":"Riti di conclusione","fr":"Rites de conclusion","eu":"Amaierako errituak"},"items":[{"id":"bedeinkapena","titles":{"es":"Bendición final","ca":"Benedicció final","it":"Benedizione finale","fr":"Bénédiction finale","eu":"Amaierako bedeinkapena"},"parts":[{"who":"priest","text":{"es":"El Señor esté con vosotros.","ca":"El Senyor sigui amb vosaltres.","it":"Il Signore sia con voi.","fr":"Le Seigneur soit avec vous.","eu":"Jauna zuekin."}},{"who":"assembly","text":{"es":"Y con tu espíritu.","ca":"I amb el teu esperit.","it":"E con il tuo spirito.","fr":"Et avec votre esprit.","eu":"Eta zure espirituarekin."}},{"who":"priest","text":{"es":"La bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre vosotros.","ca":"Que la benedicció de Déu totpoderós, Pare, Fill i Esperit Sant, descendeixi sobre vosaltres.","it":"Vi benedica Dio onnipotente, Padre e Figlio e Spirito Santo.","fr":"Que Dieu tout-puissant vous bénisse, le Père, le Fils et le Saint-Esprit.","eu":"Jaun ahalguztidunaren bedeinkapena, Aitarena, Semearena eta Espiritu Santuarena, jaits bedi zuetara."}},{"who":"assembly","text":{"es":"Amén.","ca":"Amén.","it":"Amen.","fr":"Amen.","eu":"Amen."}}]},{"id":"agurra-bukaera","titles":{"es":"Despedida","ca":"Acomiadament","it":"Congedo","fr":"Renvoi","eu":"Agurra"},"parts":[{"who":"priest","text":{"es":"Podéis ir en paz.","ca":"Podeu anar en pau.","it":"Andate in pace.","fr":"Allez dans la paix du Christ.","eu":"Zoazte bakean."}},{"who":"assembly","text":{"es":"Damos gracias a Dios.","ca":"Donem gràcies a Déu.","it":"Rendiamo grazie a Dio.","fr":"Nous rendons grâce à Dieu.","eu":"Eskerrak Jainkoari."}}]}]}]};
+const LANGS = DATA.LANGS;
+const ROLE_LABELS = DATA.ROLE_LABELS;
+const UI = DATA.UI;
+const MASS = DATA.MASS;
+
+const ALL_ITEMS = [];
+for (const s of MASS) for (const it of s.items) ALL_ITEMS.push(it);
+const langMeta = code => LANGS.find(l => l.code === code) || LANGS[0];
+const findItem = id => ALL_ITEMS.find(i => i.id === id) || ALL_ITEMS[0];
+const sectionOf = id => MASS.find(s => s.items.some(i => i.id === id)) || MASS[0];
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+/* ================= iconos ================= */
+const IC = {
+  menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>',
+  columns: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7.5" height="18" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="18" rx="1.5"/></svg>',
+  minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+  chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  panelL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9.5 3v18"/></svg>',
+  panelR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M14.5 3v18"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 4h3v5.5H19v3h-5.5V20h-3v-7.5H5v-3h5.5z"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>'
+};
+
+/* ================= estado ================= */
+let langA = 'es', langB = 'fr', dual = false, fontScale = 1, activeId = 'senyal';
+let mobileView = 0, drawerOpen = false, sidebarOpen = true, lastId = null;
+const KEY = 'missa-standalone-v1';
+function persist(){
+  try { localStorage.setItem(KEY, JSON.stringify({ langA, langB, dual, fontScale, activeId })); } catch (e) {}
+}
+function restore(){
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (!d) return;
+    if (LANGS.some(l => l.code === d.langA)) langA = d.langA;
+    if (LANGS.some(l => l.code === d.langB) && d.langB !== d.langA) langB = d.langB;
+    if (typeof d.dual === 'boolean') dual = d.dual;
+    if (typeof d.fontScale === 'number' && d.fontScale >= 0 && d.fontScale <= 2) fontScale = d.fontScale;
+    if (ALL_ITEMS.some(i => i.id === d.activeId)) activeId = d.activeId;
+  } catch (e) {}
+}
+
+/* ================= piezas UI ================= */
+const ROLE_CLS = { priest: 'bg-priest', assembly: 'bg-assembly', all: 'bg-all' };
+function roleChip(who, lang){
+  return '<span class="role-chip ' + (ROLE_CLS[who] || ROLE_CLS.all) + '">' + esc(ROLE_LABELS[who][lang] || '') + '</span>';
+}
+function columnHTML(code, item){
+  const meta = langMeta(code);
+  const parts = item.parts.map((p, idx) => {
+    const showChip = idx === 0 || item.parts[idx - 1].who !== p.who;
+    return '<div class="part">' + (showChip ? roleChip(p.who, code) : '') +
+      '<p class="part-text fs-b' + fontScale + '">' + esc(p.text[code]) + '</p></div>';
+  }).join('');
+  const note = item.note && item.note[code]
+    ? '<div class="note">' + IC.info + '<span>' + esc(item.note[code]) + '</span></div>' : '';
+  return '<article class="clay-raised col-card">' +
+    '<header class="col-head">' +
+      '<span class="lang-chip" style="background:' + meta.color + '26"><span class="c" style="background:' + meta.color + '"></span>' + esc(meta.short) + '</span>' +
+      '<span class="col-langname">' + esc(meta.name) + '</span>' +
+    '</header>' +
+    '<h2 class="col-title fs-t' + fontScale + '">' + esc(item.titles[code]) + '</h2>' +
+    note +
+    '<div class="parts">' + parts + '</div>' +
+    (dual ? '<p class="col-foot">' + esc(meta.name) + '</p>' : '') +
+  '</article>';
+}
+function langOptions(exclude, current){
+  return LANGS.filter(l => l.code !== exclude).map(l =>
+    '<option value="' + l.code + '"' + (l.code === current ? ' selected' : '') + '>' + esc(l.name) + '</option>'
+  ).join('');
+}
+function langSelectHTML(which, sm){
+  const isA = which === 'a';
+  const cur = isA ? langA : langB;
+  const exc = isA ? langB : langA;
+  const meta = langMeta(cur);
+  return '<span class="langsel' + (sm ? ' langsel--sm' : '') + '">' +
+    '<span class="dot" style="background:' + meta.color + '"></span>' +
+    '<select class="lang-native" data-lang="' + which + '" aria-label="' + (isA ? 'Idioma principal' : 'Segundo idioma') + '">' +
+      langOptions(exc, cur) +
+    '</select></span>';
+}
+function fontControlHTML(){
+  return '<span class="fontctl">' +
+    '<button data-action="font-down" aria-label="Letra más pequeña"' + (fontScale === 0 ? ' disabled' : '') + '>' + IC.minus + '</button>' +
+    '<b>A</b>' +
+    '<button data-action="font-up" aria-label="Letra más grande"' + (fontScale === 2 ? ' disabled' : '') + '>' + IC.plus + '</button>' +
+  '</span>';
+}
+const ACCENTS = { intro: '#e8896b', hitzaren: '#7fa7d1', eukaristia: '#8fbf7f', amaiera: '#dcb45c' };
+function partMenuHTML(secondary){
+  return MASS.map(s => {
+    const a = ACCENTS[s.id] || '#e8896b';
+    const items = s.items.map(it => {
+      const act = it.id === activeId;
+      return '<li><button type="button" class="pm-item' + (act ? ' is-active' : '') + '" data-action="select-part" data-id="' + it.id + '">' +
+        '<span class="pm-dot" style="background:' + a + '"></span>' +
+        '<span class="pm-main"><span class="pm-title">' + esc(it.titles[langA]) + '</span>' +
+        (secondary && secondary !== langA ? '<span class="pm-sub">' + esc(it.titles[secondary]) + '</span>' : '') +
+        '</span></button></li>';
+    }).join('');
+    return '<div class="pm-section"><h3 class="pm-head"><span class="pm-secdot" style="background:' + a + '"></span>' +
+      esc(s.titles[langA]) + '</h3><ul class="pm-list">' + items + '</ul></div>';
+  }).join('');
+}
+function drawerHTML(ui){
+  return '<div class="drawer-backdrop" data-action="close-drawer"></div>' +
+  '<aside class="drawer" role="dialog" aria-modal="true" aria-label="' + esc(ui.parts) + '">' +
+    '<header class="drawer-head"><span class="logo">' + IC.cross + '</span><h2>' + esc(ui.appName) + '</h2>' +
+      '<button type="button" class="icon-btn icon-btn--s" data-action="close-drawer" aria-label="Cerrar">' + IC.x + '</button></header>' +
+    '<div class="drawer-scroll"><p class="drawer-label">' + esc(ui.parts) + '</p><nav>' + partMenuHTML(dual ? langB : null) + '</nav></div>' +
+    '<footer class="drawer-foot"><button type="button" class="pill" data-action="close-drawer">Cerrar</button>' +
+      '<span class="drawer-note">' + esc(ui.source) + '</span></footer>' +
+  '</aside>';
+}
+function headerHTML(ui){
+  return '<header class="topbar">' +
+    '<div class="topbar-inner">' +
+      '<button type="button" class="icon-btn lg-hide" data-action="open-drawer" aria-label="' + esc(ui.menu) + '">' + IC.menu + '</button>' +
+      '<button type="button" class="icon-btn md-show" data-action="toggle-sidebar" aria-label="Menú">' + (sidebarOpen ? IC.panelL : IC.panelR) + '</button>' +
+      '<span class="logo">' + IC.cross + '</span>' +
+      '<span class="brand"><b>' + esc(ui.appName) + '</b><small>' + esc(ui.tagline) + '</small></span>' +
+      '<span class="top-controls">' +
+        langSelectHTML('a') +
+        '<button type="button" class="duo" data-action="toggle-dual" title="' + esc(ui.twoCol) + '" aria-pressed="' + dual + '">' + IC.columns + '</button>' +
+        (dual ? langSelectHTML('b') : '') +
+        '<span class="sep"></span>' +
+        fontControlHTML() +
+        '<button type="button" class="dl-btn" data-action="download" title="' + esc(ui.download) + '">' + IC.download + '<span>' + esc(ui.download) + '</span></button>' +
+      '</span>' +
+    '</div>' +
+    '<div class="mob-controls">' +
+      langSelectHTML('a', true) +
+      '<button type="button" class="duo" data-action="toggle-dual" aria-pressed="' + dual + '" title="' + esc(ui.twoCol) + '">' + IC.columns + '</button>' +
+      (dual ? langSelectHTML('b', true) : '') +
+      fontControlHTML() +
+      '<button type="button" class="icon-btn" data-action="download" aria-label="' + esc(ui.download) + '" title="' + esc(ui.download) + '">' + IC.download + '</button>' +
+    '</div>' +
+  '</header>';
+}
+
+/* ================= render ================= */
+const app = document.getElementById('app');
+function render(){
+  const ui = UI[langA];
+  const item = findItem(activeId);
+  const section = sectionOf(activeId);
+  const flatIndex = ALL_ITEMS.findIndex(i => i.id === activeId);
+  const cols = dual ? [langA, langB] : [langA];
+  const tIdx = Math.min(2, fontScale + 1);
+
+  app.innerHTML =
+    headerHTML(ui) +
+    '<div class="layout">' +
+      (sidebarOpen
+        ? '<aside class="sidebar"><div class="sidebar-inner">' +
+          '<div class="sidebar-top"><p class="sidebar-label">' + esc(ui.parts) + '</p>' +
+          '<span class="progress-chip">' + (flatIndex + 1) + '/' + ALL_ITEMS.length + '</span></div>' +
+          partMenuHTML(dual ? langB : null) +
+          '</div></aside>'
+        : '') +
+      '<main class="content"><div class="fade-in">' +
+        (dual
+          ? '<div class="mob-switch">' + [0, 1].map(i => {
+              const c = i === 0 ? langA : langB;
+              const m = langMeta(c);
+              return '<button type="button" class="' + (mobileView === i ? 'is-active' : '') + '" data-action="set-view" data-v="' + i + '">' +
+                '<span class="dot" style="background:' + m.color + '"></span>' + esc(m.short) + '</button>';
+            }).join('') + '</div>'
+          : '') +
+        '<div class="part-head">' +
+          '<div class="part-eyebrow"><span>' + esc(section.titles[langA]) + '</span>' +
+          '<span class="progress-chip">' + (flatIndex + 1) + '/' + ALL_ITEMS.length + '</span></div>' +
+          '<h1 class="part-title fs-t' + tIdx + '">' + esc(item.titles[langA]) + '</h1>' +
+          (dual ? '<p class="part-title2">' + esc(item.titles[langB]) + '</p>' : '') +
+        '</div>' +
+        '<div class="cols' + (dual ? ' cols-dual' : '') + '">' +
+          cols.map((c, i) => {
+            const hidden = dual && i !== mobileView;
+            return '<div class="col-wrap' + (hidden ? ' hidden-mobile' : '') + '">' + columnHTML(c, item) + '</div>';
+          }).join('') +
+        '</div>' +
+        '<nav class="pager">' +
+          '<button type="button" class="prev" data-action="prev"' + (flatIndex === 0 ? ' disabled' : '') + '>' + IC.chevL + '<span>' + esc(ui.prev) + '</span></button>' +
+          '<button type="button" class="next" data-action="next"' + (flatIndex === ALL_ITEMS.length - 1 ? ' disabled' : '') + '><span>' + esc(ui.next) + '</span>' + IC.chevR + '</button>' +
+        '</nav>' +
+      '</div></main>' +
+    '</div>' +
+    (drawerOpen ? drawerHTML(ui) : '');
+
+  if (activeId !== lastId) {
+    lastId = activeId;
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+  document.body.style.overflow = drawerOpen ? 'hidden' : '';
+  persist();
+}
+
+/* ================= eventos ================= */
+function go(delta){
+  const i = ALL_ITEMS.findIndex(x => x.id === activeId);
+  const n = ALL_ITEMS[i + delta];
+  if (n) { activeId = n.id; render(); }
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  switch (el.dataset.action) {
+    case 'open-drawer': drawerOpen = true; break;
+    case 'close-drawer': drawerOpen = false; break;
+    case 'toggle-sidebar': sidebarOpen = !sidebarOpen; break;
+    case 'toggle-dual': dual = !dual; break;
+    case 'font-up': fontScale = Math.min(2, fontScale + 1); break;
+    case 'font-down': fontScale = Math.max(0, fontScale - 1); break;
+    case 'set-view': mobileView = Number(el.dataset.v); break;
+    case 'select-part': activeId = el.dataset.id; drawerOpen = false; break;
+    case 'prev': go(-1); return;
+    case 'next': go(1); return;
+    case 'download': {
+      try {
+        const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'missa-standalone.html';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      } catch (e) {}
+      return;
+    }
+    default: return;
+  }
+  render();
+});
+document.addEventListener('change', e => {
+  const sel = e.target.closest('[data-lang]');
+  if (!sel) return;
+  if (sel.dataset.lang === 'a') langA = sel.value; else langB = sel.value;
+  render();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  else if (e.key === 'Escape' && drawerOpen) { drawerOpen = false; render(); }
+});
+
+/* ================= inicio ================= */
+restore();
+render();
+</script>
+</body>
+</html>
