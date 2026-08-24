@@ -1,0 +1,3116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preghiere Clarettiane · CMF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --granat:#6E1423; --granat-fosc:#520E1A; --granat-clar:#8C2333;
+  --or:#A87B2D; --or-clar:#C9A45C;
+  --paper:#FAF6ED; --paper-2:#F3EDDF; --paper-3:#ECE4D2;
+  --tinta:#26211A; --tinta-2:#5A5246; --tinta-3:#8A8070;
+  --linia:#DDD3BE;
+  --fs-preg:1.28rem;
+  --serif:'EB Garamond',Georgia,serif;
+  --display:'Cormorant Garamond',Georgia,serif;
+  --ui:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--tinta);font-family:var(--serif);min-height:100vh}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+a{color:inherit}
+
+/* ============ LAYOUT ============ */
+.shell{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+@media(max-width:900px){.shell{grid-template-columns:1fr}}
+
+/* ============ SIDEBAR (llom del llibre) ============ */
+.spine{background:linear-gradient(175deg,var(--granat) 0%,var(--granat-fosc) 100%);color:#F5E9D7;padding:2rem 1.5rem 2.5rem;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--granat-clar) transparent}
+.spine::after{content:'';position:fixed;left:296px;top:0;bottom:0;width:4px;background:linear-gradient(90deg,rgba(0,0,0,.28),transparent);pointer-events:none}
+@media(max-width:900px){
+  .spine{position:relative;height:auto;padding:1.4rem 1.2rem 1.2rem}
+  .spine::after{display:none}
+  .spine .idx{display:none}
+  .spine.open .idx{display:block}
+}
+.marca{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.35rem}
+.marca .creu{font-family:var(--display);font-size:1.5rem;color:var(--or-clar)}
+.marca h1{font-family:var(--display);font-weight:600;font-size:1.62rem;line-height:1.1;letter-spacing:.01em}
+.marca h1 a{text-decoration:none}
+.sub-marca{font-family:var(--ui);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--or-clar);margin-bottom:1.6rem}
+.idx-titol{font-family:var(--ui);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,233,215,.55);margin:1.5rem 0 .55rem;padding-bottom:.4rem;border-bottom:1px solid rgba(245,233,215,.18)}
+.idx a{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;text-decoration:none;padding:.34rem .5rem;margin:0 -.5rem;border-radius:4px;font-size:1.02rem;line-height:1.25;transition:background .15s}
+.idx a:hover,.idx a:focus-visible{background:rgba(255,255,255,.09);outline:none}
+.idx a.actiu{background:rgba(255,255,255,.13)}
+.idx a .n{font-family:var(--ui);font-size:.66rem;color:var(--or-clar);letter-spacing:.05em;flex-shrink:0}
+.toggle-idx{display:none;font-family:var(--ui);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--or-clar);border:1px solid rgba(201,164,92,.5);border-radius:20px;padding:.42rem 1rem;margin-top:.8rem}
+@media(max-width:900px){.toggle-idx{display:inline-block}}
+
+/* ============ PÀGINA ============ */
+.pagina{padding:2.6rem clamp(1.2rem,5vw,4.5rem) 5rem;max-width:880px;width:100%;margin:0 auto}
+@media(max-width:900px){.pagina{padding-top:1.6rem}}
+
+/* cerca */
+.cerca-wrap{position:relative;margin-bottom:1.8rem}
+.cerca{width:100%;font-family:var(--serif);font-size:1.12rem;padding:.85rem 1.1rem .85rem 2.9rem;border:1px solid var(--linia);border-radius:8px;background:#fff;color:var(--tinta);box-shadow:0 1px 3px rgba(60,45,20,.06)}
+.cerca:focus{outline:2px solid var(--granat);outline-offset:-1px}
+.cerca::placeholder{color:var(--tinta-3);font-style:italic}
+.cerca-ico{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--tinta-3);pointer-events:none}
+
+/* portada */
+.eyebrow{font-family:var(--ui);font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;color:var(--granat);margin-bottom:.5rem}
+.portada h2{font-family:var(--display);font-weight:600;font-size:clamp(1.7rem,3.4vw,2.3rem);line-height:1.12;margin-bottom:.7rem}
+.portada p.intro{font-size:1.12rem;color:var(--tinta-2);max-width:56ch;line-height:1.55;margin-bottom:2rem}
+
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.4rem}
+.chip{font-family:var(--ui);font-size:.78rem;font-weight:500;padding:.42rem .95rem;border:1px solid var(--linia);border-radius:100px;background:#fff;color:var(--tinta-2);transition:all .15s;text-decoration:none;display:inline-block}
+.chip:hover,.chip:focus-visible{border-color:var(--granat);color:var(--granat);outline:none}
+
+.temes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.9rem}
+.tema-card{position:relative;background:#fff;border:1px solid var(--linia);border-radius:8px;padding:1.2rem 1.15rem 1.05rem;text-align:left;text-decoration:none;transition:border-color .15s, box-shadow .15s;overflow:hidden;display:block}
+.tema-card:hover,.tema-card:focus-visible{border-color:var(--granat);box-shadow:0 3px 12px rgba(110,20,35,.09);outline:none}
+.tema-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--granat)}
+.tema-card h3{font-family:var(--display);font-weight:600;font-size:1.28rem;line-height:1.15;margin-bottom:.3rem}
+.tema-card .desc{font-size:.95rem;font-style:italic;color:var(--tinta-2);line-height:1.35;margin-bottom:.55rem}
+.tema-card .compta{font-family:var(--ui);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--or)}
+
+/* llista de pregàries */
+.torna{font-family:var(--ui);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--granat);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-bottom:1.4rem}
+.torna:hover{text-decoration:underline}
+.tema-cap h2{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3vw,2.1rem);margin-bottom:.35rem}
+.tema-cap .desc{font-size:1.08rem;font-style:italic;color:var(--tinta-2);margin-bottom:1.7rem;max-width:60ch;line-height:1.5}
+.sub-grup{font-family:var(--ui);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--granat);margin:1.8rem 0 .6rem;display:flex;align-items:center;gap:.8rem}
+.sub-grup::after{content:'';flex:1;height:1px;background:var(--linia)}
+.llista{list-style:none}
+.preg-item{border-bottom:1px solid var(--linia)}
+.preg-item a{display:flex;gap:1rem;align-items:baseline;padding:.85rem .4rem;text-decoration:none;transition:background .12s}
+.preg-item a:hover,.preg-item a:focus-visible{background:rgba(110,20,35,.045);outline:none}
+.foli{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--granat);min-width:2.6rem;text-align:right;flex-shrink:0;font-variant-numeric:oldstyle-nums}
+.preg-item .tt{font-size:1.16rem;line-height:1.3}
+.preg-item .inc{display:block;font-size:.92rem;font-style:italic;color:var(--tinta-3);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58ch}
+.preg-item .etq{font-family:var(--ui);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--or);margin-left:auto;flex-shrink:0}
+.buit{padding:2.5rem 0;text-align:center;color:var(--tinta-3);font-style:italic;font-size:1.08rem}
+
+/* resultat de cerca */
+.res-cap{font-family:var(--ui);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-3);margin-bottom:.8rem}
+.res-tema{font-family:var(--ui);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--or);margin-left:auto;flex-shrink:0}
+
+/* ============ PREGÀRIA ============ */
+.preg-full{background:#fff;border:1px solid var(--linia);border-radius:10px;padding:clamp(1.6rem,4vw,3.2rem) clamp(1.3rem,4.5vw,3.6rem) clamp(2rem,4vw,3rem);box-shadow:0 2px 14px rgba(60,45,20,.07);position:relative}
+.preg-full::before{content:'';position:absolute;top:-1px;left:clamp(1.3rem,4.5vw,3.6rem);width:26px;height:44px;background:var(--granat);clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%)}
+.preg-meta{font-family:var(--ui);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--or);margin-bottom:.9rem;padding-left:3.2rem}
+.preg-num{font-family:var(--display);font-weight:700;font-size:2.6rem;line-height:1;color:var(--granat);float:left;margin:-.3rem 1rem .2rem 0;font-variant-numeric:oldstyle-nums}
+.preg-titol{font-family:var(--display);font-weight:600;font-size:clamp(1.55rem,3vw,2.05rem);line-height:1.15;margin-bottom:1.4rem}
+.preg-cos{clear:both;font-size:var(--fs-preg);line-height:1.62;border-top:1px solid var(--linia);padding-top:1.5rem}
+.preg-cos p{margin-bottom:.16em}
+.preg-cos p.espai{margin-top:.9em}
+.preg-cos .rub{font-family:var(--ui);font-size:.72em;letter-spacing:.16em;text-transform:uppercase;color:var(--or);margin:1.1em 0 .5em;font-style:normal}
+.preg-cos .vers{position:relative;padding-left:1.9em}
+.preg-cos .vers::before{content:'V/.';position:absolute;left:0;font-style:italic;color:var(--tinta-3);font-size:.85em;top:.15em}
+.preg-cos .resp{position:relative;padding-left:1.9em;color:var(--granat);font-style:italic;font-weight:500;margin-bottom:.45em}
+.preg-cos .resp::before{content:'R/.';position:absolute;left:0;color:var(--granat);font-size:.85em;font-style:italic;top:.15em}
+.preg-eines{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.3rem 0 1.6rem;align-items:center}
+.eina{font-family:var(--ui);font-size:.76rem;font-weight:500;padding:.48rem .95rem;border:1px solid var(--linia);border-radius:6px;background:#fff;color:var(--tinta-2);display:inline-flex;align-items:center;gap:.45rem;transition:all .15s}
+.eina:hover,.eina:focus-visible{border-color:var(--granat);color:var(--granat);outline:none}
+.eina.fav-actiu{background:var(--granat);border-color:var(--granat);color:#F5E9D7}
+.mida-grup{display:inline-flex;border:1px solid var(--linia);border-radius:6px;overflow:hidden;margin-left:auto}
+.mida-grup .eina{border:none;border-radius:0;padding:.48rem .8rem}
+.mida-grup .eina+.eina{border-left:1px solid var(--linia)}
+.nav-pn{display:flex;justify-content:space-between;gap:1rem;margin-top:1.6rem}
+.nav-pn a{font-family:var(--ui);font-size:.78rem;color:var(--tinta-2);text-decoration:none;display:flex;flex-direction:column;gap:.15rem;max-width:46%}
+.nav-pn a:hover .pn-t{color:var(--granat)}
+.nav-pn .pn-l{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-3)}
+.nav-pn .pn-t{font-family:var(--serif);font-size:1.02rem;line-height:1.25;transition:color .15s}
+.nav-pn a.seg{text-align:right;margin-left:auto}
+
+/* mode lectura */
+body.lectura .spine,body.lectura .cerca-wrap,body.lectura .torna,body.lectura .preg-eines .eina:not(.surt-lectura):not(.mida),body.lectura .nav-pn,body.lectura .preg-meta{display:none}
+body.lectura .shell{grid-template-columns:1fr}
+body.lectura .pagina{max-width:820px;padding-top:2.2rem}
+body.lectura .preg-full{border:none;box-shadow:none;background:var(--paper)}
+body.lectura .preg-full::before{display:none}
+body.lectura{--fs-preg:1.6rem}
+body.lectura .preg-eines{position:sticky;top:0;background:var(--paper);padding:.6rem 0;z-index:5;margin-top:0}
+
+/* favorits ribbon on list */
+.fav-cinta{color:var(--granat);flex-shrink:0;font-size:.85rem}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+@media print{
+  .spine,.cerca-wrap,.torna,.preg-eines,.nav-pn,.toggle-idx{display:none!important}
+  .shell{display:block}
+  body{background:#fff}
+  .preg-full{border:none;box-shadow:none;padding:0}
+  .preg-full::before{display:none}
+  .pagina{padding:0;max-width:none}
+}
+
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="spine">
+    <div class="marca"><span class="creu">✠</span><h1><a href="#/">Preghiere Clarettiane</a></h1></div>
+    <div class="sub-marca">Missionari Figli del Cuore di Maria</div>
+    <button class="toggle-idx" id="toggleIdx" aria-expanded="false">Indice dei temi</button>
+    <nav class="idx" id="idxNav" aria-label="Indice dei temi"></nav>
+  </aside>
+  <main class="pagina" id="pagina"></main>
+</div>
+<script>
+const DADES = [
+{id:"1",num:1,title:"Preghiera apostolica",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore e mio Padre,"},
+{"t":"p","x":"che io ti conosca e ti faccia conoscere,"},
+{"t":"p","x":"ti ami e ti faccia amare,"},
+{"t":"p","x":"ti serva e ti faccia servire,"},
+{"t":"p","x":"ti lodi e ti faccia lodare da"},
+{"t":"p","x":"tutte le creature."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"(Sant’Antonio M. Claret)"}
+]},
+{id:"2",num:2,title:"Provvidenza di Dio",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Sii benedetto per la tua provvidenza, Signore,"},
+{"t":"p","x":"e per la cura che sempre e in ogni luogo"},
+{"t":"p","x":"hai avuto di me."},
+{"t":"p","x":"Amen."}
+]},
+{id:"3",num:3,title:"Amare e servire Dio",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Sii benedetto, o Signore, per il tuo amore e la tua misericordia per me. Ch’io ti ami e ti serva."},
+{"t":"p","x":"Ch’io ti faccia amare e servire da tutte le creature."},
+{"t":"p","x":"Amen."}
+]},
+{id:"4",num:4,title:"Richiesta del dono dell’amore",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Fuoco che sempre bruci e mai ti estingui,"},
+{"t":"p","x":"amore che sempre ardi e mai ti plachi,"},
+{"t":"p","x":"infiammami, perché io t’ami."},
+{"t":"p","x":"Ti amo, Gesù, con tutto il mio cuore,"},
+{"t":"p","x":"con tutta la mia anima, con tutte le mie forze."},
+{"t":"p","x":"Vorrei amarti più ancora, vorrei che tutti ti amassero."},
+{"t":"p","x":"Vorrei amarti per me e per tutte le tue creature."},
+{"t":"p","x":"Vergine Santissima, concedimi la grazia"},
+{"t":"p","x":"che tutti si salvino e che nessuno sia condannato."},
+{"t":"p","x":"Amen."}
+]},
+{id:"5",num:5,title:"Unione con Dio",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Come l’acqua nell’eucaristia si unisce al vino,"},
+{"t":"p","x":"così, Signore, desidero unirmi a Te; e con Te, offrirmi"},
+{"t":"p","x":"alla Santissima Trinità."},
+{"t":"p","x":"Amen."}
+]},
+{id:"6",num:6,title:"Dio Padre, vita, amore e speranza",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Signor mio, Tu sei mio amore, mio onore,"},
+{"t":"p","x":"mia speranza, mio rifugio."},
+{"t":"p","x":"Sei mia vita, mia gloria, mio fine,"},
+{"t":"p","x":"mio Maestro, mio Padre, mio amore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"7",num:7,title:"Dio provvidente e salvatore",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Grazie, Signore, per la tua bontà"},
+{"t":"p","x":"e perché ti avvali di ogni mezzo"},
+{"t":"p","x":"per la conversione dei peccatori."},
+{"t":"p","x":"Sia benedetta la tua provvidenza, che sempre veglia su me."},
+{"t":"p","x":"Canterò ora e sempre la tua eterna misericordia."},
+{"t":"p","x":"Amen."}
+]},
+{id:"8",num:8,title:"Solo Dio",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Tu sei mio amore, Signore, mio onore,"},
+{"t":"p","x":"mia speranza e mio rifugio."},
+{"t":"p","x":"Tu sei mia gloria e mio fine. Mio Maestro e mio Padre."},
+{"t":"p","x":"Aiutami a non cercare altra cosa che Te,"},
+{"t":"p","x":"a non saper d’altro che della tua volontà, per compierla."},
+{"t":"p","x":"Amo solo Te, e in Te e per Te,"},
+{"t":"p","x":"ogni altra cosa."},
+{"t":"p","x":"Tu mi basti assolutamente."},
+{"t":"p","x":"Fa’ che io ti ami come Tu ami me,"},
+{"t":"p","x":"come vuoi che io ti ami."},
+{"t":"p","x":"Amen."}
+]},
+{id:"9",num:9,title:"Tutto per la gloria di Dio",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Dio mio, voglio amarti"},
+{"t":"p","x":"con tutto il mio cuore, con tutto il mio essere,"},
+{"t":"p","x":"con tutte le mie forze:"},
+{"t":"p","x":"ti consacro i miei pensieri, i desideri,"},
+{"t":"p","x":"le parole e le azioni,"},
+{"t":"p","x":"ciò che possiedo, ciò che potrei possedere."},
+{"t":"p","x":"Fa’ che io usi ciò che possiedo"},
+{"t":"p","x":"per il tuo onore e per la tua gloria,"},
+{"t":"p","x":"secondo la tua volontà."},
+{"t":"p","x":"Amen."}
+]},
+{id:"10",num:10,title:"Per poter seguire Gesù",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, ti supplico:"},
+{"t":"p","x":"fragile qual sono, mandami il tuo Spirito,"},
+{"t":"p","x":"affinché m’illumini e mi accenda nel tuo amore,"},
+{"t":"p","x":"mi diriga e mi instradi sul cammino retto di Gesù Cristo"},
+{"t":"p","x":"e della Vergine Maria, Madre di Dio e Madre mia."},
+{"t":"p","x":"Amen."}
+]},
+{id:"11",num:11,title:"Per chiedere le virtù",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Credo, Signore, ma che io creda più fermamente."},
+{"t":"p","x":"Spero, Signore, ma che io speri con più grande verità."},
+{"t":"p","x":"Amo, Signore, ma che io ami con più ardore."},
+{"t":"p","x":"Soffro, Signore, ma che il mio dolore sia più forte."},
+{"t":"p","x":"Ti supplico, Signore: che vuoi che io faccia?"},
+{"t":"p","x":"Insegnami a compiere la tua volontà: sii Tu il mio Dio."},
+{"t":"p","x":"Concedimi un cuore desto per guidare il tuo popolo,"},
+{"t":"p","x":"per distinguere tra il bene e il male."},
+{"t":"p","x":"Padre, concedimi umiltà, mansuetudine,"},
+{"t":"p","x":"castità, pazienza e carità."},
+{"t":"p","x":"Insegnami la bontà, la scienza e la disciplina."},
+{"t":"p","x":"Donami il tuo amore, la tua grazia,"},
+{"t":"p","x":"ed io sarò ricco in abbondanza."},
+{"t":"p","x":"Dio mio, Gesù mio, mio tutto."},
+{"t":"p","x":"Vivo sulla croce e sulla croce voglio morire,"},
+{"t":"p","x":"e spero di discendere dalla croce, non con le mie mani,"},
+{"t":"p","x":"ma aiutato da mani altrui,"},
+{"t":"p","x":"dopo essermi consumato in sacrificio."},
+{"t":"p","x":"Né mai mi accada, Signore, di gloriarmi d’altra cosa"},
+{"t":"p","x":"se non della croce di nostro Signore Gesù Cristo,"},
+{"t":"p","x":"per la quale il mondo è stato crocifisso per me"},
+{"t":"p","x":"ed io per il mondo."},
+{"t":"p","x":"Amen."}
+]},
+{id:"12",num:12,title:"Esercizio d’amor di Dio",theme:"dio-padre",sub:null,tags:[],lines:[
+{"t":"p","x":"Dio mio, sii Dio come sei, in eterno e per sempre:"},
+{"t":"p","x":"godo sapendo che Tu lo sei."},
+{"t":"p","x":"Hai potere infinito:"},
+{"t":"p","x":"sii Dio Onnipotente come sei."},
+{"t":"p","x":"Hai sapienza infinita:"},
+{"t":"p","x":"sii lodato;"},
+{"t":"p","x":"abbi sapienza infinita come hai."},
+{"t":"p","x":"Tu hai bontà infinita, carità infinita e infinita clemenza."},
+{"t":"p","x":"Abbi bontà, Signore,"},
+{"t":"p","x":"carità e clemenza infinita come hai."},
+{"t":"p","x":"Signore, Tu sei glorioso e benedetto senza fine:"},
+{"t":"p","x":"sii glorioso e benedetto come sei."},
+{"t":"p","x":"Tu sei Trino ed Uno, Signore,"},
+{"t":"p","x":"Padre, Figlio e Spirito Santo,"},
+{"t":"p","x":"tre Persone distinte e un solo vero Dio:"},
+{"t":"p","x":"sii Trino e Uno come sei."},
+{"t":"p","x":"Sei Salvatore e glorificatore nostro"},
+{"t":"p","x":"e di tutte le creature:"},
+{"t":"p","x":"sii lodato."},
+{"t":"p","x":"Tu, Signore, sei Signore universale"},
+{"t":"p","x":"che gli angeli amano, lodano e servono"},
+{"t":"p","x":"come i beati in cielo"},
+{"t":"p","x":"e gli uomini sulla terra;"},
+{"t":"p","x":"Tu sei il Signore di tutti"},
+{"t":"p","x":"e tutti ti amiamo nei cieli e sulla terra,"},
+{"t":"p","x":"tutti ti lodiamo e ti serviamo senza fine."},
+{"t":"p","x":"Cuore di Gesù, ama Dio per me."},
+{"t":"p","x":"Cuore di Maria, ama Dio per me."},
+{"t":"p","x":"Cuore di tutti i Santi, amate Dio per me."},
+{"t":"p","x":"Cori degli Angeli tutti amate Dio per me."},
+{"t":"p","x":"Creature tutte, amate Dio per me."},
+{"t":"p","x":"O fuoco divino che sempre ardi e mai ti appaghi."},
+{"t":"p","x":"O Cuore di Gesù che sempre bruci e mai ti plachi,"},
+{"t":"p","x":"fa’ che il mio cuore arda sempre"},
+{"t":"p","x":"nel fuoco del divino amore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"13",num:13,title:"Litania clarettiana di invocazioni a Maria",theme:"cuore-maria",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Santa Maria, Figlia del Padre"},
+{"t":"r","x":"prega per noi"},
+{"t":"p","x":"Santa Maria, Madre del Figlio"},
+{"t":"p","x":"Santa Maria, Tempio dello Spirito Santo"},
+{"t":"p","x":"Termine e coronamento della Trinità"},
+{"t":"p","x":"Delizia di Dio"},
+{"t":"p","x":"Opera di Dio, la più perfetta"},
+{"t":"p","x":"Concepita in grazia"},
+{"t":"p","x":"Colei in cui brillano onnipotenza, sapienza e bontà di Dio"},
+{"t":"p","x":"Concepita in grazia, confermata in grazia e piena di grazia"},
+{"t":"p","x":"Esentata da ogni contagio di peccato"},
+{"t":"p","x":"Creatura singolarissima e prediletta"},
+{"t":"p","x":"Purificata e santificata nella sua stessa concezione"},
+{"t":"p","x":"Preservata da ogni colpa"},
+{"t":"p","x":"Erede del cielo"},
+{"t":"p","x":"Confermata in grazia"},
+{"t":"p","x":"Sublimata a dignità quasi infinita"},
+{"t":"p","x":"Piena di grazia"},
+{"t":"p","x":"La più pura e la più caritatevole"},
+{"t":"p","x":"Madre di Dio e degli uomini"},
+{"t":"p","x":"Madre di Dio fatto uomo"},
+{"t":"p","x":"Madre vera"},
+{"t":"p","x":"Madre spirituale"},
+{"t":"p","x":"Madre del bell’amore"},
+{"t":"p","x":"Madre della carità"},
+{"t":"p","x":"Madre della pietà e della misericordia"},
+{"t":"p","x":"Madre dei viventi"},
+{"t":"p","x":"Madre affettuosa"},
+{"t":"p","x":"Madre, maestra e guida"},
+{"t":"p","x":"Madre cui Dio ci donò come figli"},
+{"t":"p","x":"Formatrice e guida di apostoli e missionari"},
+{"t":"p","x":"Madre e avvocata dei peccatori"},
+{"t":"p","x":"Madre, sollievo, fortezza e consolazione"},
+{"t":"p","x":"Dispensatrice delle misericordie"},
+{"t":"p","x":"Canale di grazia"},
+{"t":"p","x":"Rifugio dei derelitti"},
+{"t":"p","x":"Stella polare dei naviganti"},
+{"t":"p","x":"Salute degli infermi"},
+{"t":"p","x":"Coraggio di chi muore"},
+{"t":"p","x":"Riscatto dei prigionieri"},
+{"t":"p","x":"Avvocata sempre disposta"},
+{"t":"p","x":"Consolazione degli afflitti"},
+{"t":"p","x":"Scala del cielo"},
+{"t":"p","x":"Finestra del paradiso"},
+{"t":"p","x":"Regina dei cieli e della terra"},
+{"t":"p","x":"Regina e Signora della grazia"},
+{"t":"p","x":"Cuore della Chiesa"},
+{"t":"p","x":"Cuore del mondo cristiano"}
+]},
+{id:"14",num:14,title:"Supplica a Maria",theme:"cuore-maria",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"O Vergine e Madre di Dio,"},
+{"t":"p","x":"rivolgi i tuoi occhi misericordiosi"},
+{"t":"p","x":"a noi che viviamo in questa valle di lacrime,"},
+{"t":"p","x":"e che in te, come figli, confidiamo."},
+{"t":"p","x":"Aiutaci ad annunziare la Buona Novella del Regno"},
+{"t":"p","x":"in fedeltà e con fortezza"},
+{"t":"p","x":"poiché molti vi si oppongono,"},
+{"t":"p","x":"per l’ambizione del potere, per l’affanno delle ricchezze,"},
+{"t":"p","x":"per l’ansia del piacere."},
+{"t":"p","x":"Disponi di me, perché nella missione apostolica"},
+{"t":"p","x":"io collabori con il tuo materno ufficio."},
+{"t":"p","x":"Amen."}
+]},
+{id:"15",num:15,title:"Invocazioni a Maria",theme:"cuore-maria",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Ave, o Maria Immacolata, Figlia di Dio Padre."},
+{"t":"p","x":"Ave, o Maria Immacolata, Madre di Dio Figlio."},
+{"t":"p","x":"Ave, o Maria Immacolata, Tempio di Dio, Spirito Santo."},
+{"t":"p","x":"Ave, o Maria, madre e avvocata dei peccatori."},
+{"t":"p","x":"Benedetta te fra tutte le donne."},
+{"t":"p","x":"Tu sei la gloria di Gerusalemme,"},
+{"t":"p","x":"la gioia di Israele e l’onore del nostro popolo."},
+{"t":"p","x":"Tu sei il rifugio dei peccatori,"},
+{"t":"p","x":"la consolazione degli afflitti, la stella polare dei naviganti."},
+{"t":"p","x":"Tu sei la salute degli infermi,"},
+{"t":"p","x":"il coraggio dei moribondi,"},
+{"t":"p","x":"la porta del cielo."},
+{"t":"p","x":"Tu sei, dopo il Signore frutto benedetto del tuo seno,"},
+{"t":"p","x":"ogni nostra speranza."},
+{"t":"p","x":"O clemente, o pia, o dolce Immacolata Maria."},
+{"t":"p","x":"Amen."}
+]},
+{id:"16",num:16,title:"Madre del Divin Amore",theme:"cuore-maria",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Maria, Madre mia, Madre del Divin Amore!"},
+{"t":"p","x":"Nulla posso chiederti che ti sia più gradito"},
+{"t":"p","x":"e più facile concedere"},
+{"t":"p","x":"che il Divino Amore."},
+{"t":"p","x":"Concedimelo, Madre mia. Madre mia, mio amore."},
+{"t":"p","x":"Madre mia, ho fame e sete di amore."},
+{"t":"p","x":"Soccorrimi, saziami."},
+{"t":"p","x":"O Cuore di Maria, fucina e strumento di amore,"},
+{"t":"p","x":"accendimi nell’amore di Dio e del prossimo."},
+{"t":"p","x":"Amen."}
+]},
+{id:"17",num:17,title:"Figlio e ministro di Maria",theme:"cuore-maria",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"O Vergine e Madre di Dio!,"},
+{"t":"p","x":"sai bene che siamo tuoi figli e tuoi ministri,"},
+{"t":"p","x":"da te stessa formati"},
+{"t":"p","x":"nella fucina della tua misericordia e del tuo amore."},
+{"t":"p","x":"Siamo come una freccia pronta nella tua mano potente."},
+{"t":"p","x":"Scagliaci, Madre nostra,"},
+{"t":"p","x":"contro tutto ciò che si oppone al Regno di Dio."},
+{"t":"p","x":"Fidenti nella tua protezione,"},
+{"t":"p","x":"annunciamo il Vangelo"},
+{"t":"p","x":"senza altre armi che la divina Parola,"},
+{"t":"p","x":"senza altri titoli che l’esser figli del tuo Cuore Immacolato."},
+{"t":"p","x":"La vittoria, Madre, sarà tua."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"b) DELLA CONGREGAZIONE"}
+]},
+{id:"18",num:18,title:"Configurazione a Cristo",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore e Dio nostro,"},
+{"t":"p","x":"che hai scelto la sempre Vergine Maria"},
+{"t":"p","x":"come Madre del tuo Figlio e Madre nostra,"},
+{"t":"p","x":"fa’ che, fedeli al suo Cuore materno cui siamo consacrati,"},
+{"t":"p","x":"ci configuriamo più pienamente a Cristo"},
+{"t":"p","x":"e cooperiamo alla missione apostolica"},
+{"t":"p","x":"con il suo ufficio materno."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"19",num:19,title:"Litanie della Vergine Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"fondate sulle Costituzioni"},
+{"t":"p","x":"O Maria, noi, Figli del tuo Cuore Immacolato,"},
+{"t":"p","x":"per la tua fede obbediente e per il tuo ardente amore"},
+{"t":"p","x":"ti proclamiamo «beata»"},
+{"t":"p","x":"e ti invochiamo:"},
+{"t":"v","x":"Madre di Dio e Madre nostra."},
+{"t":"r","x":"Tu sei benedetta fra tutte le donne."},
+{"t":"v","x":"Madre di Gesù Cristo, Signore nostro, inviato dal Padre"},
+{"t":"v","x":"Madre del Verbo, fatto uomo per opera dello Spirito Santo"},
+{"t":"v","x":"Madre del Figlio, unto per evangelizzare i poveri"},
+{"t":"v","x":"Fondatrice, Patrona e Titolare della nostra Congregazione"},
+{"t":"v","x":"Prima discepola di Cristo"},
+{"t":"v","x":"Nostro Modello nella sequela di Cristo"},
+{"t":"v","x":"Prima fra i poveri del Signore"},
+{"t":"v","x":"Serva totalmente consacrata alla persona e all’opera"},
+{"t":"p","x":"del Figlio tuo"},
+{"t":"v","x":"Madre e Maestra dei missionari"},
+{"t":"v","x":"Formatrice di apostoli"},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Dio Padre nostro, ti ringraziamo"},
+{"t":"p","x":"per chiamarci e per essere Figli"},
+{"t":"p","x":"del Cuore Immacolato di Maria."},
+{"t":"p","x":"Fa’ che veneriamo con amore e fiducia la Madre nostra"},
+{"t":"p","x":"e che ci doniamo a Lei perché ci configuri a Cristo,"},
+{"t":"p","x":"così che cooperiamo col suo ufficio materno"},
+{"t":"p","x":"nella missione apostolica che ci hai affidato."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"20",num:20,title:"Preghiera filiale e apostolica al Cuore di Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"O Vergine e Madre di Dio!,"},
+{"t":"p","x":"mi dono a Te come tuo figlio e tuo ministro."},
+{"t":"p","x":"Mi consacro al tuo amore materno"},
+{"t":"p","x":"perché Tu formi in me Gesù,"},
+{"t":"p","x":"il Figlio e l’Inviato del Padre,"},
+{"t":"p","x":"l’Unto dallo Spirito Santo"},
+{"t":"p","x":"per annunciare la Buona Novella ai poveri."},
+{"t":"p","x":"Insegnami a conservare, come Te, la Parola nel cuore,"},
+{"t":"p","x":"fino a trasformarmi in Vangelo vivo."},
+{"t":"p","x":"La forza dello Spirito"},
+{"t":"p","x":"faccia di me testimone di Cristo fra gli uomini."},
+{"t":"p","x":"Infondimi il tuo amore materno"},
+{"t":"p","x":"perché io riveli loro il Padre"},
+{"t":"p","x":"ed essi sentano la gioia di essere figli di Dio"},
+{"t":"p","x":"nella comunione fraterna della Chiesa."},
+{"t":"p","x":"Madre, ecco tuo figlio: formami."},
+{"t":"p","x":"Madre, ecco tuo figlio: inviami."},
+{"t":"p","x":"Madre, ecco tuo figlio: parla Tu in me, ama Tu in me."},
+{"t":"p","x":"Custodiscimi, e non sia che annunciando agli altri"},
+{"t":"p","x":"il Vangelo,"},
+{"t":"p","x":"io rimanga escluso dal tuo Regno."},
+{"t":"p","x":"In Te, Madre mia,"},
+{"t":"p","x":"ho posto tutta la mia fiducia."},
+{"t":"p","x":"Non resterò mai deluso."},
+{"t":"p","x":"Amen."}
+]},
+{id:"21",num:21,title:"Litanie al Cuore di Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore, pietà"},
+{"t":"p","x":"Cristo, pietà"},
+{"t":"p","x":"Signore, pietà"},
+{"t":"p","x":"Cristo, ascoltaci"},
+{"t":"p","x":"Cristo, esaudiscici"},
+{"t":"p","x":"Dio, Padre celeste"},
+{"t":"r","x":"Abbi pietà di noi"},
+{"t":"p","x":"Dio, Figlio Redentore del mondo"},
+{"t":"p","x":"Dio, Spirito Santo"},
+{"t":"p","x":"Santa Trinità, unico Dio"},
+{"t":"p","x":"Cuore di Maria, modellato dal Padre"},
+{"t":"r","x":"Prega per noi"},
+{"t":"p","x":"Cuore di Maria,"},
+{"t":"p","x":"adornato con tutti i doni dello Spirito Santo"},
+{"t":"p","x":"Cuore di Maria, che ami il Padre con amore di figlia"},
+{"t":"p","x":"Cuore di Maria, che ami il Figlio con amore di madre"},
+{"t":"p","x":"Cuore di Maria, che ami lo Spirito Santo con amore di sposa"},
+{"t":"p","x":"Cuore di Maria, che conservi"},
+{"t":"p","x":"fedelmente le parole e le azioni di Gesù"},
+{"t":"p","x":"Cuore di Maria, trapassato dalla spada del dolore"},
+{"t":"p","x":"Cuore di Maria, inchiodato sulla croce con Cristo crocifisso"},
+{"t":"p","x":"Cuore di Maria, vivificato dalla gioia della Resurrezione"},
+{"t":"p","x":"di Gesù"},
+{"t":"p","x":"Cuore di Maria, ricolmato di nuova pienezza di grazia"},
+{"t":"p","x":"nella discesa dello Spirito Santo"},
+{"t":"p","x":"Cuore di Maria, dimora di Dio, piena della sua gloria"},
+{"t":"p","x":"Cuore di Maria, arca dell’alleanza di Dio con gli uomini"},
+{"t":"p","x":"Cuore di Maria, grembo di Dio e degli uomini"},
+{"t":"p","x":"Cuore di Maria, che hai permesso la salvezza degli uomini"},
+{"t":"p","x":"Cuore di Maria, pieno di grazia"},
+{"t":"p","x":"Cuore di Maria, benedetto tra tutti i cuori"},
+{"t":"p","x":"Cuore di Maria, abisso di umiltà"},
+{"t":"p","x":"Cuore di Maria, trono di misericordia"},
+{"t":"p","x":"Cuore di Maria, fucina del divin amore"},
+{"t":"p","x":"Cuore di Maria, che meriti grazia per i peccatori"},
+{"t":"p","x":"Cuore di Maria, invincibile rocca di fede"},
+{"t":"p","x":"Cuore di Maria, fonte di perfetta amicizia"},
+{"t":"p","x":"Cuore di Maria, sostegno della Chiesa nel suo ritorno"},
+{"t":"p","x":"al Padre"},
+{"t":"p","x":"Cuore di Maria, fucina di amore che ci configura a Cristo"},
+{"t":"p","x":"Cuore di Maria, nostra Madre e formatrice"},
+{"t":"p","x":"Cuore di Maria, consolazione degli afflitti"},
+{"t":"p","x":"Cuore di Maria, rifugio dei peccatori"},
+{"t":"p","x":"Cuore di Maria, aiuto degli agonizzanti"},
+{"t":"p","x":"Cuore di Maria, speranza del mondo"},
+{"t":"p","x":"Cuore di Maria, padrona dei nostri cuori"},
+{"t":"p","x":"Cuore di Maria, regina della pace"},
+{"t":"p","x":"Agnello di Dio, che togli i peccati del mondo"},
+{"t":"p","x":"Perdonaci, Signore"},
+{"t":"p","x":"Agnello di Dio, che togli i peccati del mondo"},
+{"t":"p","x":"Ascoltaci, Signore"},
+{"t":"p","x":"Agnello di Dio, che togli i peccati del mondo"},
+{"t":"p","x":"Abbi pietà di noi"},
+{"t":"v","x":"Prega per noi, Santa Madre di Dio."},
+{"t":"r","x":"Perché siamo fatti degni delle promesse di Cristo."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Signore, Dio nostro"},
+{"t":"p","x":"che hai fatto del Cuore Immacolato di Maria"},
+{"t":"p","x":"una dimora per il tuo Figlio"},
+{"t":"p","x":"e il santuario dello Spirito Santo,"},
+{"t":"p","x":"donaci un cuore limpido e docile,"},
+{"t":"p","x":"affinché, sempre sottomessi alla tua volontà,"},
+{"t":"p","x":"ti amiamo sopra tutte le cose"},
+{"t":"p","x":"e aiutiamo i fratelli nelle loro necessità."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"22",num:22,title:"Azione di grazie al Cuore di Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Ti rendiamo grazie, Padre santo,"},
+{"t":"p","x":"perché hai dato alla Vergine Maria un cuore saggio e docile,"},
+{"t":"p","x":"sempre disposto a compiacerti;"},
+{"t":"p","x":"un cuore nuovo ed umile"},
+{"t":"p","x":"per fissarvi la legge della nuova Alleanza;"},
+{"t":"p","x":"un cuore semplice e limpido,"},
+{"t":"p","x":"che la rese degna di concepire candidamente il Figlio tuo"},
+{"t":"p","x":"e la rese capace di compiacerti in eterno;"},
+{"t":"p","x":"un cuore forte e disposto"},
+{"t":"p","x":"a sopportare con forza la spada del dolore"},
+{"t":"p","x":"e ad aspettare, gonfia di fede, la risurrezione del Figlio tuo."},
+{"t":"p","x":"Donaci un cuore sapiente e docile, nuovo ed umile,"},
+{"t":"p","x":"semplice e limpido, forte e disposto,"},
+{"t":"p","x":"perché sappiamo imitarla"},
+{"t":"p","x":"e cooperiamo con più grande fedeltà"},
+{"t":"p","x":"alla tua opera di salvezza."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"23",num:23,title:"Atto di abbandono al Cuore di Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Madre del Signore, o Cuore di Maria!"},
+{"t":"p","x":"Tu che hai presieduto come Fondatrice"},
+{"t":"p","x":"all’inizio della nostra Congregazione,"},
+{"t":"p","x":"sii sempre nostra ispiratrice,"},
+{"t":"p","x":"sii sempre il Cuore della nostra Congregazione,"},
+{"t":"p","x":"così bisognosa di contemplazione e di nuove speranze"},
+{"t":"p","x":"in questo mondo tanto amato dal Padre"},
+{"t":"p","x":"e così segnato dalla mancanza di fede e dall’ingiustizia;"},
+{"t":"p","x":"parla per noi"},
+{"t":"p","x":"e testimonia attraverso la nostra vita"},
+{"t":"p","x":"il messaggio del Regno."},
+{"t":"p","x":"Madre del Signore,"},
+{"t":"p","x":"prega perché venga a noi lo Spirito,"},
+{"t":"p","x":"che è spinta al mondo nuovo."},
+{"t":"p","x":"Col tuo Cuore, Madre, prega per noi!,"},
+{"t":"p","x":"intercedi per noi!"},
+{"t":"p","x":"Amen."}
+]},
+{id:"24",num:24,title:"Offerta al Cuore di Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Vergine Maria, Madre di Dio e Madre nostra:"},
+{"t":"p","x":"mi affido al tuo amore materno"},
+{"t":"p","x":"perché Tu faccia di me un missionario"},
+{"t":"p","x":"a immagine e somiglianza del tuo Figlio,"},
+{"t":"p","x":"l’Inviato del Padre,"},
+{"t":"p","x":"per annunciare la Buona Novella ai poveri."},
+{"t":"p","x":"Insegnami a credere, ad amare e a servire come Te."},
+{"t":"p","x":"Fammi generoso e grato"},
+{"t":"p","x":"per vivere nella gioia"},
+{"t":"p","x":"il dono della mia vocazione missionaria."},
+{"t":"p","x":"Amen."}
+]},
+{id:"25",num:25,title:"Cuore di Maria",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore, Dio nostro,"},
+{"t":"p","x":"che hai scelto la sempre Vergine Maria,"},
+{"t":"p","x":"come Madre di tuo Figlio e Madre nostra:"},
+{"t":"p","x":"fa’ che per la fedele donazione al suo Cuore materno,"},
+{"t":"p","x":"ci configuriamo più pienamente a Cristo"},
+{"t":"p","x":"e, spinti dal suo amore,"},
+{"t":"p","x":"ci dedichiamo con più grande generosità"},
+{"t":"p","x":"a proclamare il Vangelo a tutti gli uomini."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"26 Madre e Maestra dei Missionari"},
+{"t":"p","x":"Maria, Madre e Maestra dei Missionari,"},
+{"t":"p","x":"intercedi presso il Padre"},
+{"t":"p","x":"affinché noi, figli del tuo Cuore,"},
+{"t":"p","x":"riproduciamo gli stessi atteggiamenti di Gesù"},
+{"t":"p","x":"e siamo uomini universali,"},
+{"t":"p","x":"dagli occhi penetranti e dalle orecchie attente"},
+{"t":"p","x":"ai bisogni del mondo."},
+{"t":"p","x":"Che noi siamo anche, come Te,"},
+{"t":"p","x":"uomini di misericordia,"},
+{"t":"p","x":"di tenerezza e compassione;"},
+{"t":"p","x":"che ci apriamo sempre a nuovi orizzonti missionari,"},
+{"t":"p","x":"disposti ad accettare ciò che è diverso."},
+{"t":"p","x":"E la carità apostolica che fluisce"},
+{"t":"p","x":"dalla fucina del tuo Cuore"},
+{"t":"p","x":"ci dia forza in ogni circostanza"},
+{"t":"p","x":"in cui lo Spirito ci collochi."},
+{"t":"p","x":"Amen."}
+]},
+{id:"27",num:27,title:"Invocazione a Maria Madre della Chiesa",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Vergine Maria, Madre della Chiesa,"},
+{"t":"p","x":"la Chiesa noi ti raccomandiamo."},
+{"t":"p","x":"Ricordati di tutti i Tuoi figli;"},
+{"t":"p","x":"da’ forza alle loro orazioni davanti a Dio;"},
+{"t":"p","x":"mantieni solida la loro fede; fortifica la loro speranza"},
+{"t":"p","x":"e aumenta la loro carità."},
+{"t":"p","x":"Al tuo Cuore Immacolato noi raccomandiamo"},
+{"t":"p","x":"l’intero genere umano:"},
+{"t":"p","x":"conducilo al conoscimento dell’unico"},
+{"t":"p","x":"e vero salvatore, Gesù Cristo;"},
+{"t":"p","x":"allontanalo dal castigo del peccato;"},
+{"t":"p","x":"concedi a tutti la pace nella verità,"},
+{"t":"p","x":"nella giustizia, nella libertà e nell’amore."},
+{"t":"p","x":"E fa’ che tutta la Chiesa"},
+{"t":"p","x":"possa elevare al Dio delle misericordie"},
+{"t":"p","x":"un inno di lode, di gioia e di riconoscenza,"},
+{"t":"p","x":"perché grandi cose ha operato il Signore per tuo mezzo,"},
+{"t":"p","x":"o clemente, o pia, o dolce Vergine Maria."},
+{"t":"p","x":"Amen."}
+]},
+{id:"28",num:28,title:"Giaculatorie",theme:"cuore-maria",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Dolce Cuore di Maria"},
+{"t":"r","x":"Sii la salvezza mia."},
+{"t":"p","x":"Cuore di Maria"},
+{"t":"r","x":"Intercedi per noi."},
+{"t":"p","x":"Maria, cuore della Chiesa."},
+{"t":"r","x":"Prega per noi"},
+{"t":"p","x":"Madre e formatrice di apostoli"},
+{"t":"r","x":"Prega per noi"},
+{"t":"p","x":"Cuore fedele di Maria"},
+{"t":"r","x":"Intercedi per noi."}
+]},
+{id:"29",num:29,title:"Fondatore e modello",theme:"claret",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, Dio nostro,"},
+{"t":"p","x":"che hai scelto S. Antonio Maria Claret"},
+{"t":"p","x":"come Fondatore della nostra Famiglia"},
+{"t":"p","x":"e hai voluto che, ardendo di carità,"},
+{"t":"p","x":"godesse degli delle calunnie e dei tormenti;"},
+{"t":"p","x":"concedi benigno che,"},
+{"t":"p","x":"aderendo fedelmente ai suoi insegnamenti,"},
+{"t":"p","x":"proclamiamo la tua gloria in ogni parte del mondo"},
+{"t":"p","x":"e ricerchiamo sempre e con sollecitudine"},
+{"t":"p","x":"la salvezza di tutti gli uomini."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"30",num:30,title:"Fedeltà al suo spirito",theme:"claret",sub:null,tags:[],lines:[
+{"t":"p","x":"Dio Padre nostro,"},
+{"t":"p","x":"che hai concesso a S. Antonio Maria Claret"},
+{"t":"p","x":"un ardente e filiale amore al Santissimo Sacramento"},
+{"t":"p","x":"e al Cuore Immacolato di Maria"},
+{"t":"p","x":"per realizzare nella Chiesa di Dio"},
+{"t":"p","x":"grandi meraviglie per la gloria divina"},
+{"t":"p","x":"e per la salvezza delle anime:"},
+{"t":"p","x":"ottieni a noi che,"},
+{"t":"p","x":"a imitazione di lui ardendo"},
+{"t":"p","x":"negli stessi santi amori"},
+{"t":"p","x":"e continuando con la più grande efficacia"},
+{"t":"p","x":"la sua opera evangelizzatrice,"},
+{"t":"p","x":"meritiamo di vivere e morire nella Congregazione"},
+{"t":"p","x":"come Figli degni del Cuore Immacolato di Maria."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"31",num:31,title:"Preghiera per continuare la sua opera",theme:"claret",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore,"},
+{"t":"p","x":"che hai fatto di S. Antonio Maria Claret, nostro Padre,"},
+{"t":"p","x":"uno zelante apostolo della gloria di Dio"},
+{"t":"p","x":"e della salvezza degli uomini,"},
+{"t":"p","x":"concedici la stessa carità ardente"},
+{"t":"p","x":"che infiammava il suo cuore,"},
+{"t":"p","x":"affinché continuiamo con intensità ed efficacia"},
+{"t":"p","x":"la sua opera apostolica."},
+{"t":"p","x":"Fa’ che i suoi figli si moltiplichino"},
+{"t":"p","x":"per dilatare il Regno del Signore,"},
+{"t":"p","x":"e che nel momento della nostra morte"},
+{"t":"p","x":"meritiamo di essere riconosciuti «servi fedeli»"},
+{"t":"p","x":"di Cristo e del Vangelo."},
+{"t":"p","x":"Per lo stesso Gesù Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"32",num:32,title:"Magnificat della vocazione",theme:"congregazione",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Signore, Dio nostro, ti benediciamo"},
+{"t":"p","x":"perché ci hai scelti"},
+{"t":"p","x":"per essere Figli del Cuore Immacolato di tua Madre!"},
+{"t":"p","x":"Madre tre volte benedetta,"},
+{"t":"p","x":"ti lodiamo per la finezza del tuo Cuore Immacolato"},
+{"t":"p","x":"e perché ci hai voluti come tuoi figli."},
+{"t":"p","x":"Fa’, o Madre nostra, che corrispondiamo a tanta bontà;"},
+{"t":"p","x":"che siamo ogni giorno più umili, più fervorosi"},
+{"t":"p","x":"e più zelanti della salvezza delle anime."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"33",num:33,title:"Preghiera del clarettiano",theme:"congregazione",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Fa’, o Signore, che noi, Missionari"},
+{"t":"p","x":"Figli del Cuore Immacolato di Maria,"},
+{"t":"p","x":"siamo uomini ardenti in carità"},
+{"t":"p","x":"e capaci di bruciare ovunque passiamo."},
+{"t":"p","x":"Fa’ che desideriamo efficacemente"},
+{"t":"p","x":"e procuriamo con ogni mezzo possibile"},
+{"t":"p","x":"di accendere il mondo intero nel fuoco del divino amore."},
+{"t":"p","x":"Che nulla e nessuno ci spingano indietro."},
+{"t":"p","x":"Che sappiamo godere nelle privazioni,"},
+{"t":"p","x":"affrontare il lavoro, abbracciare i sacrifici,"},
+{"t":"p","x":"compiacerci nelle calunnie che ci si levino contro,"},
+{"t":"p","x":"rallegrarci nei tormenti e nei dolori,"},
+{"t":"p","x":"gloriarci nella croce del Signore."},
+{"t":"p","x":"E che non pensiamo ad altro se non a come seguire"},
+{"t":"p","x":"e imitare più da vicino il Signore Gesù"},
+{"t":"p","x":"nella preghiera, nel lavoro e nella sofferenza;"},
+{"t":"p","x":"e a procurare sempre e soltanto la maggior gloria di Dio"},
+{"t":"p","x":"e la salvezza delle anime."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"b) DELLA CONGREGAZIONE"}
+]},
+{id:"34",num:34,title:"Preghiera per l’anniversario della fondazione",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore,"},
+{"t":"p","x":"Tu hai concesso a S. Antonio Maria Claret, nostro Padre,"},
+{"t":"p","x":"di ardere in carità"},
+{"t":"p","x":"e di vivere una sollecitudine apostolica"},
+{"t":"p","x":"per la salvezza degli uomini di tutto il mondo."},
+{"t":"p","x":"Fin da bimbo lo accompagnasti"},
+{"t":"p","x":"nella conoscenza più piena del mistero di Cristo."},
+{"t":"p","x":"Spinto dalla carità,"},
+{"t":"p","x":"egli si donò all’annuncio del Vangelo;"},
+{"t":"p","x":"fu paziente nel lavoro e nelle calunnie,"},
+{"t":"p","x":"confermò la sua vita col sangue e con l’esilio."},
+{"t":"p","x":"Per continuare la sua opera,"},
+{"t":"p","x":"e per intervento delle Vergine Maria,"},
+{"t":"p","x":"fondò la nostra Congregazione e ci consegnò il suo spirito."},
+{"t":"p","x":"Oggi, ricordando il nostro inizio nella Chiesa,"},
+{"t":"p","x":"per intercessione di Maria, nostra Madre,"},
+{"t":"p","x":"ti preghiamo che ci renda fedeli figli suoi"},
+{"t":"p","x":"nel ministero della Parola,"},
+{"t":"p","x":"che il suo Cuore continui ad essere per noi"},
+{"t":"p","x":"il pastorale della fiducia;"},
+{"t":"p","x":"che benedica con nuove vocazioni"},
+{"t":"p","x":"questa Famiglia Clarettiana"},
+{"t":"p","x":"e che dia un amore perseverante verso Gesù"},
+{"t":"p","x":"a noi che ci chiamiamo"},
+{"t":"p","x":"e siamo Figli del Cuore Immacolato di Maria"},
+{"t":"p","x":"e lavoriamo nella Chiesa"},
+{"t":"p","x":"per la gloria di Dio."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"35",num:35,title:"Per la nostra Congregazione",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"v","x":"Guarda dal cielo la nostra Congregazione, volgiti ad essa e vieni a visitarla."},
+{"t":"r","x":"Curala, irrigala e arricchiscila senza misura."},
+{"t":"v","x":"Ricordati, Signore, di ciascuno di noi."},
+{"t":"r","x":"Mandaci la tua luce e la tua verità."},
+{"t":"v","x":"Donaci vita affinché invochiamo il tuo nome."},
+{"t":"r","x":"E compiamo la missione di annunciare il Vangelo a tutti i popoli."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Ti preghiamo, Signore:"},
+{"t":"p","x":"per intercessione del Cuore Immacolato di Maria,"},
+{"t":"p","x":"libera la nostra Congregazione da ogni male,"},
+{"t":"p","x":"affinché, con spirito umile e generoso,"},
+{"t":"p","x":"come S. Antonio Maria Claret,"},
+{"t":"p","x":"si dedichi al tuo piano di salvezza per tutti gli uomini."},
+{"t":"p","x":"Per Cristo nostra Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"36",num:36,title:"Per la Congregazione",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"v","x":"Santa Maria"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"San Michele e santi Angeli tutti"},
+{"t":"r","x":"Pregate per noi."},
+{"t":"v","x":"San Giuseppe"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"Santi Apostoli"},
+{"t":"r","x":"Pregate per noi"},
+{"t":"v","x":"Sant’Alfonso Maria de’ Liguori"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"Sant’Ignazio di Loyola"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"San Francesco Saverio."},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"San Vincenzo de’ Paoli"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"Sant’Antonio Maria Claret"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"Santa Teresa di Gesù"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"Santa Caterina da Siena"},
+{"t":"r","x":"Prega per noi."},
+{"t":"v","x":"Beati Martiri della Famiglia Clarettiana"},
+{"t":"r","x":"Pregate per noi"},
+{"t":"v","x":"Sante e Santi tutti di Dio"},
+{"t":"r","x":"Pregate per noi"},
+{"t":"v","x":"Ricordati, Signore, della tua Congregazione"},
+{"t":"r","x":"Fu tua fin dal principio"},
+{"t":"v","x":"Compia la sua missione di annunciare il Vangelo"},
+{"t":"r","x":"Perché tutti gli uomini si salvino"},
+{"t":"v","x":"Ti preghiamo: Vengano in aiuto dei tuoi servi"},
+{"t":"r","x":"Coloro che hai redento con il tuo sangue prezioso"},
+{"t":"v","x":"Salva la tua Congregazione, Signore"},
+{"t":"r","x":"Sii suo pastore e guidala per sempre."},
+{"t":"v","x":"Abbi pietà di noi, Signore"},
+{"t":"r","x":"Abbi pietà di noi"},
+{"t":"v","x":"Discenda su di noi la tua misericordia, Signore."},
+{"t":"r","x":"Che da Te speriamo."},
+{"t":"v","x":"Signore, ascolta la nostra preghiera."},
+{"t":"r","x":"E il nostro grido giunga fino a Te."},
+{"t":"v","x":"Il Signore sia con voi"},
+{"t":"r","x":"E con il tuo Spirito."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Signore, ti preghiamo:"},
+{"t":"p","x":"per intercessione della Vergine Maria,"},
+{"t":"p","x":"libera da ogni male questa Congregazione,"},
+{"t":"p","x":"versa abbondantemente la tua grazia sui tuoi figli,"},
+{"t":"p","x":"e riempili del tuo Spirito"},
+{"t":"p","x":"affinché si compiacciano sempre nella verità."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"37",num:37,title:"Preghiera per la Congregazione",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre di bontà e di misericordia,"},
+{"t":"p","x":"noi ti lodiamo e ti benediciamo"},
+{"t":"p","x":"perché hai voluto arricchire la tua Chiesa"},
+{"t":"p","x":"con lo stile di santificazione e di apostolato"},
+{"t":"p","x":"di S. Antonio Maria Claret,"},
+{"t":"p","x":"nostro Fondatore e Padre."},
+{"t":"p","x":"Ti supplichiamo umilmente:"},
+{"t":"p","x":"manda nuovi operai alla nostra Congregazione"},
+{"t":"p","x":"e infondi il tuo Spirito in coloro che hai scelto."},
+{"t":"p","x":"Confermaci, tutti, nella vocazione missionaria,"},
+{"t":"p","x":"e fa’ che, spinti dalla carità di Cristo,"},
+{"t":"p","x":"come veri Figli del Cuore Immacolato di Maria,"},
+{"t":"p","x":"annunciamo a tutti i popoli"},
+{"t":"p","x":"la Buona Novella del Regno."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"38",num:38,title:"Per rinnovare lo spirito clarettiano.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Rinnova, Signore, nella nostra Congregazione,"},
+{"t":"p","x":"lo spirito che infiammò S. Antonio Maria Claret,"},
+{"t":"p","x":"nostro Padre perché, animati"},
+{"t":"p","x":"e fortificati dal suo stesso spirito,"},
+{"t":"p","x":"amiamo ciò che egli ha amato"},
+{"t":"p","x":"e traduciamo nella vita quanto ci ha insegnato."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"39",num:39,title:"Evangelizzatori fedeli.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Tu, o Signore,"},
+{"t":"p","x":"hai misericordiosamente decretato"},
+{"t":"p","x":"che la tua Parola s’incarnasse nel seno della Vergine Maria:"},
+{"t":"p","x":"concedici di osservarla con i nostri cuori"},
+{"t":"p","x":"così che siamo sempre servitori fedeli"},
+{"t":"p","x":"nella proclamazione della sua Buona Novella di salvezza."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"40",num:40,title:"Costituzioni.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre, Tu ci hai concesso il dono"},
+{"t":"p","x":"di seguire Gesù"},
+{"t":"p","x":"e di annunciare il tuo Regno fra gli uomini"},
+{"t":"p","x":"allo stile di Claret, di essere suoi discepoli."},
+{"t":"p","x":"Aiutaci ad osservare con tutta la cura possibile"},
+{"t":"p","x":"le nostre Costituzioni,"},
+{"t":"p","x":"nostra via del Vangelo."},
+{"t":"p","x":"Concedici di ascoltare la tua Parola con tutta docilità,"},
+{"t":"p","x":"come tua Madre,"},
+{"t":"p","x":"per essere fedeli Figli del suo Cuore,"},
+{"t":"p","x":"e cooperare con il suo compito materno"},
+{"t":"p","x":"nella missione apostolica."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"41",num:41,title:"Ringraziamento per la vocazione.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Io vi ringrazio della vocazione ricevuta, Madre mia!"},
+{"t":"p","x":"Fatemi la grazia d’esser fedele ad essa tutta la mia vita."},
+{"t":"p","x":"Amen."}
+]},
+{id:"42",num:42,title:"Definizione del missionario clarettiano.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"v","x":"Signore, per intercessione del Cuore Immacolato di Maria, infondi in noi lo spirito dell’amore, affinché siamo uomini brucianti di carità,"},
+{"t":"p","x":"capaci di infiammare ovunque passiamo..."},
+{"t":"r","x":"Amen."},
+{"t":"v","x":"E affinché desideriamo efficacemente e procuriamo"},
+{"t":"p","x":"con tutti i mezzi possibili"},
+{"t":"p","x":"di accendere tutto il mondo nel fuoco del divino amore."},
+{"t":"r","x":"Amen."},
+{"t":"v","x":"Signore, per intercessione del Cuore Immacolato di Maria, infondi in noi lo spirito di fortezza, affinché nulla ci spinga indietro,"},
+{"t":"p","x":"ma godiamo nelle privazioni ed affrontiamo coraggiosamente le fatiche..."},
+{"t":"r","x":"Amen."},
+{"t":"v","x":"E affinché abbracciamo con gioia i sacrifici, godiamo nelle calunnie e ci rallegriamo nei tormenti."},
+{"t":"r","x":"Amen."},
+{"t":"v","x":"Signore, per intercessione del Cuore Immacolato di Maria, infondi in noi lo spirito missionario che infiammò Gesù, tuo Figlio,"},
+{"t":"p","x":"affinché non pensiamo ad altro"},
+{"t":"p","x":"se non a come seguirlo e imitarlo nella preghiera,"},
+{"t":"p","x":"nel lavoro e nella sofferenza."},
+{"t":"r","x":"Amen."},
+{"t":"v","x":"E affinché, come Gesù, procuriamo sempre e unicamente la tua maggior gloria e la salvezza degli uomini."},
+{"t":"r","x":"Amen."}
+]},
+{id:"43",num:43,title:"Professione dell’identità clarettiana.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Crediamo che lo Spirito Santo"},
+{"t":"p","x":"ci ha convocati nella Chiesa"},
+{"t":"p","x":"in S. Antonio Maria Claret"},
+{"t":"p","x":"affinché, come Congregazione,"},
+{"t":"p","x":"ci chiamiamo e siamo"},
+{"t":"p","x":"Missionari Figli del Cuore Immacolato di Maria."},
+{"t":"p","x":"Crediamo che il Padre ci convoca"},
+{"t":"p","x":"a vivere in modo autentico e significativo"},
+{"t":"p","x":"il mistero e la missione apostolica del Figlio suo"},
+{"t":"p","x":"in fraternità evangelizzata ed evangelizzatrice."},
+{"t":"p","x":"È lui, e non i nostri progetti,"},
+{"t":"p","x":"che ci rende veri discepoli di Cristo."},
+{"t":"p","x":"Questo amore che configura la nostra vita fraterna,"},
+{"t":"p","x":"vogliamo significarlo, ogni giorno più, nell’Eucaristia."},
+{"t":"p","x":"Crediamo che Maria è all’origine della nostra vocazione"},
+{"t":"p","x":"e che esercita la sua maternità configurando le nostre vite"},
+{"t":"p","x":"a Cristo, suo Figlio."},
+{"t":"p","x":"Nel suo Cuore di Madre"},
+{"t":"p","x":"si formano gli apostoli della Congregazione."},
+{"t":"p","x":"La sua presenza in noi è impulso evangelizzatore"},
+{"t":"p","x":"e amore misericordioso"},
+{"t":"p","x":"capaci di trasformare ed animare i credenti."},
+{"t":"p","x":"Crediamo che il Padre Claret fu scelto da Dio"},
+{"t":"p","x":"e proposto come nostro prototipo"},
+{"t":"p","x":"e modello di missionari al servizio del Vangelo"},
+{"t":"p","x":"nella Chiesa universale."},
+{"t":"p","x":"Crediamo che la nostra comune vocazione-missione"},
+{"t":"p","x":"comporta una sequela,"},
+{"t":"p","x":"in perfetta fedeltà e in assoluta disponibilità"},
+{"t":"p","x":"a Cristo e alla Chiesa,"},
+{"t":"p","x":"secondo le esigenze evangeliche vissute"},
+{"t":"p","x":"dal nostro Fondatore e Padre,"},
+{"t":"p","x":"e trasmesse dai nostri anziani."},
+{"t":"p","x":"Crediamo che lo Spirito di Gesù risorto"},
+{"t":"p","x":"ci spinge profeticamente ad annunciare"},
+{"t":"p","x":"la Buona Novella ai popoli,"},
+{"t":"p","x":"e a bruciare,"},
+{"t":"p","x":"ancora spinti dalla sua stessa carità sacrificata e redentrice,"},
+{"t":"p","x":"ovunque passiamo."},
+{"t":"p","x":"Crediamo d’essere stati chiamati come coraggiosi"},
+{"t":"p","x":"collaboratori del Sommo Pontefice"},
+{"t":"p","x":"e dei Vescovi"},
+{"t":"p","x":"nel ministero della Parola, per l’espansione"},
+{"t":"p","x":"del Regno di Dio in tutto il mondo."},
+{"t":"p","x":"A questo scopo, impiegando tutti i mezzi possibili,"},
+{"t":"p","x":"vogliamo guardare con attenzione a ciò che è più urgente,"},
+{"t":"p","x":"opportuno ed efficace."},
+{"t":"p","x":"Crediamo che la Congregazione è opera di Dio"},
+{"t":"p","x":"e che Gesù e Maria non l’abbandoneranno,"},
+{"t":"p","x":"suscitando vocazioni"},
+{"t":"p","x":"e fornendo ai chiamati lo Spirito,"},
+{"t":"p","x":"perché, vivendo tutti in fraternità"},
+{"t":"p","x":"la stessa consacrazione e missione,"},
+{"t":"p","x":"glorifichiamo il Padre,"},
+{"t":"p","x":"prolunghiamo la testimonianza della comunione ecclesiale"},
+{"t":"p","x":"e rendiamo più efficace l’azione evangelizzatrice."},
+{"t":"p","x":"Crediamo, Signore. Aumenta la nostra fede."}
+]},
+{id:"44",num:44,title:"Il clarettiano e la sua spiritualità personale.",theme:"congregazione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Poiché la nostra missione di evangelizzatori non può essere intesa né vissuta senza una spiritualità centrata nella sulla sequela di Gesù, Figlio di Dio, sentendoci suoi fratelli, lo supplichiamo dicendo:"},
+{"t":"p","x":"Insegnaci a stare nelle cose del Padre."},
+{"t":"p","x":"Signore Gesù, che ci inviti a vivere la nostra spiritualità nella prospettiva della missione,"},
+{"t":"v","x":"aiutaci affinché le nostre esigenze e opzioni di evangelizzazione siano parte integrante della nostra spiritualità."},
+{"t":"p","x":"Signore Gesù, che ci inviti a configurarci a Te in una spiritualità missionaria, profetica, inculturata ed evangelizzatrice,"},
+{"t":"v","x":"ridesta in noi attitudine di disponibilità, di itineranza e di docilità allo Spirito."},
+{"t":"p","x":"Signore Gesù, che ci chiami ad essere ministri della Parola di fra il nostro popolo bisognoso di evangelizzazione,"},
+{"t":"v","x":"aiutaci perché essa occupi un luogo fondamentale nella nostra preghiera, nella meditazione e nella contemplazione."},
+{"t":"p","x":"Signore Gesù, Parola definitiva del Padre verso i suoi i figli,"},
+{"t":"v","x":"alimenta in noi l’attitudine a lasciarci interpellare da essa e ad imparare a leggerla nella luce degli avvenimenti che circondano il nostro servizio missionario."},
+{"t":"p","x":"Signore Gesù, che sperimentasti la tentazione,"},
+{"t":"v","x":"rafforza il nostro spirito, perché non scendiamo a patti con la mediocrità, con l’edonismo, la consuetudine e la routine."},
+{"t":"p","x":"Signore Gesù, Pane di Vita che alimenti la nostra identificazione con Te,"},
+{"t":"v","x":"fa’ che vivendo il Mistero eucaristico, come il Claret, ci disponiamo ad opporci alla presenza del male nella nostra storia."},
+{"t":"p","x":"Signore Gesù, che ci insegni e raccomandi la preghiera assidua,"},
+{"t":"v","x":"aiutaci ad impegnarci più seriamente nella preghiera personale e comunitaria."},
+{"t":"p","x":"Signore Gesù, che ci hai donato Maria come Madre, Fondatrice della nostra Congregazione e modello della tua sequela,"},
+{"t":"v","x":"insegnaci a potenziare la dimensione mariana della nostra spiritualità, vivendola ed esprimendola nella concretezza dei fatti."}
+]},
+{id:"45",num:45,title:"Carità apostolica",theme:"consigli",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Dio mio!"},
+{"t":"p","x":"Donami carità apostolica,"},
+{"t":"p","x":"così da operare sempre con fortezza e soavemente,"},
+{"t":"p","x":"con mitezza e carità."},
+{"t":"p","x":"Amen."}
+]},
+{id:"46",num:46,title:"Pratica delle virtù",theme:"consigli",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Gesù, donami grazia per imitarti fedelmente"},
+{"t":"p","x":"nella pratica di ogni virtù."},
+{"t":"p","x":"Con te posso tutto, senza di te assolutamente nulla."},
+{"t":"p","x":"Amen."}
+]},
+{id:"47",num:47,title:"Povertà",theme:"consigli",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Salvatore nostro,"},
+{"t":"p","x":"ti sei fatto povero,"},
+{"t":"p","x":"povero volesti nascere,"},
+{"t":"p","x":"poveramente vivere e morire nella più assoluta povertà."},
+{"t":"p","x":"Fa’ che noi tuoi missionari conosciamo"},
+{"t":"p","x":"il valore della povertà, che l’amiamo e la pratichiamo"},
+{"t":"p","x":"come Tu insegni,"},
+{"t":"p","x":"con le parole e coi fatti;"},
+{"t":"p","x":"e che, ad esempio degli Apostoli,"},
+{"t":"p","x":"lasciamo tutto per seguirti nell’annuncio del Vangelo."},
+{"t":"p","x":"Amen."}
+]},
+{id:"48",num:48,title:"Mitezza",theme:"consigli",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Dio mio,"},
+{"t":"p","x":"donami uno zelo discreto e prudente"},
+{"t":"p","x":"perché operi in ogni cosa"},
+{"t":"p","x":"fortemente e soavemente,"},
+{"t":"p","x":"con mansuetudine e buone maniere."},
+{"t":"p","x":"Aiutami a comportarmi sempre"},
+{"t":"p","x":"con santa prudenza,"},
+{"t":"p","x":"coltivata nello studio,"},
+{"t":"p","x":"resa forte dall’età,"},
+{"t":"p","x":"schiarita nel dialogo"},
+{"t":"p","x":"e consumata nell’esperienza degli avvenimenti."},
+{"t":"p","x":"Amen."}
+]},
+{id:"49",num:49,title:"Mortificazione",theme:"consigli",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"O Signore,"},
+{"t":"p","x":"so bene che le pene, i dolori e le fatiche"},
+{"t":"p","x":"sono la divisa dell’apostolo."},
+{"t":"p","x":"Con la tua grazia,"},
+{"t":"p","x":"abbraccio tutto."},
+{"t":"p","x":"Aiutami Tu, Signore,"},
+{"t":"p","x":"a bere il calice di pene interiori"},
+{"t":"p","x":"e a ricevere il battesimo delle pene esteriori."},
+{"t":"p","x":"Fa’ che io non mi glori d’altra cosa"},
+{"t":"p","x":"se non della croce sulla quale Tu sei inchiodato per me."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"b) DELLA CONGREGAZIONE"}
+]},
+{id:"50",num:50,title:"La nostra consacrazione",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Dio e Padre mio,"},
+{"t":"p","x":"rispondendo alla tua chiamata"},
+{"t":"p","x":"voglio procurare con maggiore impegno"},
+{"t":"p","x":"che si compia sempre la tua volontà."},
+{"t":"p","x":"Desidero con tutto il cuore di dedicarmi pienamente a Te,"},
+{"t":"p","x":"seguendo Gesù, come gli Apostoli,"},
+{"t":"p","x":"perché tutti gli uomini abbiano vita in abbondanza."},
+{"t":"p","x":"Spinto dallo Spirito Santo,"},
+{"t":"p","x":"rinnovo la mia donazione a Te, Padre,"},
+{"t":"p","x":"perché mi configuri ad immagine e somiglianza"},
+{"t":"p","x":"del tuo Figlio Gesù."},
+{"t":"p","x":"Fiducioso nella materna assistenza"},
+{"t":"p","x":"del Cuore Immacolato di Maria,"},
+{"t":"p","x":"ti prometto di vivere in questa comunità di vita apostolica,"},
+{"t":"p","x":"casto, povero ed obbediente,"},
+{"t":"p","x":"osservando le Costituzioni della nostra Congregazione"},
+{"t":"p","x":"con tutta la cura possibile."},
+{"t":"p","x":"Mi unga, Padre Santo, il tuo Spirito di santità,"},
+{"t":"p","x":"perché nel servizio della Parola"},
+{"t":"p","x":"sia fedele al carisma di S. Antonio Maria Claret"},
+{"t":"p","x":"e raggiunga la perfezione nel comandamento dell’amore."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"51",num:51,title:"Configurazione a Cristo",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Grazie o Padre, perché ci hai unto col tuo Spirito"},
+{"t":"p","x":"e ci hai reso partecipi della pienezza di Cristo, tuo Figlio."},
+{"t":"p","x":"Sii benedetto per averci chiamato a seguirlo,"},
+{"t":"p","x":"e a collaborare con Lui nell’opera che Tu gli affidasti."},
+{"t":"p","x":"Ti chiediamo che, penetrati dal suo Spirito,"},
+{"t":"p","x":"non siamo noi più a vivere,"},
+{"t":"p","x":"ma sia Cristo che realmente viva in noi,"},
+{"t":"p","x":"al fine di essere validi strumenti nell’annuncio"},
+{"t":"p","x":"del Regno dei cieli."},
+{"t":"p","x":"Fa’ che conseguiamo la configurazione a Cristo"},
+{"t":"p","x":"nella nostra comunità missionaria"},
+{"t":"p","x":"secondo il nostro specifico carisma nella Chiesa."},
+{"t":"p","x":"Egli, che vive e regna nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"52",num:52,title:"Identificazione con Cristo Gesù",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Preghiamo il Padre che ci ha unti con lo Spirito Santo e ci ha resi partecipi della pienezza del suo Figlio Gesù Cristo:"},
+{"t":"p","x":"Santifica i tuoi fratelli, Signore!"},
+{"t":"p","x":"Perché ci lasciamo invadere dalla grazia, fino a che non siamo più noi a vivere, ma sia Cristo a vivere in noi, onde così essere strumenti validi nell’annuncio del Regno. Preghiamo."},
+{"t":"p","x":"Perché, come Gesù, spinti da un ardente amore al Padre e agli uomini, ci sforziamo con tutti i nostri mezzi di conseguire che Dio sia amato, conosciuto e servito da tutti. Preghiamo."},
+{"t":"p","x":"Perché diamo gloria a Dio per tutti i doni che riteniamo di possedere e li facciamo fruttificare copiosamente. Preghiamo."},
+{"t":"p","x":"Perché siamo disposti a confessare i nostri difetti ed errori, a chiedere perdono ai nostri fratelli e a stare in mezzo a loro come coloro che servono. Preghiamo."},
+{"t":"p","x":"Perché ci sforziamo di imitare la mitezza proposta nel Vangelo come segno della nostra vocazione apostolica. Preghiamo."},
+{"t":"p","x":"Perché, come stranieri e pellegrini, ci asteniamo dai cattivi desideri e custodiamo con cura diligente i nostri sensi, glorificando Dio e riflettendo nel nostro corpo la sua santità. Preghiamo."},
+{"t":"p","x":"Perché i nostri infermi sopportino la malattia umilmente e sottomessi alla volontà di Dio, sapendo che con la loro debolezza completano ciò che manca alla passione di Cristo. Preghiamo."}
+]},
+{id:"53",num:53,title:"Il dono della castità",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Ti benediciamo, Dio nostro, perché ci hai concesso"},
+{"t":"p","x":"il dono della castità per il Regno dei cieli,"},
+{"t":"p","x":"grazie al quale possiamo consacrarci con tutto il cuore"},
+{"t":"p","x":"alle cose del Padre,"},
+{"t":"p","x":"ad imitazione di Gesù Cristo"},
+{"t":"p","x":"e secondo l’esempio della Vergine Maria."},
+{"t":"p","x":"Chiediamo umilmente il tuo aiuto, Signore,"},
+{"t":"p","x":"per dominare le inclinazioni della nostra natura,"},
+{"t":"p","x":"ricevere con gioia il dono della castità"},
+{"t":"p","x":"e coltivarlo con ogni diligenza."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"54",num:54,title:"Castità",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Benedetto sii, Signore,"},
+{"t":"p","x":"perché, col dono della castità per il Regno dei cieli,"},
+{"t":"p","x":"si manifesti il potere della tua gloria"},
+{"t":"p","x":"nella fragilità della nostra natura"},
+{"t":"p","x":"al fine di incoraggiare negli uomini la speranza"},
+{"t":"p","x":"della vita futura."},
+{"t":"p","x":"Fa’ che la castità che professiamo"},
+{"t":"p","x":"favorisca in Cristo una nuova comunione fraterna"},
+{"t":"p","x":"e costruisca una comunità"},
+{"t":"p","x":"che non si fondi nella carne o nel sangue,"},
+{"t":"p","x":"ma sulla tua volontà."},
+{"t":"p","x":"E, come segno di amore perfetto,"},
+{"t":"p","x":"diventi una fonte speciale di fecondità spirituale"},
+{"t":"p","x":"per il mondo"},
+{"t":"p","x":"e ci infiammi d’amore per Te e per tutti gli uomini."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"55",num:55,title:"Tu, da ricco che eri",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Tu, da ricco che eri,"},
+{"t":"p","x":"ti sei fatto povero per noi"},
+{"t":"p","x":"perché noi diventassimo ricchi."},
+{"t":"p","x":"Dedito all’annuncio della Buona Novella del Regno,"},
+{"t":"p","x":"non avevi dove reclinare il capo."},
+{"t":"p","x":"Donaci di condividere la tua povertà,"},
+{"t":"p","x":"per ricordare agli uomini i beni del mondo futuro,"},
+{"t":"p","x":"per vivere come Maria, la prima fra i poveri del Signore,"},
+{"t":"p","x":"e a somiglianza degli Apostoli che, abbandonando tutto,"},
+{"t":"p","x":"ti seguirono."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"56",num:56,title:"Cercare prima di tutto il Regno di Dio",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Ti preghiamo, Signore,"},
+{"t":"p","x":"che riponendo in Te tutta la nostra fiducia,"},
+{"t":"p","x":"e mai nel potere e nelle ricchezze,"},
+{"t":"p","x":"cerchiamo prima di tutto il Regno che appartiene ai poveri."},
+{"t":"p","x":"Amen."}
+]},
+{id:"57",num:57,title:"Comunione dei beni",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Concedici, Signore,"},
+{"t":"p","x":"che con la nostra povertà volontaria"},
+{"t":"p","x":"costruiamo la comunità fraterna"},
+{"t":"p","x":"nell’unità di cuore e di spirito"},
+{"t":"p","x":"e la esprimiamo nella comunione dei beni,"},
+{"t":"p","x":"spirituali e materiali,"},
+{"t":"p","x":"con i poveri e al loro servizio."},
+{"t":"p","x":"Amen."}
+]},
+{id:"58",num:58,title:"Povertà",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Ti rendiamo grazie, Padre santo,"},
+{"t":"p","x":"perché hai voluto manifestarci il valore della povertà"},
+{"t":"p","x":"e la beatitudine di coloro che non pongono il loro interesse"},
+{"t":"p","x":"nelle ricchezze."},
+{"t":"p","x":"Concedici che tutta la nostra vita e la nostra attività"},
+{"t":"p","x":"siano informate dallo spirito della povertà."},
+{"t":"p","x":"Fa’ che siamo poveri di fatto e di spirito"},
+{"t":"p","x":"e che ci sentiamo obbligati dalla comune legge del lavoro,"},
+{"t":"p","x":"condividendo la condizione dei poveri."},
+{"t":"p","x":"Che i nostri beni, inoltre, siano a disposizione degli altri,"},
+{"t":"p","x":"e ci rallegriamo quando sperimentiamo"},
+{"t":"p","x":"alcuni effetti della povertà,"},
+{"t":"p","x":"non dubitando mai della tua provvidenza."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"59",num:59,title:"Per compiere la tua volontà",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Per compiere la tua volontà, Padre,"},
+{"t":"p","x":"ci hai mandato tuo Figlio Gesù."},
+{"t":"p","x":"A esempio della Santissima Vergine,"},
+{"t":"p","x":"che, come serva del Signore, si consacrò totalmente"},
+{"t":"p","x":"all’opera del Figlio,"},
+{"t":"p","x":"ti offriamo"},
+{"t":"p","x":"la libera facoltà di ordinare la nostra vita"},
+{"t":"p","x":"per configurarci a Gesù Cristo,"},
+{"t":"p","x":"che si fece obbediente fino alla morte di croce,"},
+{"t":"p","x":"e unirci in tutto alla tua volontà salvifica."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"60",num:60,title:"Obbedienti nella missione",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Condividendo la stessa vocazione,"},
+{"t":"p","x":"vogliamo cercare insieme, Signore, la tua volontà"},
+{"t":"p","x":"per portare a compimento la nostra missione nella Chiesa."},
+{"t":"p","x":"Illumina coloro che esprimono l’unità di amore"},
+{"t":"p","x":"e di missione nella comunità"},
+{"t":"p","x":"perché promuovano la cooperazione di tutti"},
+{"t":"p","x":"al bene della Chiesa e della Congregazione;"},
+{"t":"p","x":"e fa’ che tutti, spinti dall’amore,"},
+{"t":"p","x":"sappiamo obbedire con prontezza e perfettamente."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"61",num:61,title:"Obbedienza",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Ti rendiamo grazie, Padre,"},
+{"t":"p","x":"perché ci concedi la libera facoltà"},
+{"t":"p","x":"di disporre della nostra vita"},
+{"t":"p","x":"e con la forza del tuo Spirito ci muovi a donartela."},
+{"t":"p","x":"Grazie per averci chiamati a configurarci"},
+{"t":"p","x":"al tuo Figlio Gesù Cristo"},
+{"t":"p","x":"nella sua obbedienza fino alla morte di croce."},
+{"t":"p","x":"Sii benedetto per aver voluto"},
+{"t":"p","x":"che in Lui partecipiamo della tua volontà salvifica."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"62",num:62,title:"Obbedienza in comunione",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore, concedi a noi"},
+{"t":"p","x":"di cercare, conoscere e compiere insieme la tua volontà,"},
+{"t":"p","x":"al fine di realizzare la missione comune"},
+{"t":"p","x":"che ci caratterizza nella Chiesa."},
+{"t":"p","x":"Concedici che nella ricerca"},
+{"t":"p","x":"e nel compimento della tua volontà,"},
+{"t":"p","x":"ci obblighiamo ad offrire il nostro aiuto ai fratelli"},
+{"t":"p","x":"con la preghiera, il consiglio e il dialogo solidale."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"63",num:63,title:"Per i Superiori",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Rafforza i nostri Superiori, Signore,"},
+{"t":"p","x":"perché ricerchino prima di tutto la tua volontà,"},
+{"t":"p","x":"esercitino l’autorità secondo le Costituzioni"},
+{"t":"p","x":"e in spirito di servizio,"},
+{"t":"p","x":"fino a dare la vita per i fratelli."},
+{"t":"p","x":"E concedi a noi tutti che,"},
+{"t":"p","x":"spinti dall’amore,"},
+{"t":"p","x":"ti obbediamo con prontezza e perfettamente,"},
+{"t":"p","x":"sottomettendoci agli uomini per Te."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"64",num:64,title:"Disponibilità",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Concedi a noi il dono della disponibilità, Signore,"},
+{"t":"p","x":"per essere inviati in qualunque parte del mondo,"},
+{"t":"p","x":"per porre tutte le nostre energie"},
+{"t":"p","x":"al servizio del ministero"},
+{"t":"p","x":"che ci sia affidato dalla Congregazione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"65",num:65,title:"Imitare la preghiera di Gesù",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Dio onnipotente ed eterno"},
+{"t":"p","x":"che hai ritenuto cosa buona associarci"},
+{"t":"p","x":"all’opera missionaria di Gesù Cristo:"},
+{"t":"p","x":"apri il nostro cuore"},
+{"t":"p","x":"perché ci convertiamo al Vangelo,"},
+{"t":"p","x":"e donaci costanza per imitarlo"},
+{"t":"p","x":"nella sua preghiera assidua."},
+{"t":"p","x":"Per lo stesso Gesù Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"66",num:66,title:"Progresso nella carità",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre misericordioso,"},
+{"t":"p","x":"concedi che la carità di Cristo ci solleciti"},
+{"t":"p","x":"con lo stesso amore con cui Tu ci ami,"},
+{"t":"p","x":"e che con fortezza di spirito"},
+{"t":"p","x":"siamo disposti ogni giorno"},
+{"t":"p","x":"a morire per i nostri fratelli."},
+{"t":"p","x":"Fa’ che, come stranieri e pellegrini,"},
+{"t":"p","x":"ci asteniamo dai desideri della carne,"},
+{"t":"p","x":"custodiamo con diligente attenzione"},
+{"t":"p","x":"i nostri sensi"},
+{"t":"p","x":"e ci rallegriamo in ogni avversità."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"67",num:67,title:"La carità di Cristo ci spinge",theme:"consigli",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre santo,"},
+{"t":"p","x":"Gesù Cristo, spinto da un ardente amore per Te"},
+{"t":"p","x":"e per gli uomini,"},
+{"t":"p","x":"si donò al lavoro, alla passione e alla morte."},
+{"t":"p","x":"Concedi a noi la carità apostolica e la gioia dello Spirito"},
+{"t":"p","x":"al fine di conseguire"},
+{"t":"p","x":"che tutti gli uomini ti conoscano, ti amino, ti servano"},
+{"t":"p","x":"e raggiungano la beatitudine del tuo Regno."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"68",num:68,title:"Preghiera al Padre",theme:"comunita",sub:null,tags:[],lines:[
+{"t":"p","x":"Tu, Padre,"},
+{"t":"p","x":"per lo Spirito Santo che ci configura a Cristo"},
+{"t":"p","x":"e che edifica la nostra comunione,"},
+{"t":"p","x":"hai riversato nei nostri cuori"},
+{"t":"p","x":"l’amore a Te e ai fratelli."},
+{"t":"p","x":"Ti chiediamo: rendici capaci di accogliere questo tuo dono"},
+{"t":"p","x":"affinché tutta la nostra vita missionaria"},
+{"t":"p","x":"sia retta ed informata da questo stesso amore"},
+{"t":"p","x":"e conseguiamo nella comunità missionaria"},
+{"t":"p","x":"la pienezza personale cui Tu ci chiami."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"69",num:69,title:"Preghiera della comunità",theme:"comunita",sub:null,tags:[],lines:[
+{"t":"p","x":"Ti ringraziamo, Padre santo,"},
+{"t":"p","x":"perché ci hai riuniti in questa tua comunità"},
+{"t":"p","x":"donde vuoi che annunciamo il tuo Regno"},
+{"t":"p","x":"con una vita perfettamente consacrata"},
+{"t":"p","x":"e con un deciso dono al sevizio del Vangelo."},
+{"t":"p","x":"Vogliamo proclamare"},
+{"t":"p","x":"con tutto il nostro essere e il nostro agire,"},
+{"t":"p","x":"come veri Figli del Cuore di Maria,"},
+{"t":"p","x":"le meraviglie del tuo amore fra gli uomini."},
+{"t":"p","x":"Rinnoviamo il nostro proposito"},
+{"t":"p","x":"di essere ogni giorno migliori,"},
+{"t":"p","x":"di aiutarci mutuamente nella sequela del tuo Figlio,"},
+{"t":"p","x":"di assecondare le ispirazioni dello Spirito Santo"},
+{"t":"p","x":"e di collaborare al compimento della missione"},
+{"t":"p","x":"che ci hai affidato nella Chiesa."},
+{"t":"p","x":"Non permettere, Signore, che questa buona volontà"},
+{"t":"p","x":"sfumi quasi inavvertitamente"},
+{"t":"p","x":"a causa dell’egoismo, dell’abitudine,"},
+{"t":"p","x":"della mancata continuità."},
+{"t":"p","x":"Ravviva la fede e la speranza di questa comunità apostolica"},
+{"t":"p","x":"al momento di discernere le inevitabili differenze"},
+{"t":"p","x":"e dilata i nostri cuori al perdono necessario."},
+{"t":"p","x":"Dalla coscienza della nostra debolezza,"},
+{"t":"p","x":"ti chiediamo di mantenerci attenti alla tua grazia:"},
+{"t":"p","x":"che l’assidua meditazione della tua Parola ci ricrei,"},
+{"t":"p","x":"e che la convivenza fraterna ci stimoli"},
+{"t":"p","x":"a dare quella testimonianza di amore"},
+{"t":"p","x":"di cui il mondo ha bisogno per credere,"},
+{"t":"p","x":"e che le necessità dei più poveri"},
+{"t":"p","x":"ci stimolino ad uscire da noi stessi"},
+{"t":"p","x":"e ci obblighino a lavorare per loro senza riposo."},
+{"t":"p","x":"Ci raccomandiamo a Maria, Madre di Gesù,"},
+{"t":"p","x":"esempio di vita consacrata,"},
+{"t":"p","x":"perché ci formi nel suo Cuore"},
+{"t":"p","x":"e ci faccia proseguire sulla via della perfezione"},
+{"t":"p","x":"e del servizio apostolico"},
+{"t":"p","x":"che S. Antonio Maria Claret, con la vita e la dottrina,"},
+{"t":"p","x":"tracciò per noi nella Chiesa e nel mondo."},
+{"t":"p","x":"Suggella con la tua fedeltà eterna, Padre,"},
+{"t":"p","x":"ciò che in questo momento"},
+{"t":"p","x":"costituisce la nostra più sincera aspirazione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"70",num:70,title:"Carità fraterna",theme:"comunita",sub:null,tags:[],lines:[
+{"t":"p","x":"Ti supplichiamo umilmente, Signore Dio nostro,"},
+{"t":"p","x":"di unire in un solo cuore noi che condividiamo lo spirito"},
+{"t":"p","x":"del tuo servo S. Antonio Maria Claret,"},
+{"t":"p","x":"affinché, nel mutuo amore concordi,"},
+{"t":"p","x":"possiamo essere testimoni della tua carità"},
+{"t":"p","x":"fra gli uomini."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"71",num:71,title:"Preghiera per la mia comunità",theme:"comunita",sub:null,tags:[],lines:[
+{"t":"p","x":"Padre, voglio pregarti quest’oggi"},
+{"t":"p","x":"per i miei fratelli di comunità."},
+{"t":"p","x":"Tu li conosci personalmente:"},
+{"t":"p","x":"conosci i loro nomi e i loro cognomi,"},
+{"t":"p","x":"le loro virtù e i loro difetti,"},
+{"t":"p","x":"le loro gioie e le loro pene,"},
+{"t":"p","x":"la loro fortezza e la loro debolezza,"},
+{"t":"p","x":"tutta la loro storia;"},
+{"t":"p","x":"e li accetti come sono,"},
+{"t":"p","x":"li vivifichi con il tuo Spirito."},
+{"t":"p","x":"Insegnami ad amarli nella verità,"},
+{"t":"p","x":"ad imitazione di Gesù Cristo;"},
+{"t":"p","x":"non per le loro parole o per le loro opere,"},
+{"t":"p","x":"ma per se stessi,"},
+{"t":"p","x":"scoprendo in ciascuno di loro,"},
+{"t":"p","x":"e specialmente nei più deboli,"},
+{"t":"p","x":"il mistero del tuo amore infinito."},
+{"t":"p","x":"Ti ringrazio, Padre,"},
+{"t":"p","x":"perché mi hai dato tanti fratelli."},
+{"t":"p","x":"Tutti sono un dono per me, un vero sacramento,"},
+{"t":"p","x":"segno sensibile ed efficace della presenza del tuo Figlio."},
+{"t":"p","x":"Dammi lo sguardo di Gesù per contemplarli,"},
+{"t":"p","x":"il suo cuore per amarli fino in fondo,"},
+{"t":"p","x":"perché anch’io voglio essere per ciascuno di loro"},
+{"t":"p","x":"sacramento vivo della presenza di Gesù."},
+{"t":"p","x":"Egli vive e regna nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"72",num:72,title:"Preghiera apostolica",theme:"missione",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Dio mio e Padre mio!"},
+{"t":"p","x":"Che ti conosca e ti faccia conoscere;"},
+{"t":"p","x":"che ti ami e ti faccia amare;"},
+{"t":"p","x":"che ti serva e ti faccia servire;"},
+{"t":"p","x":"che ti lodi e ti faccia lodare da tutte le creature."},
+{"t":"p","x":"Concedimi, Padre mio, che tutti i peccatori si convertano,"},
+{"t":"p","x":"che tutti i giusti perseverino nella grazia,"},
+{"t":"p","x":"che tutti conseguano l’eterna gloria."},
+{"t":"p","x":"Amen."}
+]},
+{id:"73",num:73,title:"Conoscere Dio per servirlo",theme:"missione",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Concedimi, Signore,"},
+{"t":"p","x":"che tutti conoscano la tua bontà e vicinanza,"},
+{"t":"p","x":"e ti amino e ti servano con ogni fedeltà,"},
+{"t":"p","x":"perché Tu sei buono e la tua misericordia è infinita."},
+{"t":"p","x":"Amen."}
+]},
+{id:"74",num:74,title:"Strumento del Regno",theme:"missione",sub:"del Padre Fondatore",tags:[],lines:[
+{"t":"p","x":"Sono qui, o Signore,"},
+{"t":"p","x":"se vuoi far di me uno strumento"},
+{"t":"p","x":"per l’annunzio del tuo Regno."},
+{"t":"p","x":"Fa’, o Signore, che io mangi solo per aver forza"},
+{"t":"p","x":"e servirti meglio;"},
+{"t":"p","x":"che usi delle cose di questo mondo secondo necessità,"},
+{"t":"p","x":"che studi per conoscerti e amarti,"},
+{"t":"p","x":"per aiutare i miei fratelli:"},
+{"t":"p","x":"che il mio riposo sia per riequilibrare le forze spese"},
+{"t":"p","x":"e per servirti meglio."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"b) DELLA CONGREGAZIONE"}
+]},
+{id:"75",num:75,title:"Per il frutto apostolico dei Missionari",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre di bontà,"},
+{"t":"p","x":"senza nostro merito ci hai scelti e ci invii"},
+{"t":"p","x":"come a suo tempo tuo Figlio Gesù."},
+{"t":"p","x":"Comunicaci il tuo Spirito,"},
+{"t":"p","x":"rendici ministri idonei del Vangelo,"},
+{"t":"p","x":"e concedi a noi la forza necessaria"},
+{"t":"p","x":"per esercitare efficacemente il ministero"},
+{"t":"p","x":"della salvezza degli uomini."},
+{"t":"p","x":"Da’ incremento, Signore, alle nostre opere,"},
+{"t":"p","x":"e fa’ che Cristo, tua Parola, parli attraverso di noi."},
+{"t":"p","x":"Donaci la tua benedizione e aiutaci"},
+{"t":"p","x":"perché tutti gli uomini accettino il Vangelo"},
+{"t":"p","x":"e ti amino ogni giorno di più."},
+{"t":"p","x":"Non permettere, Signore, che ti offendiamo;"},
+{"t":"p","x":"preservaci da tutti i pericoli"},
+{"t":"p","x":"e fortificaci con la tua grazia."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"76",num:76,title:"Missionari",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore,"},
+{"t":"p","x":"che ci chiami come gli Apostoli,"},
+{"t":"p","x":"fa’ che ci sforziamo"},
+{"t":"p","x":"con tutti i nostri mezzi e con tutte le nostre risorse"},
+{"t":"p","x":"ad ottenere che sia amato, conosciuto"},
+{"t":"p","x":"e servito da tutti."},
+{"t":"p","x":"Donaci un cuore aperto"},
+{"t":"p","x":"per amare tutti gli uomini senza eccezione alcuna,"},
+{"t":"p","x":"procurando loro la beatitudine del Regno,"},
+{"t":"p","x":"già presente su questa terra."},
+{"t":"p","x":"Dei doni che crediamo di possedere,"},
+{"t":"p","x":"vogliamo rendere gloria unicamente a Te,"},
+{"t":"p","x":"procurando di farli fruttificare abbondantemente;"},
+{"t":"p","x":"fa’ che ricordiamo i nostri limiti e i nostri difetti,"},
+{"t":"p","x":"così riconoscendo la nostra assoluta dipendenza da Te."},
+{"t":"p","x":"Che manifestiamo, Signore, questo convincimento"},
+{"t":"p","x":"nel nostro modo di agire"},
+{"t":"p","x":"e nelle nostre relazioni con gli altri,"},
+{"t":"p","x":"disposti a chiedere perdono"},
+{"t":"p","x":"per i nostri errori e i nostri contrappunti."},
+{"t":"p","x":"Che prestiamo ai nostri fratelli"},
+{"t":"p","x":"il servizio del nostro amore,"},
+{"t":"p","x":"così che ciascuno di noi stia in mezzo a loro"},
+{"t":"p","x":"come uno che serve."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"77",num:77,title:"Missione clarettiana",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre santo,"},
+{"t":"p","x":"tu chiamasti Antonio Maria Claret a seguire il Figlio tuo,"},
+{"t":"p","x":"ed egli, spinto dal suo amore,"},
+{"t":"p","x":"impegnò completamente la vita alla lotta per la Causa di Lui:"},
+{"t":"p","x":"il Regno."},
+{"t":"p","x":"Ridesta in noi il suo spirito evangelizzatore"},
+{"t":"p","x":"per cogliere ciò che è più urgente,"},
+{"t":"p","x":"più opportuno ed efficace"},
+{"t":"p","x":"e di realizzare, docili allo Spirito"},
+{"t":"p","x":"e obbedienti alla tua volontà,"},
+{"t":"p","x":"la missione di propagare la fede."},
+{"t":"p","x":"Animati come il Claret dalla forza del tuo Spirito,"},
+{"t":"p","x":"anche noi vogliamo deciderci per la Causa del Regno"},
+{"t":"p","x":"e accettare i rischi della denuncia"},
+{"t":"p","x":"e il compromesso profetico"},
+{"t":"p","x":"che la nostra missione evangelizzatrice comporta."},
+{"t":"p","x":"Vogliamo renderci solidali e condividere le angustie,"},
+{"t":"p","x":"le privazioni e le speranze degli uomini"},
+{"t":"p","x":"ai quali siamo inviati."},
+{"t":"p","x":"E mentre confessiamo che tuo Figlio è vivo tra gli uomini,"},
+{"t":"p","x":"vogliamo lavorare per allontanare la non credulità,"},
+{"t":"p","x":"l’odio, l’ingiustizia,"},
+{"t":"p","x":"la menzogna, l’oppressione, il dolore,"},
+{"t":"p","x":"la solitudine, la fame, l’ignoranza"},
+{"t":"p","x":"e tante altre urgenze d’amore"},
+{"t":"p","x":"che sono urgenze del Regno."},
+{"t":"p","x":"Te lo chiediamo per Gesù Cristo tuo Figlio"},
+{"t":"p","x":"che vive e regna nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"78",num:78,title:"Preghiera missionaria",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"O Padre,"},
+{"t":"p","x":"che hai riversato i doni del tuo Spirito"},
+{"t":"p","x":"sulla Beata Vergine Maria,"},
+{"t":"p","x":"in preghiera nel Cenacolo con gli Apostoli,"},
+{"t":"p","x":"fa’ che noi pure perseveriamo unanimi nella preghiera"},
+{"t":"p","x":"con Maria, nostra Madre, per portare al mondo,"},
+{"t":"p","x":"con la forza dello Spirito,"},
+{"t":"p","x":"la Buona Novella della salvezza."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"79",num:79,title:"Per la Chiesa",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore Gesù,"},
+{"t":"p","x":"per amore verso gli uomini"},
+{"t":"p","x":"pregasti per la fede dei tuoi discepoli,"},
+{"t":"p","x":"intercedesti per i peccatori"},
+{"t":"p","x":"e ti movesti a compassione per tutta l’umana miseria:"},
+{"t":"p","x":"accogli le preghiere che per la Chiesa eleviamo a te,"},
+{"t":"p","x":"rispondi alle nostre preghiere per la vita del mondo"},
+{"t":"p","x":"e ricevi tutti nella gioia del Regno eterno"},
+{"t":"p","x":"dove vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"80",num:80,title:"Il Signore è presente nella Missione",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Signore Gesù, il tuo mandato missionario"},
+{"t":"p","x":"un giorno ci disperse per il mondo intero."},
+{"t":"p","x":"La tua Parola di comunione oggi ci raduna qui,"},
+{"t":"p","x":"dove s’incrociano tutte le nostre strade,"},
+{"t":"p","x":"dove incontrarci è incontrarTi,"},
+{"t":"p","x":"dove amarci è renderTi testimonianza,"},
+{"t":"p","x":"dove accendere speranze è annunciare la Tua venuta."},
+{"t":"p","x":"Come i Dodici,"},
+{"t":"p","x":"ritorniamo a Te dai sentieri della nostra missione,"},
+{"t":"p","x":"portando alla Tua presenza il dolore"},
+{"t":"p","x":"e le umiliazioni dei nostri popoli,"},
+{"t":"p","x":"il lamento dei poveri che ci hai mandato ad evangelizzare,"},
+{"t":"p","x":"le speranze degli umili che hanno aperto"},
+{"t":"p","x":"il loro cuore al tuo messaggio"},
+{"t":"p","x":"e che dovunque lo fanno fiorire in fraternità,"},
+{"t":"p","x":"nella Chiesa."},
+{"t":"p","x":"Concedici che, celebrando e contemplando la tua Parola,"},
+{"t":"p","x":"impariamo a discernere nella fede i segni dei tempi,"},
+{"t":"p","x":"e a proclamare Te che sei verità completa"},
+{"t":"v","x":"sempre nuova -,"},
+{"t":"p","x":"in mezzo alle ambiguità e alle contraddizioni"},
+{"t":"p","x":"di questo mondo."},
+{"t":"p","x":"Che la tua presenza risuscitata tra di noi"},
+{"t":"p","x":"sciolga timori e disinganni,"},
+{"t":"p","x":"e ci faccia decidere,"},
+{"t":"p","x":"con libertà e fortezza,"},
+{"t":"p","x":"a favore della tua proposta di vita, di giustizia e di fraternità,"},
+{"t":"p","x":"là dove si coltivano progetti di distruzione,"},
+{"t":"p","x":"d’oppressione e di violenza."},
+{"t":"p","x":"Mandaci il tuo Spirito"},
+{"t":"p","x":"perché come in Maria, la Vergine Madre,"},
+{"t":"p","x":"crei anche in noi un cuore nuovo,"},
+{"t":"p","x":"acceso in carità apostolica,"},
+{"t":"p","x":"disponibile dinanzi alle sfide della nuova evangelizzazione,"},
+{"t":"p","x":"fecondo nelle opere di amore e di servizio"},
+{"t":"p","x":"ai più bisognosi."},
+{"t":"p","x":"Fa’ che siamo strumenti di comunione"},
+{"t":"p","x":"e di riconciliazione"},
+{"t":"p","x":"affinché, tra i popoli ai quali ci hai inviato,"},
+{"t":"p","x":"la comunità di coloro che credono in Te"},
+{"t":"p","x":"sia trasparenza del tuo disegno di salvezza"},
+{"t":"p","x":"e glorifichi il tuo nome."},
+{"t":"p","x":"Amen."}
+]},
+{id:"81",num:81,title:"Il ministero della Parola",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Ti ringraziamo, Signore, perché, senza nostro merito, ci hai concesso il dono di annunciare il Vangelo. Che la tua grazia non sia sterile in noi."},
+{"t":"p","x":"Signore, rendici ministri idonei della tua Parola."},
+{"t":"p","x":"La nostra speciale vocazione nel Popolo di Dio è il ministero della Parola con cui comunichiamo agli uomini il mistero del Cristo totale:"},
+{"t":"v","x":"Ti chiediamo, Signore, che ci conceda di compiere degnamente e fruttuosamente il ministero che ci hai affidato nella Chiesa."},
+{"t":"p","x":"Mossi dallo zelo apostolico e dalla gioia dello Spirito, vogliamo sforzarci con tutti i nostri mezzi e tutte le nostre possibilità, di conseguire che Tu sia conosciuto, amato e servito da tutti:"},
+{"t":"v","x":"Signore, ti chiediamo, con le parole del nostro Fondatore che ti conosciamo e ti facciamo conoscere, ti amiamo e ti facciamo amare, ti serviamo e ti facciamo servire, ti lodiamo e ti facciamo lodare da ogni creatura."},
+{"t":"p","x":"Desideriamo ardentemente, o Signore, la tua giustizia; e ci sforziamo di giungere alla maturità della pienezza in Cristo, per comunicare con più grande efficacia agli altri la grazia del Vangelo:"},
+{"t":"v","x":"Signore, vogliamo praticare ciò che predichiamo. Trasformaci pienamente in tuo Vangelo, perché siamo davvero fedeli evangelizzati ed efficaci evangelizzatori."}
+]},
+{id:"82",num:82,title:"Per coltivare la nostra vocazione missionaria",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Con la gioia di saperci inviati dallo Spirito di Gesù ad annunciare il Regno, condividendo le speranze e le gioie degli uomini, chiediamo al Signore Gesù la forza di realizzare la nostra missione, supplicandolo così:"},
+{"t":"p","x":"Donaci lo Spirito, e risponderemo con amore e fedeltà."},
+{"t":"p","x":"Signore, consapevoli che l’evangelizzazione è il nostro servizio all’uomo, al mondo, alla Chiesa e alla costruzione del Regno:"},
+{"t":"v","x":"Concedici di esaltare la nostra evangelizzazione missionaria «allo stile degli Apostoli» rispondendo a «ciò che è più urgente, più opportuno e più efficace»."},
+{"t":"p","x":"Signore, il dinamismo della tua incarnazione fra gli uomini vuole da noi una evangelizzazione inculturata:"},
+{"t":"v","x":"Donaci il cuore e la mente aperti ai popoli che dobbiamo servire, per essere capaci di trasmettere il messaggio evangelico a partire dagli specifici loro valori culturali:"},
+{"t":"p","x":"Signore, la nostra Congregazione è presente in regioni dove tanti squilibri e tante ingiustizie distruggono la dignità dell’uomo:"},
+{"t":"v","x":"Fa’ che la nostra opzione sia per una evangelizzazione profetica e liberatrice e con la nostra vita e parola portiamo la luce del Vangelo con tutto il suo contenuto di annuncio di salvezza:"},
+{"t":"p","x":"Signore, che hai fatto di S. Antonio Maria Claret un uomo che percepì e annunciò il disegno di salvezza nelle concrete situazioni del suo tempo:"},
+{"t":"v","x":"Aiutaci ad essere segno e forza liberatrice da ogni schiavitù che impedisca all’uomo di essere persona in comunione con Dio e con i fratelli."},
+{"t":"p","x":"Signore, con la Chiesa del nostro tempo, abbiamo preso coscienza nuova che i poveri sono i primi destinatari della tua missione:"},
+{"t":"v","x":"Ti chiediamo che, fedeli alla tua sequela e alla Chiesa, la nostra evangelizzazione sia sempre nella prospettiva dei poveri e dei bisognosi."},
+{"t":"p","x":"Signore, se davvero questa preferenza per i poveri ci chiede di revisionare i nostri criteri, le nostre attitudini, le nostre strutture e soprattutto il nostro stile di vita:"},
+{"t":"v","x":"Disponici alla tua insistente chiamata alla conversione della mentalità e dei comportamenti."},
+{"t":"p","x":"Signore, l’urgenza dell’evangelizzazione nella Chiesa di oggi esige da noi l’attualizzazione della sensibilità che fu del Claret per la promozione di evangelizzatori:"},
+{"t":"v","x":"Fa’ che la nostra evangelizzazione moltiplichi guide evangelizzatrici: sacerdoti, religiosi e laici."}
+]},
+{id:"83",num:83,title:"Vogliamo compiere la tua volontà",theme:"missione",sub:"della Congregazione",tags:[],lines:[
+{"t":"p","x":"Padre nostro,"},
+{"t":"p","x":"Padre di bontà e di misericordia:"},
+{"t":"p","x":"siamo qui riuniti in nome dell’amore"},
+{"t":"p","x":"che nutri per noi."},
+{"t":"p","x":"Ti lodiamo, ti benediciamo, ti ringraziamo."},
+{"t":"p","x":"Rispondiamo con gioia alla chiamata"},
+{"t":"p","x":"del tuo Figlio Gesù"},
+{"t":"p","x":"e sostenuti dalla forza dello Spirito,"},
+{"t":"p","x":"ti diciamo fidenti: «Vogliamo compiere la tua volontà»."},
+{"t":"p","x":"Donaci occhi limpidi, intelligenza aperta"},
+{"t":"p","x":"e cuore ardente"},
+{"t":"p","x":"per comprendere ed abbracciare il disegno"},
+{"t":"p","x":"che maturi su di noi."},
+{"t":"p","x":"Pensando alla missione che ci affidi,"},
+{"t":"p","x":"sentiamo le profonde e costanti esigenze"},
+{"t":"p","x":"cui dobbiamo rispondere."},
+{"t":"p","x":"Aumenta in noi la generosità e la speranza"},
+{"t":"p","x":"ed aprici alla necessità più urgenti degli uomini."},
+{"t":"p","x":"Fa’ che ci distinguiamo esprimendo nella nostra vita"},
+{"t":"p","x":"l’amore universale di Cristo Signore,"},
+{"t":"p","x":"la sua incondizionata donazione"},
+{"t":"p","x":"e la dimenticanza totale di se stesso"},
+{"t":"p","x":"nella realizzazione della sua missione"},
+{"t":"p","x":"di salvezza in questo mondo."},
+{"t":"p","x":"Confermaci nella verità: dacci sete della tua giustizia"},
+{"t":"p","x":"e rendici strumenti utili della pace."},
+{"t":"p","x":"Che noi siamo forze vive di comunione"},
+{"t":"p","x":"in questa Chiesa pellegrina"},
+{"t":"p","x":"e che giungiamo ad essere testimoni del potere sovrano"},
+{"t":"p","x":"di Cristo risorto"},
+{"t":"p","x":"fra di un popolo che soffre passione di libertà."},
+{"t":"p","x":"Che siamo responsabili, in ogni azione e impegno,"},
+{"t":"p","x":"e non permettere che, proclamando il Vangelo,"},
+{"t":"p","x":"ricerchiamo il nostro interesse."},
+{"t":"p","x":"Concedici, Signore, la carità apostolica"},
+{"t":"p","x":"di S. Antonio Maria Claret, nostro Padre."},
+{"t":"p","x":"Insegnaci in ogni tempo, come egli fece,"},
+{"t":"p","x":"ciò che hai a cuore,"},
+{"t":"p","x":"ciò che è giusto e ciò che costruisce il tuo Regno"},
+{"t":"p","x":"in mezzo agli uomini."},
+{"t":"p","x":"Te lo chiediamo per Gesù Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"84",num:84,title:"Per le vocazioni",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore Gesù Cristo, che hai detto:"},
+{"t":"p","x":"«Pregate il padrone della messe"},
+{"t":"p","x":"perché mandi operai nella sua messe»:"},
+{"t":"p","x":"Ti chiediamo umilmente:"},
+{"t":"p","x":"manda operai nella nostra Congregazione."},
+{"t":"p","x":"Infondi il tuo Spirito in coloro che hai chiamato"},
+{"t":"p","x":"e confermali nella vocazione"},
+{"t":"p","x":"perché annunziando degnamente e fruttuosamente"},
+{"t":"p","x":"il tuo santo Vangelo"},
+{"t":"p","x":"ci chiamiamo e siamo realmente"},
+{"t":"p","x":"Figli del Cuore Immacolato della beata Vergine Maria,"},
+{"t":"p","x":"ti amiamo con tutto il cuore, con le parole e nei fatti,"},
+{"t":"p","x":"e non cessiamo mai di lodarti."},
+{"t":"p","x":"Amen."}
+]},
+{id:"85",num:85,title:"Preghiera per le vocazioni",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, Tu che chiamasti gli Apostoli"},
+{"t":"p","x":"perché fossero pescatori di uomini,"},
+{"t":"p","x":"chiama alla Famiglia Clarettiana"},
+{"t":"p","x":"nuovi membri"},
+{"t":"p","x":"che siano sale della terra e luce del mondo"},
+{"t":"p","x":"e diffondano in ogni parte la carità"},
+{"t":"p","x":"che incalzava il tuo servo Antonio Maria Claret."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"86",num:86,title:"Per intercessione del Cuore Immacolato di Maria",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Dio e Signore nostro,"},
+{"t":"p","x":"che attraverso il Cuore Immacolato di Maria"},
+{"t":"p","x":"hai dato a S. Antonio Maria Claret"},
+{"t":"p","x":"un grande amore verso il tuo Figlio Gesù"},
+{"t":"p","x":"e gli hai ispirato la fondazione"},
+{"t":"p","x":"della Congregazione dei missionari,"},
+{"t":"p","x":"per la salvezza di tutti gli uomini,"},
+{"t":"p","x":"benedici con nuove vocazioni"},
+{"t":"p","x":"la Congregazione Clarettiana,"},
+{"t":"p","x":"e concedici di perseverare sino alla fine"},
+{"t":"p","x":"nell’annuncio del Vangelo."},
+{"t":"p","x":"Amen."}
+]},
+{id:"87",num:87,title:"Preghiera per chiedere al Signore vocazioni clarettiane",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, per continuare nel mondo intero la grande opera di S. Antonio Maria Claret."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Signore, per santificare i popoli cristiani con la predicazione ed altre opere apostoliche."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Signore, per portare la luce del Vangelo a coloro che non lo conoscono."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Signore, per realizzare il trionfo del Cuore Immacolato di Maria."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Signore, perché per mezzo del Cuore Immacolato di Maria si compia sempre la tua volontà."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Signore, affinché tutti siano educati cristianamente e si realizzi una società più giusta e più umana, nel segno della tua volontà."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Gesù, Tu che sei il primo tra i Figli del Cuore Immacolato di Maria."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"p","x":"Cuore Immacolato di Maria, Madre di tutti gli uomini."},
+{"t":"v","x":"Mandaci molti e santi Missionari."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Padre nostro,"},
+{"t":"p","x":"che vuoi che tutti gli uomini siano salvi"},
+{"t":"p","x":"e giungano alla conoscenza della verità,"},
+{"t":"p","x":"ti preghiamo:"},
+{"t":"p","x":"manda operai nella tua messe"},
+{"t":"p","x":"e concedi loro di predicare fiduciosamente la tua Parola,"},
+{"t":"p","x":"affinché la verità risplenda e si diffonda;"},
+{"t":"p","x":"e tutti gli uomini conoscano Te, unico e vero Dio."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"88",num:88,title:"Per le vocazioni missionarie",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Padre,"},
+{"t":"p","x":"che vuoi che tutti gli uomini siano salvi"},
+{"t":"p","x":"e giungano alla conoscenza della verità,"},
+{"t":"p","x":"attira a Te nuovi seguaci del Figlio tuo,"},
+{"t":"p","x":"sullo stile di S. Antonio Maria Claret,"},
+{"t":"p","x":"ed inviali nel campo del mondo"},
+{"t":"p","x":"perché predichino il Vangelo a tutte le creature,"},
+{"t":"p","x":"e il tuo popolo, radunato dalla Parola di vita"},
+{"t":"p","x":"e sostenuto dalla forza dei sacramenti,"},
+{"t":"p","x":"cammini sui sentieri della salvezza e dell’amore."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"89",num:89,title:"Preghiera per le vocazioni e la perseveranza",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Tu hai detto, Signore, che la messe è molta,"},
+{"t":"p","x":"gli operai sono pochi,"},
+{"t":"p","x":"e vuoi che si moltiplichi"},
+{"t":"p","x":"il numero di apostoli e di evangelizzatori"},
+{"t":"p","x":"che dilatino il tuo Regno e trasformino la faccia della terra."},
+{"t":"p","x":"Ti preghiamo: aumenta il numero"},
+{"t":"p","x":"e la qualità evangelica di coloro che lavorano"},
+{"t":"p","x":"al bene degli uomini."},
+{"t":"p","x":"Ti ringraziamo delle vocazioni che ci hai concesso"},
+{"t":"p","x":"per l’intercessione del Cuore Immacolato di Maria, nostra Madre."},
+{"t":"p","x":"Concedici la tua presenza e la tua assistenza,"},
+{"t":"p","x":"perché tante vocazioni bussino ancora al nostro Istituto,"},
+{"t":"p","x":"e aiutaci tutti a perseverare nella nostra vocazione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"90",num:90,title:"Per le vocazioni a tutti gli stati di vita e a tutti i ministeri",theme:"vocazioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Illuminati e sostenuti dalla tua Parola, Signore,"},
+{"t":"p","x":"ti preghiamo per tutti coloro"},
+{"t":"p","x":"che hanno già udito la tua chiamata e l’hanno seguita."},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Per il Papa, i Vescovi, i Presbiteri, i Diaconi,"},
+{"t":"p","x":"e per i Missionari e tutti i Consacrati,"},
+{"t":"p","x":"perché vivano gioiosamente la loro vocazione"},
+{"t":"p","x":"e con la loro vita e la loro parola ti rendano presente"},
+{"t":"p","x":"in mezzo agli uomini."},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Per i Laici e i Secolari"},
+{"t":"p","x":"che lavorano generosamente"},
+{"t":"p","x":"nei ministeri istituiti della Chiesa"},
+{"t":"p","x":"e nelle opere necessarie alla comunità."},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Sostienili nelle difficoltà,"},
+{"t":"p","x":"confortali nelle sofferenze,"},
+{"t":"p","x":"assistili nella solitudine,"},
+{"t":"p","x":"proteggili nella persecuzione"},
+{"t":"p","x":"e confermali nella fedeltà"},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Ti preghiamo, Signore,"},
+{"t":"p","x":"per coloro che aprono il loro cuore alla tua chiamata"},
+{"t":"p","x":"e si preparano a seguirla."},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Che la tua Parola li illumini,"},
+{"t":"p","x":"la tua persona li conquisti,"},
+{"t":"p","x":"il tuo Spirito li guidi alla meta"},
+{"t":"p","x":"della professione religiosa o degli ordini sacri."},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Sii per loro, Signore, rocca e roccia"},
+{"t":"p","x":"e fa’ che trovino chi li possa"},
+{"t":"p","x":"consigliare, accompagnare e sostenere"},
+{"t":"p","x":"con la forza di convinzione e di amore"},
+{"t":"p","x":"che Tu solo puoi comunicare."},
+{"t":"p","x":"Ti preghiamo, ascoltaci."},
+{"t":"p","x":"Te lo chiediamo per Gesù Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"91",num:91,title:"Per i fratelli infermi",theme:"infermi",sub:null,tags:[],lines:[
+{"t":"v","x":"Guarda con amore, Signore, ai nostri fratelli infermi."},
+{"t":"r","x":"Sperino fiduciosamente in Te."},
+{"t":"v","x":"Assistili con la tua bontà."},
+{"t":"r","x":"Consola il loro cuore e allevia le loro sofferenze."},
+{"t":"v","x":"Ascolta le loro preghiere e suppliche, Padre."},
+{"t":"r","x":"Dona loro forza e pace per compiere la tua volontà."},
+{"t":"v","x":"Fa’ che, a letto, si ricordino sempre di Te."},
+{"t":"r","x":"E che vegliando meditino su di Te."},
+{"t":"v","x":"Sei stato loro aiuto."},
+{"t":"r","x":"Restino sempre uniti a Te."},
+{"t":"v","x":"Ricordati, Padre, di tutti gli uomini e di tutte le donne che soffrono."},
+{"t":"r","x":"Allevia le loro sofferenze e fa’ che ci sentiamo solidali, noi stessi aiutandoli ed assistendoli amorevolmente."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Padre di bontà, che plachi il dolore"},
+{"t":"p","x":"dei nostri fratelli infermi,"},
+{"t":"p","x":"cura la loro malattia, ravviva la loro speranza,"},
+{"t":"p","x":"confortali e consolali con la tua grazia"},
+{"t":"p","x":"affinché, ristabiliti secondo la tua volontà e misericordia,"},
+{"t":"p","x":"si incorporino nuovamente alla vita della comunità"},
+{"t":"p","x":"e al servizio del Vangelo."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"rub","x":"Oppure:"},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Padre di bontà, che hai voluto"},
+{"t":"p","x":"che il tuo Figlio sopportasse le nostre debolezze,"},
+{"t":"p","x":"per manifestare"},
+{"t":"p","x":"il valore della malattia e della pazienza,"},
+{"t":"p","x":"ascolta le preghiere che rivolgiamo a Te"},
+{"t":"p","x":"per i nostri fratelli di Congregazione infermi,"},
+{"t":"p","x":"e per quanti vivono oppressi dal dolore,"},
+{"t":"p","x":"dall’afflizione o dalla malattia."},
+{"t":"p","x":"Concedi loro la grazia di unirsi alla passione di Cristo"},
+{"t":"p","x":"per la redenzione del mondo."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"rub","x":"Oppure"},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Dio e Signore nostro,"},
+{"t":"p","x":"salvezza di quanti credono in Te,"},
+{"t":"p","x":"ascolta le preghiere che ti rivolgiamo"},
+{"t":"p","x":"per i nostri fratelli di Congregazione:"},
+{"t":"p","x":"sostienili con l’aiuto della tua misericordia"},
+{"t":"p","x":"affinché, ricuperata la salute, possano servirti"},
+{"t":"p","x":"nella costruzione del tuo Regno."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"92",num:92,title:"Per i nostri fratelli ammalati",theme:"infermi",sub:null,tags:[],lines:[
+{"t":"v","x":"Salva i tuoi servi, Signore."},
+{"t":"r","x":"Sperino in Te."},
+{"t":"v","x":"Manda loro l’aiuto dal tuo Santuario."},
+{"t":"r","x":"Proteggili da Sion."},
+{"t":"v","x":"Sii loro baluardo, Signore."},
+{"t":"r","x":"Dinanzi al nemico."},
+{"t":"v","x":"Concedi loro la tua forza."},
+{"t":"r","x":"Sul letto del dolore."},
+{"t":"v","x":"Ascolta, Signore, la nostra preghiera."},
+{"t":"r","x":"E il nostro grido giunga fino a Te."},
+{"t":"v","x":"Il Signore sia con voi."},
+{"t":"r","x":"E con il tuo spirito."},
+{"t":"rub","x":"Preghiamo"},
+{"t":"p","x":"O Dio,"},
+{"t":"p","x":"che compatisci sempre e sempre perdoni,"},
+{"t":"p","x":"accogli la nostra preghiera"},
+{"t":"p","x":"perché la tua pietà misericordiosa"},
+{"t":"p","x":"assolva benignamente"},
+{"t":"p","x":"noi e i nostri fratelli ammalati."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"rub","x":"Oppure"},
+{"t":"p","x":"O Dio, difesa singolare contro l’umana debolezza,"},
+{"t":"p","x":"manifesta la forza del tuo aiuto sui nostri fratelli ammalati,"},
+{"t":"p","x":"affinché, sostenuti dalla tua misericordia,"},
+{"t":"p","x":"meritino di presentarsi nuovamente sani dinanzi alla tua Chiesa."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"rub","x":"Oppure"},
+{"t":"p","x":"Ti chiediamo, Signore,"},
+{"t":"p","x":"che noi tuoi servi godiamo sempre la salute"},
+{"t":"p","x":"dell’anima e del corpo"},
+{"t":"p","x":"e, per l’intercessione della Santa Vergine Maria,"},
+{"t":"p","x":"liberaci dalle tristezze di questo mondo"},
+{"t":"p","x":"e donaci le gioie del paradiso."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"94",num:94,title:"Preghiera per i defunti della Congregazione",theme:"defunti",sub:null,tags:[],lines:[
+{"t":"v","x":"Dona loro, Signore, il riposo eterno."},
+{"t":"r","x":"E splenda ad essi la luce perpetua."},
+{"t":"v","x":"Riposino in pace."},
+{"t":"r","x":"Amen."},
+{"t":"v","x":"Le anime di tutti i fedeli defunti,"},
+{"t":"p","x":"per la misericordia di Dio, riposino in pace."},
+{"t":"r","x":"Amen."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"O Dio, che nel mistero pasquale del tuo Figlio"},
+{"t":"p","x":"mantieni desta la speranza"},
+{"t":"p","x":"della nostra felicità futura,"},
+{"t":"p","x":"umilmente ti chiediamo"},
+{"t":"p","x":"che quanti sulla terra hanno partecipato"},
+{"t":"p","x":"della nostra fraternità clarettiana"},
+{"t":"p","x":"e hanno speso la loro vita per la propagazione del tuo Regno"},
+{"t":"p","x":"raggiungano la gioia dell’eterna felicità"},
+{"t":"p","x":"nel cielo dei Santi e dei Beati."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"95",num:95,title:"Preghiera per i genitori defunti",theme:"defunti",sub:null,tags:[],lines:[
+{"t":"p","x":"O Dio, che ci hai comandato di onorare il padre e la madre,"},
+{"t":"p","x":"abbi misericordia dei nostri genitori:"},
+{"t":"p","x":"perdona i loro peccati e fa’ che un giorno"},
+{"t":"p","x":"ci raduniamo insieme con loro nella chiarità della tua gloria."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen,"}
+]},
+{id:"96",num:96,title:"Preghiera per i familiari e i benefattori",theme:"defunti",sub:null,tags:[],lines:[
+{"t":"p","x":"O Dio, che nel mistero pasquale del tuo Figlio"},
+{"t":"p","x":"mantieni desta la speranza della nostra resurrezione,"},
+{"t":"p","x":"ti chiediamo umilmente"},
+{"t":"p","x":"che quanti sulla terra hanno partecipato"},
+{"t":"p","x":"della nostra fraternità clarettiana"},
+{"t":"p","x":"e hanno collaborato nella nostra missione di annunciare il Vangelo"},
+{"t":"p","x":"ricevano la gioia dell’eterna felicità."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"97",num:97,title:"Preghiera per i fratelli, i parenti e i benefattori",theme:"defunti",sub:null,tags:[],lines:[
+{"t":"p","x":"O Dio, che concedi il perdono dei peccati"},
+{"t":"p","x":"e vuoi la salvezza degli uomini,"},
+{"t":"p","x":"per intercessione della Vergine Maria"},
+{"t":"p","x":"e di tutti i Santi,"},
+{"t":"p","x":"concedi ai nostri fratelli, parenti e benefattori"},
+{"t":"p","x":"che hanno lasciato questo mondo"},
+{"t":"p","x":"di raggiungere la beatitudine eterna."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"III. PREGHIERA QUOTIDIANA"}
+]},
+{id:"101",num:101,title:"Angelus",theme:"angelus",sub:null,tags:[],lines:[
+{"t":"p","x":"Si recita dopo la preghiera delle Lodi, fuori del tempo pasquale"},
+{"t":"v","x":"L’Angelo del Signore portò l’annuncio a Maria."},
+{"t":"r","x":"E concepì dallo Spirito Santo."},
+{"t":"p","x":"Ave Maria."},
+{"t":"v","x":"Io sono la serva del Signore."},
+{"t":"r","x":"Si compia in me la tua parola."},
+{"t":"p","x":"Ave Maria."},
+{"t":"v","x":"Il verbo di Dio si è fatto carne."},
+{"t":"r","x":"È venuto ad abitare con noi."},
+{"t":"p","x":"Ave Maria"},
+{"t":"v","x":"Prega per noi, Santa Madre di Dio."},
+{"t":"r","x":"E saremo degni delle promesse di Cristo."},
+{"t":"rub","x":"Preghiamo"},
+{"t":"p","x":"Infondi nel nostro spirito la tua grazia, Signore. Tu che all’annunzio dell’Angelo ci hai rivelato l’incarnazione del tuo Figlio, per la sua passione e la sua croce guidaci alla gloria della Risurrezione. Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"Gloria al Padre"},
+{"t":"p","x":"Nel tempo pasquale"},
+{"t":"p","x":"Regina dei cieli, rallegrati."},
+{"t":"p","x":"Alleluia!"},
+{"t":"p","x":"Cristo, che hai portato nel grembo."},
+{"t":"p","x":"Alleluia!"},
+{"t":"p","x":"È risorto, come aveva promesso."},
+{"t":"p","x":"Alleluia!"},
+{"t":"v","x":"Prega il Signore per noi."},
+{"t":"r","x":"Alleluia!"},
+{"t":"p","x":"Rallegrati,Vergine Maria, alleluia."},
+{"t":"p","x":"Il Signore è veramente risorto, alleluia."},
+{"t":"p","x":"O Dio che hai rallegrato il mondo con la risurrezione del Figlio tuo, Nostro Signore Gesù Cristo, concedi, te ne preghiamo, che per i meriti della Madre sua, la Vergine Maria, possiamo giungere alla gioia della vita eterna."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"Gloria al Padre"},
+{"t":"p","x":"Dopo i Vespri, si recita l’Angelus o altra preghiera mariana"}
+]},
+{id:"102-1",num:1,title:"Salve, Regina",theme:"angelus",sub:"Antifone di Compieta",tags:[],lines:[
+{"t":"p","x":"vita, dolcezza e speranza nostra, salve."},
+{"t":"p","x":"A te ricorriamo, noi, esuli figli di Eva;"},
+{"t":"p","x":"a te sospiriamo, gementi e piangenti"},
+{"t":"p","x":"in questa valle di lacrime,"},
+{"t":"p","x":"Orsù dunque, avvocata nostra,"},
+{"t":"p","x":"rivolgi a noi gli occhi tuoi misericordiosi."},
+{"t":"p","x":"E mostraci, dopo questo esilio, Gesù,"},
+{"t":"p","x":"il frutto benedetto del tuo seno."},
+{"t":"p","x":"O clemente, o pia, o dolce Vergine Maria."}
+]},
+{id:"102-2",num:2,title:"O Santa Madre del Redentore (Alma Redemptoris)",theme:"angelus",sub:"Antifone di Compieta",tags:[],lines:[
+{"t":"p","x":"porta dei cieli, stella del mare,"},
+{"t":"p","x":"soccorri il tuo popolo"},
+{"t":"p","x":"che anela a risorgere."},
+{"t":"p","x":"Tu che accogliendo il saluto dell’angelo,"},
+{"t":"p","x":"nello stupore di tutto il creato,"},
+{"t":"p","x":"hai generato il tuo Creatore,"},
+{"t":"p","x":"Madre sempre vergine,"},
+{"t":"p","x":"pietà di noi peccatori."}
+]},
+{id:"102-3",num:3,title:"Ave, Regina dei cieli",theme:"angelus",sub:"Antifone di Compieta",tags:[],lines:[
+{"t":"p","x":"ave, signora degli angeli;"},
+{"t":"p","x":"porta e radice di salvezza,"},
+{"t":"p","x":"rechi nel mondo la luce."},
+{"t":"p","x":"Godi, vergine gloriosa,"},
+{"t":"p","x":"bella fra tutte le donne;"},
+{"t":"p","x":"salve, o tutta santa,"},
+{"t":"p","x":"prega per noi Cristo Signore."}
+]},
+{id:"102-4",num:4,title:"Sub tuum praesidium",theme:"angelus",sub:"Antifone di Compieta",tags:[],lines:[
+{"t":"p","x":"santa Madre di Dio:"},
+{"t":"p","x":"non disprezzare le suppliche"},
+{"t":"p","x":"di noi che siamo nella prova,"},
+{"t":"p","x":"e liberaci da ogni pericolo,"},
+{"t":"p","x":"o Vergine gloriosa e benedetta."}
+]},
+{id:"102-5",num:5,title:"Regina caeli (tempo pasquale)",theme:"angelus",sub:"Antifone di Compieta",tags:[],lines:[
+{"t":"p","x":"Regina del cielo, rallegrati."},
+{"t":"p","x":"Alleluia!"},
+{"t":"p","x":"Cristo, che hai portato nel grembo."},
+{"t":"p","x":"Alleluia!"},
+{"t":"p","x":"È risorto, come aveva promesso."},
+{"t":"p","x":"Alleluia!"},
+{"t":"p","x":"Prega il Signore per noi."},
+{"t":"p","x":"Alleluia!"},
+{"t":"p","x":"Il Signore è veramente risorto, alleluia."}
+]},
+{id:"109",num:109,title:"Litanie Lauretane",theme:"angelus",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, pietà"},
+{"t":"p","x":"Cristo, pietà"},
+{"t":"p","x":"Signore, pietà"},
+{"t":"p","x":"Cristo, ascoltaci"},
+{"t":"p","x":"Cristo, esaudiscici"},
+{"t":"p","x":"Padre celeste, Dio"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"p","x":"Figlio, Redentore del mondo, Dio"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"p","x":"Spirito Santo, Dio"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"p","x":"Santa Trinità, unico Dio"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"p","x":"Santa Maria"},
+{"t":"r","x":"prega per noi"},
+{"t":"p","x":"Santa Madre di Dio"},
+{"t":"p","x":"Santa Vergine delle vergini"},
+{"t":"p","x":"Madre di Cristo"},
+{"t":"p","x":"Madre della divina grazia"},
+{"t":"p","x":"Madre della Chiesa"},
+{"t":"p","x":"Madre purissima"},
+{"t":"p","x":"Madre castissima"},
+{"t":"p","x":"Madre sempre vergine"},
+{"t":"p","x":"Madre immacolata"},
+{"t":"p","x":"Madre degna di amore"},
+{"t":"p","x":"Madre ammirabile"},
+{"t":"p","x":"Madre del buon consiglio"},
+{"t":"p","x":"Madre del Creatore"},
+{"t":"p","x":"Madre del Salvatore"},
+{"t":"p","x":"Vergine prudente"},
+{"t":"p","x":"Vergine degna di onore"},
+{"t":"p","x":"Vergine degna di lode"},
+{"t":"p","x":"Vergine potente"},
+{"t":"p","x":"Vergine clemente"},
+{"t":"p","x":"Vergine fedele"},
+{"t":"p","x":"Specchio di perfezione"},
+{"t":"p","x":"Ideale di santità"},
+{"t":"p","x":"Sede della sapienza"},
+{"t":"p","x":"Causa della nostra gioia"},
+{"t":"p","x":"Tempio dello Spirito Santo"},
+{"t":"p","x":"Tabernacolo dell’eterna gloria"},
+{"t":"p","x":"Dimora consacrata a Dio"},
+{"t":"p","x":"Rosa mistica"},
+{"t":"p","x":"Torre della santa città di Davide"},
+{"t":"p","x":"Fortezza inespugnabile"},
+{"t":"p","x":"Santuario della divina presenza"},
+{"t":"p","x":"Arca della nuova alleanza"},
+{"t":"p","x":"Porta del cielo"},
+{"t":"p","x":"Stella del mattino"},
+{"t":"p","x":"Salute degli infermi"},
+{"t":"p","x":"Rifugio dei peccatori"},
+{"t":"p","x":"Consolatrice degli afflitti"},
+{"t":"p","x":"Aiuto dei cristiani"},
+{"t":"p","x":"Regina degli angeli"},
+{"t":"p","x":"Regina dei patriarchi"},
+{"t":"p","x":"Regina dei profeti"},
+{"t":"p","x":"Regina degli apostoli"},
+{"t":"p","x":"Regina dei martiri"},
+{"t":"p","x":"Regina dei confessori"},
+{"t":"p","x":"Regina dei vergini"},
+{"t":"p","x":"Regina di tutti i santi"},
+{"t":"p","x":"Regina concepita senza peccato originale"},
+{"t":"p","x":"Regina assunta in cielo"},
+{"t":"p","x":"Regina del rosario"},
+{"t":"p","x":"Regina della famiglia"},
+{"t":"p","x":"Regina della pace"},
+{"t":"p","x":"Agnello di Dio, che togli i peccati"},
+{"t":"p","x":"del mondo perdonaci, Signore"},
+{"t":"p","x":"Agnello di Dio, che togli i peccati"},
+{"t":"p","x":"del mondo ascoltaci, Signore"},
+{"t":"p","x":"Agnello di Dio, che togli i peccati"},
+{"t":"p","x":"del mondo"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"v","x":"Prega per noi, Santa Madre di Dio"},
+{"t":"r","x":"Affinché siamo fatti degni delle promesse di Cristo"},
+{"t":"p","x":"Preghiamo:"},
+{"t":"p","x":"Concedi ai tuoi fedeli, Signore Dio nostro,"},
+{"t":"p","x":"di godere sempre la salute del corpo e dello spirito,"},
+{"t":"p","x":"e per la gloriosa intercessione di Maria santissima sempre vergine,"},
+{"t":"p","x":"salvaci dai mali che ora ci rattristano"},
+{"t":"p","x":"e guidaci alla gioia senza fine."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"IV. EUCARISTIA"}
+]},
+{id:"113",num:113,title:"Illumina con la luce della fede i nostri cuori, o Signore,",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"e accendili nel fuoco della carità,"},
+{"t":"p","x":"affinché adoriamo, in spirito e verità,"},
+{"t":"p","x":"Colui che riconosciamo presente in questo Sacramento,"},
+{"t":"p","x":"nostro Dio e Signore."},
+{"t":"p","x":"Egli vive e regna nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"114",num:114,title:"O Dio, che hai redento tutti gli uomini",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"col mistero pasquale di Cristo"},
+{"t":"p","x":"che in questo Sacramento offre se stesso per i fratelli,"},
+{"t":"p","x":"concedi a noi che, venerando costantemente"},
+{"t":"p","x":"il mistero della nostra redenzione,"},
+{"t":"p","x":"meritiamo di conseguirne il frutto"},
+{"t":"p","x":"e di suscitare negli uomini"},
+{"t":"p","x":"il ricordo della presenza del Signore."},
+{"t":"p","x":"Per lo stesso Gesù Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"115",num:115,title:"Che il Sacramento dell’Eucaristia, o Signore,",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"riempia i nostri cuori del tuo amore e di zelo apostolico"},
+{"t":"p","x":"e ci spinga a desiderare"},
+{"t":"p","x":"che tutti gli uomini ti conoscano,"},
+{"t":"p","x":"ti amino, ti servano"},
+{"t":"p","x":"e vivano la beatitudine del Regno"},
+{"t":"p","x":"già presente sulla nostra terra."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"116",num:116,title:"O Signore, che ci hai resi partecipi",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"di uno stesso pane e di uno stesso Spirito,"},
+{"t":"p","x":"concedi a noi che, uniti a Te, come i tralci alla vite,"},
+{"t":"p","x":"siamo con Te una sola cosa, ed edifichiamo"},
+{"t":"p","x":"la nostra comunione perché il mondo creda."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"117",num:117,title:"Signore Gesù, tu che ti sei identificato pienamente",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"con coloro che soffrono"},
+{"t":"p","x":"e che hai detto: “Venite a me"},
+{"t":"p","x":"voi tutti che siete affaticati ed oppressi"},
+{"t":"p","x":"ed io vi ristorerò”,"},
+{"t":"p","x":"noi, solidali con gli uomini che patiscono malattia,"},
+{"t":"p","x":"dolore, ingiustizia ed oppressione,"},
+{"t":"p","x":"veniamo alla tua presenza,"},
+{"t":"p","x":"perché Tu ci accenda nella tua carità"},
+{"t":"p","x":"e noi godiamo nei patimenti,"},
+{"t":"p","x":"ci gloriamo della croce."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"118",num:118,title:"Signore, che nel mistero pasquale hai realizzato la salvezza degli uomini,",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"concedi a noi di adorarti presente in questo Sacramento"},
+{"t":"p","x":"e di proclamare con fede ciò che ora veneriamo."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"119",num:119,title:"Signore Gesù, infiammaci in quella fede che mosse",theme:"eucaristia",sub:null,tags:[],lines:[
+{"t":"p","x":"tanti predicatori della divina Parola"},
+{"t":"p","x":"ad abbracciare con animo lieto"},
+{"t":"p","x":"la povertà, l’abnegazione e il sacrificio,"},
+{"t":"p","x":"al fine di dilatare il tuo Regno."},
+{"t":"p","x":"Te lo chiediamo uniti con tutto il cuore a Te,"},
+{"t":"p","x":"che sei presente nel mistero eucaristico"},
+{"t":"p","x":"che ora veneriamo,"},
+{"t":"p","x":"e la cui vita e ministero condividiamo."},
+{"t":"p","x":"Tu che vivi e regni con il Padre e con lo Spirito Santo"},
+{"t":"p","x":"Nei secoli dei secoli."},
+{"t":"p","x":"Amen."}
+]},
+{id:"131",num:131,title:"Veni, Sancte Spiritus",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Vieni, Santo Spirito, riempi il cuore dei tuoi fedeli,"},
+{"t":"p","x":"accendi in essi il fuoco del tuo amore"},
+{"t":"v","x":"Manda il tuo Spirito: tutto sarà ricreato,"},
+{"t":"p","x":"R. E rinnoverai la faccia della terra."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"O Dio,"},
+{"t":"p","x":"che hai illuminato i cuori dei tuoi fedeli"},
+{"t":"p","x":"con la luce dello Spirito Santo,"},
+{"t":"p","x":"rendici a Lui docili"},
+{"t":"p","x":"perché possiamo agire sempre bene"},
+{"t":"p","x":"e godere della sua consolazione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"132",num:132,title:"Radunati nel tuo nome",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Radunati nel tuo nome, o Signore,"},
+{"t":"p","x":"vogliamo stare alla tua presenza!"},
+{"t":"p","x":"Concedi a noi uno spirito capace di dialogo,"},
+{"t":"p","x":"illumina le nostre menti con la luce della tua verità"},
+{"t":"p","x":"e rafforza il nostro spirito fraterno"},
+{"t":"p","x":"affinché cerchiamo, sempre insieme,"},
+{"t":"p","x":"di conoscere e di compiere la tua volontà."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"133",num:133,title:"Donaci la sapienza (Sap 9, 1-6.9-11)",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Dio dei padri e Signore di misericordia,"},
+{"t":"p","x":"che tutto hai creato con la tua parola,"},
+{"t":"p","x":"che con la tua sapienza hai formato l’uomo,"},
+{"t":"p","x":"perché domini sulle creature fatte da te,"},
+{"t":"p","x":"e governi il mondo con santità e giustizia,"},
+{"t":"p","x":"e pronunzi giudizi con animo retto,"},
+{"t":"p","x":"dammi la sapienza che siede in trono accanto a te"},
+{"t":"p","x":"e non mi escludere dal numero dei tuoi figli,"},
+{"t":"p","x":"perché io sono tuo servo e figlio della tua ancella,"},
+{"t":"p","x":"uomo debole e di vita breve,"},
+{"t":"p","x":"incapace di comprendere la giustizia e le leggi."},
+{"t":"p","x":"Se anche uno fosse il più perfetto tra gli uomini,"},
+{"t":"p","x":"mancandogli la tua sapienza, sarebbe stimato un nulla."},
+{"t":"p","x":"Con te è la sapienza che conosce le tue opere,"},
+{"t":"p","x":"che era presente quando creavi il mondo;"},
+{"t":"p","x":"essa conosce che cosa è gradito ai tuoi occhi"},
+{"t":"p","x":"e ciò che è conforme ai tuoi decreti."},
+{"t":"p","x":"Inviala dai cieli santi, mandala dal tuo trono glorioso"},
+{"t":"p","x":"perché mi assista e mi affianchi nella mia fatica"},
+{"t":"p","x":"e io sappia ciò che ti è gradito."},
+{"t":"p","x":"Essa infatti tutto conosce e tutto comprende,"},
+{"t":"p","x":"e mi guiderà prudentemente nelle mie azioni"},
+{"t":"p","x":"e mi proteggerà con la sua gloria."},
+{"t":"p","x":"Amen."}
+]},
+{id:"134",num:134,title:"Cercare e compiere insieme la volontà di Dio",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Antifona"},
+{"t":"p","x":"Dice il Signore: Dove due o tre si riuniranno nel mio nome,"},
+{"t":"p","x":"là sono io in mezzo a loro."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"Dio e Padre nostro, il tuo Figlio ha promesso la sua presenza"},
+{"t":"p","x":"nel cuore di quanti sono radunati nel suo nome:"},
+{"t":"p","x":"fa’ che lo sentiamo presente in mezzo a noi;"},
+{"t":"p","x":"che esprimiamo la comunione di vita"},
+{"t":"p","x":"e la missione di tutto l’Istituto,"},
+{"t":"p","x":"al fine di cominciare una vita nuova"},
+{"t":"v","x":"obbedienti allo Spirito"},
+{"t":"p","x":"e in piena fedeltà al nostro carisma missionario -;"},
+{"t":"p","x":"e fa’ che, conosciuta la tua volontà,"},
+{"t":"p","x":"la compiamo in un unico volere e sentire"},
+{"t":"p","x":"per realizzare la nostra comune missione nella Chiesa."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"135",num:135,title:"Grazia e disposizioni per il dialogo",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Siamo qui, o Signore,"},
+{"t":"p","x":"riuniti nel tuo nome e desiderosi di realizzare il tuo Regno."},
+{"t":"p","x":"Lo Spirito Santo, che hai inviato"},
+{"t":"p","x":"nei nostri cuori"},
+{"t":"p","x":"e che mantiene viva la tua presenza fra di noi"},
+{"t":"p","x":"ci insegni ciò che dobbiamo approfondire"},
+{"t":"p","x":"e fin dove dobbiamo camminare,"},
+{"t":"p","x":"affinché, rafforzati dalla tua grazia,"},
+{"t":"p","x":"possiamo realizzare i tuoi disegni."},
+{"t":"p","x":"Sii tu, Spirito Santo,"},
+{"t":"p","x":"l’ispiratore e l’animatore del nostro discernimento."},
+{"t":"p","x":"Insegnaci ad ascoltare gli altri,"},
+{"t":"p","x":"a lasciarci illuminare dalle loro luci,"},
+{"t":"p","x":"a proporre e a non imporre."},
+{"t":"p","x":"Donaci l’equità."},
+{"t":"p","x":"Liberaci dalla cecità di chi ritiene di aver sempre ragione,"},
+{"t":"p","x":"dai favoritismi e da ogni giudizio sulle persone."},
+{"t":"p","x":"Uniti a Te, fa’ che non ci allontaniamo mai dalla verità."},
+{"t":"p","x":"Amen."}
+]},
+{id:"136",num:136,title:"Luce per scoprire le esigenze del Vangelo",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Padre buono,"},
+{"t":"p","x":"guarda questa comunità radunata nel tuo nome"},
+{"t":"p","x":"per condividere la fraternità e dialogare nella verità."},
+{"t":"p","x":"Concedile di scoprire con maggiore chiarezza"},
+{"t":"p","x":"le esigenze del Vangelo"},
+{"t":"p","x":"per essere luce del mondo e sale della terra."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"137",num:137,title:"Preghiera per iniziare una riunione",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"La tua grazia, Signore, ispiri,"},
+{"t":"p","x":"sostenga ed accompagni le nostre opere"},
+{"t":"p","x":"perché il nostro lavoro cominci da Te, come da sua fonte,"},
+{"t":"p","x":"e tenda a Te, come a suo termine."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"138",num:138,title:"Ringraziamento per un incontro",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Padre di bontà,"},
+{"t":"p","x":"ti ringraziamo per questo incontro"},
+{"t":"p","x":"nel quale abbiamo condiviso"},
+{"t":"p","x":"le nostre attese e le nostre disillusioni,"},
+{"t":"p","x":"i nostri progetti e le nostre fatiche."},
+{"t":"p","x":"Fa’ che rispondiamo sempre efficacemente"},
+{"t":"p","x":"alla nostra vocazione e alla nostra missione nella Chiesa,"},
+{"t":"p","x":"sull’esempio del Claret, nostro Padre e Fondatore."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"139",num:139,title:"Un cuor solo e un’anima sola",theme:"riunioni",sub:null,tags:[],lines:[
+{"t":"p","x":"Ti ringraziamo per questo incontro comunitario, Signore;"},
+{"t":"p","x":"e per la tua bontà,"},
+{"t":"p","x":"per la tua presenza fra noi."},
+{"t":"p","x":"Fa’ che con spirito fraterno"},
+{"t":"p","x":"conserviamo un sol cuore e un’anima sola"},
+{"t":"p","x":"per essere una comunità"},
+{"t":"p","x":"evangelizzata ed evangelizzante."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"**Preghiere per iniziare gli esercizi spirituali**"}
+]},
+{id:"144",num:144,title:"Preghiera del P. Fondatore",theme:"esercizi",sub:null,tags:[],lines:[
+{"t":"p","x":"all’inizio degli esercizi"},
+{"t":"p","x":"A te, Vergine Maria, Madre mia,"},
+{"t":"p","x":"che hai conosciuto la consolazione"},
+{"t":"p","x":"di vedere riuniti nel Cenacolo gli Apostoli e i discepoli,"},
+{"t":"p","x":"e la gioia di saperli tutti pieni di Spirito Santo,"},
+{"t":"p","x":"con tutta confidenza, io ti chiedo"},
+{"t":"p","x":"mi ottenga tutte le grazie necessarie"},
+{"t":"p","x":"a far bene e sotto la tua protezione questi esercizi spirituali."},
+{"t":"p","x":"Sostienimi nel proposito di compiere tutto ciò che"},
+{"t":"p","x":"riconosca sia per la maggior gloria di Dio"},
+{"t":"p","x":"e per il bene dell’anima mia."},
+{"t":"p","x":"Soccorrimi e proteggimi, Madre mia, ora e sempre."},
+{"t":"p","x":"Amen."}
+]},
+{id:"157",num:157,title:"Litanie di San Giuseppe",theme:"san-giuseppe",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, pietà"},
+{"t":"p","x":"Cristo, pietà"},
+{"t":"p","x":"Signore, pietà"},
+{"t":"p","x":"Cristo, ascoltaci"},
+{"t":"p","x":"Cristo, esaudiscici"},
+{"t":"p","x":"Dio, Padre celeste"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"p","x":"Figlio, Redentore del mondo, Dio"},
+{"t":"p","x":"Spirito Santo, Dio"},
+{"t":"p","x":"Santa Trinità, unico Dio"},
+{"t":"p","x":"Santa Maria"},
+{"t":"r","x":"prega per noi"},
+{"t":"p","x":"San Giuseppe"},
+{"t":"p","x":"Discendente illustre di Davide"},
+{"t":"p","x":"Luce dei patriarchi"},
+{"t":"p","x":"Sposo della Madre di Dio"},
+{"t":"p","x":"Casto custode della Vergine"},
+{"t":"p","x":"Educatore del Figlio di Dio"},
+{"t":"p","x":"Difensore diligente di Cristo"},
+{"t":"p","x":"Capo della Sacra Famiglia"},
+{"t":"p","x":"Giusepe giustissimo"},
+{"t":"p","x":"Giuseppe castissimo"},
+{"t":"p","x":"Giuseppe prudentissimo"},
+{"t":"p","x":"Giuseppe fortissimo"},
+{"t":"p","x":"Giuseppe obbedientissimo"},
+{"t":"p","x":"Giuseppe fedelissimo"},
+{"t":"p","x":"Specchio di pazienza"},
+{"t":"p","x":"Amante della povertà"},
+{"t":"p","x":"Esemplare lavoratore"},
+{"t":"p","x":"Onore della vita familiare"},
+{"t":"p","x":"Custode delle vergini"},
+{"t":"p","x":"Sostegno delle famiglie"},
+{"t":"p","x":"Consolazione degli afflitti"},
+{"t":"p","x":"Speranza degli infermi"},
+{"t":"p","x":"Patrono dei moribondi"},
+{"t":"p","x":"Protettore della Sacra Famiglia"},
+{"t":"p","x":"Agnello di Dio,"},
+{"t":"p","x":"che togli il peccato del mondo, perdonaci, Signore"},
+{"t":"p","x":"Agnello di Dio,"},
+{"t":"p","x":"che togli il peccato del mondo, ascoltaci, Signore"},
+{"t":"p","x":"Agnello di Dio,"},
+{"t":"p","x":"che togli il peccato del mondo,"},
+{"t":"r","x":"abbi pietà di noi"},
+{"t":"v","x":"Lo costituì signore della sua casa"},
+{"t":"p","x":"R. E lo mise a capo dei suo beni."},
+{"t":"rub","x":"Preghiamo."},
+{"t":"p","x":"O Dio, che nella tua ineffabile provvidenza ti sei degnato di scegliere San Giuseppe come sposo della Madre di tuo Figlio, concedi a noi che lo veneriamo sulla terra come protettore, di averlo come intercessore nel cielo. Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"PREGHIERE A SAN GIUSEPPE"}
+]},
+{id:"158",num:158,title:"Beato Giuseppe",theme:"san-giuseppe",sub:null,tags:[],lines:[
+{"t":"p","x":"Beato Giuseppe,"},
+{"t":"p","x":"per quell’amore che ti mantenne unito"},
+{"t":"p","x":"alla Vergine Madre di Dio"},
+{"t":"p","x":"e per l’amore paterno con cui curasti il Bambino Gesù,"},
+{"t":"p","x":"ti preghiamo umilmente di guardare"},
+{"t":"p","x":"alla famiglia del tuo Figlio,"},
+{"t":"p","x":"da lui acquistata a prezzo del suo sangue,"},
+{"t":"p","x":"e col tuo aiuto, soccorri, ti preghiamo, alle nostre necessità."},
+{"t":"p","x":"Allontana da noi ogni errore ed ogni peccato;"},
+{"t":"p","x":"assistici nella lotta contro il potere del male,"},
+{"t":"p","x":"e difendi la Santa Chiesa di Dio da ogni avversità;"},
+{"t":"p","x":"proteggi ciascuno di noi,"},
+{"t":"p","x":"affinché, col tuo esempio, e sostenuti dal tuo patrocinio,"},
+{"t":"p","x":"possiamo santamente vivere,"},
+{"t":"p","x":"piamente morire e conseguire la beatitudine eterna."},
+{"t":"p","x":"Amen."}
+]},
+{id:"159",num:159,title:"Preghiera a San Giuseppe di Leone XIII",theme:"san-giuseppe",sub:null,tags:[],lines:[
+{"t":"p","x":"A te, o Beato Giuseppe,"},
+{"t":"p","x":"stretti dalla tribolazione ricorriamo,"},
+{"t":"p","x":"e, fiduciosi,"},
+{"t":"p","x":"invochiamo il tuo patrocinio"},
+{"t":"p","x":"con quello della tua santissima Sposa."},
+{"t":"p","x":"Per quel vincolo di carità"},
+{"t":"p","x":"che ti strinse all’Immacolata Vergine Maria, Madre di Dio,"},
+{"t":"p","x":"e per l’amore paterno che portasti al fanciullo Gesù,"},
+{"t":"p","x":"guarda, te ne preghiamo, con occhio benigno"},
+{"t":"p","x":"la cara eredità che Gesù Cristo acquistò col suo Sangue"},
+{"t":"p","x":"e col tuo potere ed aiuto sovvieni ai nostri bisogni."},
+{"t":"p","x":"Proteggi, o provvido custode della divina Famiglia,"},
+{"t":"p","x":"l’eletta prole di Gesù Cristo:"},
+{"t":"p","x":"allontana da noi, o Padre amatissimo,"},
+{"t":"p","x":"gli errori e i vizi che corrompono il mondo,"},
+{"t":"p","x":"assistici propizio dal cielo in questa lotta col potere del male,"},
+{"t":"p","x":"o nostro fortissimo protettore:"},
+{"t":"p","x":"e come un tempo salvasti dalla morte"},
+{"t":"p","x":"la minacciata vita del Bambino Gesù,"},
+{"t":"p","x":"così ora difendi la Santa Chiesa di Dio"},
+{"t":"p","x":"dalle ostili insidie e da ogni avversità;"},
+{"t":"p","x":"e copri ciascuno di noi con il tuo continuo patrocinio,"},
+{"t":"p","x":"affinché sul tuo esempio e col tuo soccorso"},
+{"t":"p","x":"possiamo virtuosamente vivere,"},
+{"t":"p","x":"piamente morire"},
+{"t":"p","x":"e conseguire l’eterna beatitudine in cielo."},
+{"t":"p","x":"Amen."}
+]},
+{id:"160",num:160,title:"Preghiera a San Giuseppe di Giovanni XXIII",theme:"san-giuseppe",sub:null,tags:[],lines:[
+{"t":"p","x":"“O san Giuseppe, custode di Gesù, sposo castissimo di Maria,"},
+{"t":"p","x":"che hai trascorso la vita nell’adempimento perfetto del dovere,"},
+{"t":"p","x":"sostenendo con il lavoro delle tue mani"},
+{"t":"p","x":"la Sacra Famiglia di Nazaret,"},
+{"t":"p","x":"proteggi propizio noi tutti che, con fiducia, a te ci rivolgiamo."},
+{"t":"p","x":"Tu conosci le nostre aspirazioni,"},
+{"t":"p","x":"le nostre angustie,"},
+{"t":"p","x":"e le nostre speranze: e noi a te ricorriamo,"},
+{"t":"p","x":"perché sappiamo di trovare in te chi ci capisce e ci protegge."},
+{"t":"p","x":"Anche tu hai sperimentato la prova,"},
+{"t":"p","x":"la fatica, la stanchezza;"},
+{"t":"p","x":"ma, pure in mezzo alle preoccupazioni della vita materiale,"},
+{"t":"p","x":"il tuo animo ricolmo della più profonda pace,"},
+{"t":"p","x":"esultò di gioia indicibile per l’intimità con il Figlio di Dio,"},
+{"t":"p","x":"a te affidato, e con Maria, sua dolcissima Madre."},
+{"t":"p","x":"Fa’ che anche noi comprendiamo"},
+{"t":"p","x":"di non essere soli nel nostro lavoro,"},
+{"t":"p","x":"ma sappiamo scoprire Gesù accanto a noi,"},
+{"t":"p","x":"accoglierlo con la grazia, custodirlo fedelmente"},
+{"t":"p","x":"come tu hai fatto."},
+{"t":"p","x":"E ottieni che in ogni famiglia, in ogni officina,"},
+{"t":"p","x":"in ogni laboratorio, nella nostra Congregazione,"},
+{"t":"p","x":"ovunque un cristiano lavora,"},
+{"t":"p","x":"tutto sia santificato, nella carità,"},
+{"t":"p","x":"nella pazienza, nella giustizia,"},
+{"t":"p","x":"nella ricerca del ben fare,"},
+{"t":"p","x":"affinché abbondanti discendano i doni della celeste predilezione."},
+{"t":"p","x":"Amen."}
+]},
+{id:"161",num:161,title:"Preghiera a San Giuseppe",theme:"san-giuseppe",sub:null,tags:[],lines:[
+{"t":"p","x":"Ave, Giuseppe, sposo verginale di Maria"},
+{"t":"p","x":"e Padre putativo del Signore."},
+{"t":"p","x":"Tu sei benedetto fra tutti gli uomini"},
+{"t":"p","x":"e benedetto è Gesù, il Figlio di Dio che a te si affidò."},
+{"t":"p","x":"San Giuseppe,"},
+{"t":"p","x":"patrono della Chiesa universale e della nostra Congregazione,"},
+{"t":"p","x":"mantieni nella pace e nella grazia di Dio"},
+{"t":"p","x":"le nostre comunità e famiglie,"},
+{"t":"p","x":"e soccorrici nell’ora della nostra morte."},
+{"t":"p","x":"Amen."}
+]},
+{id:"162",num:162,title:"Preghiera a San Giuseppe",theme:"san-giuseppe",sub:null,tags:[],lines:[
+{"t":"p","x":"Padre Santo, che hai scelto San Giuseppe"},
+{"t":"p","x":"per un compito così singolare"},
+{"t":"p","x":"e gli hai concesso le grazie necessarie"},
+{"t":"p","x":"a realizzarlo nella casa di Nazaret,"},
+{"t":"p","x":"concedi anche a noi"},
+{"t":"p","x":"le grazie necessarie"},
+{"t":"p","x":"per essere fedeli nell’attuazione"},
+{"t":"p","x":"del nostro ministero"},
+{"t":"p","x":"secondo il carisma e lo spirito della Congregazione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"}
+]},
+{id:"168",num:168,title:"Preghiera alla Beata Martire Maria",theme:"martiri",sub:null,tags:[],lines:[
+{"t":"p","x":"Patrocinio Giner RMI"},
+{"t":"p","x":"Dio grande e misericordioso,"},
+{"t":"p","x":"che donasti alla vergine Beata Maria Patrocinio"},
+{"t":"p","x":"la grazia d’esser generosa nel servizio dei fratelli"},
+{"t":"p","x":"e forte nel martirio, fino al perdono,"},
+{"t":"p","x":"concedi a noi, per sua intercessione,"},
+{"t":"p","x":"di seguire prontamente le orme di Cristo"},
+{"t":"p","x":"sul cammino della croce"},
+{"t":"p","x":"per partecipare un giorno alla gloria della risurrezione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"169",num:169,title:"Preghiera",theme:"beatificazione",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, Padre nostro,"},
+{"t":"p","x":"che hai scelto con amore di predilezione"},
+{"t":"p","x":"tutti i Figli del Cuore della Vergine Maria"},
+{"t":"p","x":"e hai voluto che alcuni di loro"},
+{"t":"p","x":"fossero esempio esimio di virtù,"},
+{"t":"p","x":"feconda la Chiesa con la loro glorificazione"},
+{"t":"p","x":"e fa’ che siano per noi modelli da imitare."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"170",num:170,title:"Preghiera",theme:"beatificazione",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore,"},
+{"t":"p","x":"che vuoi santi"},
+{"t":"p","x":"coloro che hai chiamati nella nostra Congregazione,"},
+{"t":"p","x":"concedi ai nostri fratelli missionari"},
+{"t":"p","x":"che più da vicino hanno seguito le orme del Santo Fondatore"},
+{"t":"p","x":"ed hanno donato la loro vita al servizio del Vangelo,"},
+{"t":"p","x":"di essere glorificati sulla terra"},
+{"t":"p","x":"e annoverati fra i santi del cielo."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"171",num:171,title:"Preghiera",theme:"beatificazione",sub:null,tags:[],lines:[
+{"t":"p","x":"Dio, che esalti gli umili e disperdi i superbi,"},
+{"t":"p","x":"degnati di glorificare il tuo servo N."},
+{"t":"p","x":"e fa’ che il suo nome risplenda fra i tuoi santi in cielo."},
+{"t":"p","x":"Moltiplica le tue grazie a favore di quanti ti invocano"},
+{"t":"p","x":"per sua intercessione."},
+{"t":"p","x":"E concedi che la Chiesa onori, un giorno, la sua memoria,"},
+{"t":"p","x":"proponendolo come modello da imitare"},
+{"t":"p","x":"e come protettore che ci aiuti a sopportare"},
+{"t":"p","x":"le difficoltà della nostra vita missionaria"},
+{"t":"p","x":"e a meritare la vita eterna."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."}
+]},
+{id:"172",num:172,title:"Preghiera per impetrare la beatificazione",theme:"beatificazione",sub:null,tags:[],lines:[
+{"t":"p","x":"Signore, Dio nostro, che hai scelto alcuni nostri fratelli,"},
+{"t":"p","x":"Figli del Cuore Immacolato di Maria,"},
+{"t":"p","x":"e li hai fatti risplendere"},
+{"t":"p","x":"nella vita missionaria"},
+{"t":"p","x":"con l’esempio di una speciale santità,"},
+{"t":"p","x":"degnati di arricchire e di fecondare la Santa Chiesa"},
+{"t":"p","x":"con la sua glorificazione;"},
+{"t":"p","x":"e fa’ che tutti noi,"},
+{"t":"p","x":"seguendo la sua testimonianza evangelica,"},
+{"t":"p","x":"ci impegniamo ardentemente a cercare in tutte le cose"},
+{"t":"p","x":"la tua gloria e la salvezza dei nostri fratelli."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"XI. PREGHIERE PER IL CAPITOLO"}
+]},
+{id:"186",num:186,title:"PREGHIERA PER IL CAPITOLO",theme:"capitolo",sub:null,tags:[],lines:[
+{"t":"p","x":"O Spirito Divino,"},
+{"t":"p","x":"che inviato dal Padre nel nome di Gesù,"},
+{"t":"p","x":"assisti e guidi infallibilmente la Chiesa,"},
+{"t":"p","x":"infondi sul Capitolo la pienezza dei tuoi doni."},
+{"t":"p","x":"O soave Maestro e Consolatore,"},
+{"t":"p","x":"illumina le menti dei Capitolari;"},
+{"t":"p","x":"fa’ che da questo Capitolo scaturiscano frutti abbondanti,"},
+{"t":"p","x":"nuovo vigore nell’impegno alla santificazione"},
+{"t":"p","x":"e all’apostolato,"},
+{"t":"p","x":"specialmente alla diffusione della luce"},
+{"t":"p","x":"e della forza del Vangelo fra gli uomini."},
+{"t":"p","x":"Ospite dolce dei cuori,"},
+{"t":"p","x":"conferma le menti nella verità,"},
+{"t":"p","x":"disponi il cuore di tutti all’obbedienza"},
+{"t":"p","x":"perché le conclusioni del Capitolo"},
+{"t":"p","x":"trovino accoglienza generosa e compimento."},
+{"t":"p","x":"Rinnova nella nostra Congregazione,"},
+{"t":"p","x":"e in ciascuno di noi,"},
+{"t":"p","x":"lo spirito che animò Sant’Antonio Maria Claret,"},
+{"t":"p","x":"nostro Padre."},
+{"t":"p","x":"Concedici che,"},
+{"t":"p","x":"riuniti in preghiera unanime ed intensa"},
+{"t":"p","x":"intorno al Cuore di Maria, nostra Madre,"},
+{"t":"p","x":"procuriamo sempre e soltanto"},
+{"t":"p","x":"la maggior gloria di Dio e la salvezza delle anime."},
+{"t":"p","x":"Amen."}
+]},
+{id:"187",num:187,title:"PRECI PER IL CAPITOLO",theme:"capitolo",sub:null,tags:[],lines:[
+{"t":"p","x":"Glorifichiamo il Padre che ci ha chiamati nel suo Figlio Gesù a condividere la vita missionaria, e diciamogli:"},
+{"t":"p","x":"Donaci l’unzione del tuo Spirito."},
+{"t":"p","x":"Ci hai chiamati in una Congregazione missionaria,"},
+{"t":"v","x":"fa’ che, guidati dallo Spirito, i capitolari cerchino la fedeltà all’annuncio del Regno."},
+{"t":"p","x":"Ci hai chiamati a seguire Gesù, l’inviato del Padre,"},
+{"t":"v","x":"l’unzione del tuo Spirito ci abiliti ad essere testimoni della sua Risurrezione."},
+{"t":"p","x":"Resi forti dalla viva memoria del nostro Padre Fondatore, Sant’Antonio Maria Claret,"},
+{"t":"v","x":"ti preghiamo: il Capitolo ricerchi la gloria di Dio, la santificazione dei missionari e la salvezza degli uomini di tutto il mondo."},
+{"t":"p","x":"Spinti dall’amore per Dio e per i fratelli, che è stato riversato nei nostri cuori,"},
+{"t":"v","x":"ti chiediamo: concedi a noi di costruire le nostre comunità in un progetto comune di missione, per annunciare e per vivere il Vangelo."},
+{"t":"p","x":"Sollecitati da ciò che è più opportuno ed efficace nel compimento della nostra missione, attese le circostanze di luogo, di tempo e di persone,"},
+{"t":"v","x":"ti chiediamo, Signore: aiutaci a determinare un buon programma di azione e di vita missionaria, in comunione con tutta Congregazione."},
+{"t":"p","x":"Signore e Padre nostro, per l’intercessione di Maria, Madre e Fondatrice della nostra Congregazione, mandaci il tuo Spirito perché sull’esempio del tuo Figlio Gesù, ci sentiamo spinti, dall’amore verso di Te e verso gli uomini, ad avere occhi penetranti ed orecchie attente sulle necessità del mondo, a mantenere l’unità nonostante le differenze, congregati come siamo nella stessa comunità, e a realizzare la missione che abbiamo ricevuto attraverso Sant’Antonio Maria Claret, nostro Padre."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"**P****reghiera**** per ****il**** XXVII ****capitolo**** ****generale**"},
+{"t":"p","x":"Vieni, Spirito Santo,"},
+{"t":"p","x":"soffio del Padre"},
+{"t":"p","x":"e fuoco vivo del Figlio risorto:"},
+{"t":"p","x":"rinnova la nostra Congregazione."},
+{"t":"p","x":"Fa’ che la preparazione al Capitolo Generale"},
+{"t":"p","x":"sia un tempo di grazia, di ascolto e di discernimento."},
+{"t":"p","x":"Effondi su di noi una rinnovata Pentecoste,"},
+{"t":"p","x":"perché possiamo camminare insieme nella comunione,"},
+{"t":"p","x":"come missionari mistici e profetici"},
+{"t":"p","x":"al servizio dell’unica missione di Cristo."},
+{"t":"p","x":"Uniti a Maria, nostra Madre,"},
+{"t":"p","x":"a sant’Antonio Maria Claret"},
+{"t":"p","x":"e alla testimonianza fedele dei nostri martiri,"},
+{"t":"p","x":"insegnaci ad ascoltare la tua voce"},
+{"t":"p","x":"nel grido dei poveri,"},
+{"t":"p","x":"nelle ferite del mondo"},
+{"t":"p","x":"e nella vita delle nostre comunità."},
+{"t":"p","x":"Plasmaci nella fucina del Cuore Immacolato di Maria,"},
+{"t":"p","x":"perché, guidati dal tuo Spirito,"},
+{"t":"p","x":"diventiamo segni di fraternità, di speranza"},
+{"t":"p","x":"e di ardore missionario"},
+{"t":"p","x":"per la Chiesa e per il mondo."},
+{"t":"p","x":"Amen."}
+]},
+{id:"201",num:201,title:"Ave, Maria, piena di grazia.",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"Il Signore è con te"},
+{"t":"p","x":"Sii benedetto per sempre, Signore"},
+{"t":"p","x":"Signore, Gesù, che a Cana di Galilea,"},
+{"t":"p","x":"per intercessione della Madre tua,"},
+{"t":"p","x":"mutasti l’acqua in vino"},
+{"t":"p","x":"benedici il cibo che stiamo per prendere,"},
+{"t":"p","x":"e concedici, mentre quest’oggi ricordiamo la Vergine Maria,"},
+{"t":"p","x":"di dedicarci, come elle fece,"},
+{"t":"p","x":"al servizio del tuo disegno di salvezza"},
+{"t":"p","x":"per tutti gli uomini."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SAN GIUSEPPE"},
+{"t":"p","x":"(19 MARZO – 1 MAGGIO)"}
+]},
+{id:"202",num:202,title:"Il Signore lo amò perché fu uomo giusto",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"e rese al suo lavoro il cento per uno."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore*"},
+{"t":"p","x":"Dio provvidente, che affidasti alla fedele custodia"},
+{"t":"p","x":"di San Giuseppe il tuo Figlio unigenito e sua Madre, Maria,"},
+{"t":"p","x":"benedici il pane del nostro sudore e concedici"},
+{"t":"p","x":"di lavorare senza riposo all’espansione del tuo Regno."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"FESTA DEL CUORE DI MARIA"}
+]},
+{id:"203",num:203,title:"Ti ringraziamo e ti benediciamo, Signore,",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"per il dono inestimabile di essere e di chiamarci"},
+{"t":"p","x":"Figli del Cuore Immacolato di Maria."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore*"},
+{"t":"p","x":"Signore, Dio nostro,"},
+{"t":"p","x":"che ti sei degnato di convocarci nella Congregazione"},
+{"t":"p","x":"facendoci Figli del Cuore Immacolato della Madre tua,"},
+{"t":"p","x":"concedi ai tuoi fedeli di vivere intensamente la pietà filiale verso Maria"},
+{"t":"p","x":"e benedici noi ora riuniti intorno a questa mensa"},
+{"t":"p","x":"dove esprimiamo e dividiamo la nostra fraternità."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SANTA CATERINA DA SIENA, COMPATRONA"},
+{"t":"p","x":"(29 APRILE)"}
+]},
+{id:"204",num:204,title:"Ti lodiamo, Signore, perché in Santa Caterina da Siena",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"ci doni prova di potenza e sapienza."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"Signore Dio nostro,"},
+{"t":"p","x":"che donasti a Santa Caterina da Siena"},
+{"t":"p","x":"di ardere di amore per Te e per la Chiesa,"},
+{"t":"p","x":"benedici questo cibo che stiamo per prendere"},
+{"t":"p","x":"e concedi a noi di mantenerci sempre alla tua presenza"},
+{"t":"p","x":"e di essere nella tua Chiesa agenti di comunione."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"FESTE DEGLI APOSTOLI"}
+]},
+{id:"205",num:205,title:"Sii benedetto, Gesù, inviato e testimone del Padre.",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"Sii benedetto per sempre, Signore"},
+{"t":"p","x":"Sii benedetto, Signore, per i frutti della terra"},
+{"t":"p","x":"e del lavoro dell’uomo:"},
+{"t":"p","x":"aiutino questa comunità di vita apostolica"},
+{"t":"p","x":"a mantenersi fedele al tuo santo servizio."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"}
+]},
+{id:"206",num:206,title:"Ti lodiamo e ti benediciamo, Cristo,",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"che prolunghi la tua presenza e la tua parola nel mondo"},
+{"t":"p","x":"per mezzo degli Apostoli."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"Signore Gesù, che ci invii come inviasti gli Apostoli"},
+{"t":"p","x":"a predicare la Buona Novella del Regno,"},
+{"t":"p","x":"benedici questo cibo che stiamo per prendere"},
+{"t":"p","x":"e rendici ministri idonei della tua Parola,"},
+{"t":"p","x":"apostoli instancabili del tuo Regno."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen"}
+]},
+{id:"207",num:207,title:"Signore Gesù, atteso dai profeti",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"e annunciato dagli apostoli e dagli evangelisti."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"Signore Gesù, che per amore al Padre e ai fratelli,"},
+{"t":"p","x":"hai voluto offrirti al sacrificio e alla morte"},
+{"t":"p","x":"e fare degli apostoli testimoni della tua vita"},
+{"t":"p","x":"e della tua risurrezione,"},
+{"t":"p","x":"benedici il nostro cibo e donaci la gioia"},
+{"t":"p","x":"della tua presenza viva in mezzo a noi."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen"}
+]},
+{id:"208",num:208,title:"Signore Gesù, che chiamasti gli Apostoli",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"perché stessero con te e per inviarli a predicare."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"Tu, o Signore, che hai affidato agli Apostoli"},
+{"t":"p","x":"il compito di andare nel mondo intero"},
+{"t":"p","x":"a predicare la Buona Novella"},
+{"t":"p","x":"e hai chiamato noi"},
+{"t":"p","x":"ad una vita perfettamente apostolica,"},
+{"t":"p","x":"benedici la nostra mensa e concedi che un giorno"},
+{"t":"p","x":"possiamo partecipare al banchetto del tuo Regno."},
+{"t":"p","x":"Tu che vivi e regni nei secoli dei secoli."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"ANNIVERSARIO DELLA FONDAZIONE DELLA CONGREGAZIONE (16 LUGLIO)"}
+]},
+{id:"209",num:209,title:"Benediciamo il Signore, che ha suscitato nella Chiesa",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"la nostra Congregazione di Missionari."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"Signore Dio nostro che,"},
+{"t":"p","x":"a tua maggior gloria, per la nostra santificazione"},
+{"t":"p","x":"e per la salvezza degli uomini,"},
+{"t":"p","x":"hai fondato la nostra Congregazione"},
+{"t":"p","x":"con l’intervento speciale"},
+{"t":"p","x":"della Vergine Maria"},
+{"t":"p","x":"e per mezzo di S. Antonio Maria Claret,"},
+{"t":"p","x":"mentre ti ringraziamo per questo cibo"},
+{"t":"p","x":"col quale oggi ci benedici,"},
+{"t":"p","x":"ti chiediamo di concederci"},
+{"t":"p","x":"di essere ogni giorno più fedeli alla tua chiamata,"},
+{"t":"p","x":"secondo il nostro carisma missionario nella Chiesa."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SANT’IGNAZIO DI LOYOLA"},
+{"t":"p","x":"(31 LUGLIO)"}
+]},
+{id:"210",num:210,title:"Glorifichiamo e lodiamo il Signore",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"che tutto dispone al bene di coloro che ama."},
+{"t":"p","x":"Sii benedetto per sempre, Signore."},
+{"t":"p","x":"Signore, Dio nostro, che hai suscitato nella tua Chiesa"},
+{"t":"p","x":"Sant’Ignazio di Loyola per estendere in tutto il mondo"},
+{"t":"p","x":"la gloria del tuo nome:"},
+{"t":"p","x":"benedici questi alimenti e donaci fame e sete di giustizia"},
+{"t":"p","x":"per cercare in ogni cosa la tua gloria"},
+{"t":"p","x":"e la salvezza dei nostri fratelli."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SANT’ALFONSO MARIA DE’ LIGUORI,"},
+{"t":"p","x":"COMPATRONO (1 AGOSTO)"}
+]},
+{id:"211",num:211,title:"I santi sono gli amici di Dio",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"che rendono testimonianza della santità divina."},
+{"t":"p","x":"Sii benedetto per sempre, Signore."},
+{"t":"p","x":"Signore, Dio nostro,"},
+{"t":"p","x":"che hai fatto di Sant’Alfonso Maria de’ Liguori"},
+{"t":"p","x":"un saggio e zelante predicatore della tua Parola:"},
+{"t":"p","x":"riversa su di noi la tua benedizione"},
+{"t":"p","x":"mentre condividiamo questo cibo che per noi hai preparato"},
+{"t":"p","x":"come segno della nostra fede comune"},
+{"t":"p","x":"e della nostra missione apostolica."},
+{"t":"p","x":"Fa’ che condividiamo con i bisognosi"},
+{"t":"p","x":"la tua divina Parola e i beni con i quali ci benedici."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"BEATI MARTIRI DI BARBASTRO"},
+{"t":"p","x":"(13 AGOSTO)"}
+]},
+{id:"212",num:212,title:"Signore Gesù,",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"che hai voluto fossimo battezzati col tuo battesimo"},
+{"t":"p","x":"e ci hai concesso di poter bere al calice che il Padre ti ha dato."},
+{"t":"p","x":"Sii benedetto per sempre, Signore."},
+{"t":"p","x":"Signore Gesù che hai dato fede ai Profeti e agli Apostoli,"},
+{"t":"p","x":"generosità ai Martiri Clarettiani di Barbastro"},
+{"t":"p","x":"nella loro offerta a Te fino al martirio,"},
+{"t":"p","x":"rafforza il nostro corpo"},
+{"t":"p","x":"con il cibo che stiamo per prendere"},
+{"t":"p","x":"e infondici la forza necessaria"},
+{"t":"p","x":"per vivere sempre di fede,"},
+{"t":"p","x":"dedicati al tuo servizio."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SANTI MICHELE, RAFFAELE, GABRIELE ED ANGELI CUSTODI, COMPATRONI"},
+{"t":"p","x":"(29 SETTEMBRE e 2 OTTOBRE)"}
+]},
+{id:"213",num:213,title:"Con il coro degli angeli",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"ti lodiamo e ti benediciamo, Signore"},
+{"t":"p","x":"Sii benedetto per sempre, Signore."},
+{"t":"p","x":"Signore, Dio nostro,"},
+{"t":"p","x":"che manifesti sempre la tua provvidenza,"},
+{"t":"p","x":"benedici la nostra tavola, segno della tua generosità"},
+{"t":"p","x":"per noi."},
+{"t":"p","x":"E fa’ che non ci manchi mai"},
+{"t":"p","x":"l’aiuto di coloro che ti servono in cielo"},
+{"t":"p","x":"perché ti possiamo lodare anche noi per tutta l’eternità."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SANTA TERESA DI GESU’ COMPATRONA"},
+{"t":"p","x":"(15 OTTOBRE)"}
+]},
+{id:"214",num:214,title:"Il nostro spirito, Signore ha sete di te,",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"come terra arida e senz’acqua."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"O Dio, che hai suscitato nella tua Chiesa"},
+{"t":"p","x":"Santa Teresa di Gesù"},
+{"t":"p","x":"e attraverso di lei ci hai manifestato una via alla perfezione:"},
+{"t":"p","x":"fa’ che desideriamo non soltanto il cibo per il corpo,"},
+{"t":"p","x":"ma anche il pane quotidiano della tua Parola e del tuo Corpo"},
+{"t":"p","x":"per crescere efficacemente nella nostra santificazione"},
+{"t":"p","x":"annunciando il tuo Regno"},
+{"t":"p","x":"secondo il nostro carisma nella Chiesa."},
+{"t":"p","x":"Per Cristo nostro Signore."},
+{"t":"p","x":"Amen"},
+{"t":"p","x":"SANT’ANTONIO MARIA CLARET, FONDATORE"},
+{"t":"p","x":"(24 OTTOBRE)"}
+]},
+{id:"215",num:215,title:"Sii benedetto Signore Gesù,",theme:"mensa",sub:null,tags:[],lines:[
+{"t":"p","x":"Figlio e inviato del Padre."},
+{"t":"p","x":"*Sii benedetto per sempre, Signore.*"},
+{"t":"p","x":"Benedici questo cibo che stiamo per prendere, Signore,"},
+{"t":"p","x":"e infondi in noi lo stesso spirito"},
+{"t":"p","x":"che animò Sant’Antonio Maria Claret, nostro Padre,"},
+{"t":"p","x":"perché, da lui sollecitati,"},
+{"t":"p","x":"siamo sempre disposti a proclamare la tua Parola"},
+{"t":"p","x":"e a dare la vita per i fratelli."},
+{"t":"p","x":"Tu che vivi e regni, nei secoli dei secoli."},
+{"t":"p","x":"Amen."},
+{"t":"p","x":"1"}
+]},
+{id:"xxvii",num:"",title:"Preghiera per il XXVII Capitolo Generale",theme:"capitolo",sub:null,tags:["capitolo"],lines:[
+{"t":"p","x":"Vieni, Spirito Santo,"},
+{"t":"p","x":"soffio del Padre e fuoco vivo del Figlio risorto:"},
+{"t":"p","x":"rinnova la nostra Congregazione."},
+{"t":"p","x":"Fa' che la preparazione al Capitolo Generale"},
+{"t":"p","x":"sia un tempo di grazia, di ascolto e di discernimento."},
+{"t":"p","x":"Effondi su di noi una rinnovata Pentecoste,"},
+{"t":"p","x":"perché possiamo camminare insieme nella comunione,"},
+{"t":"p","x":"come missionari mistici e profetici"},
+{"t":"p","x":"al servizio dell'unica missione di Cristo."},
+{"t":"p","x":"Uniti a Maria, nostra Madre,"},
+{"t":"p","x":"a sant'Antonio Maria Claret"},
+{"t":"p","x":"e alla testimonianza fedele dei nostri martiri,"},
+{"t":"p","x":"insegnaci ad ascoltare la tua voce"},
+{"t":"p","x":"nel grido dei poveri,"},
+{"t":"p","x":"nelle ferite del mondo"},
+{"t":"p","x":"e nella vita delle nostre comunità."},
+{"t":"p","x":"Plasmaci nella fucina del Cuore Immacolato di Maria,"},
+{"t":"p","x":"perché, guidati dal tuo Spirito,"},
+{"t":"p","x":"diventiamo segni di fraternità, di speranza"},
+{"t":"p","x":"e di ardore missionario per la Chiesa e per il mondo."},
+{"t":"p","x":"Amen."}
+]}
+
+];
+
+const TEMES = [
+ {id:'dio-padre',   nom:'A Dio Padre',   desc:'Preghiere del Padre Fondatore: lode, fiducia e abbandono a Dio.'},
+ {id:'cuore-maria', nom:'Al Cuore di Maria', desc:'Litanie, suppliche e offerte al Cuore Immacolato di Maria.'},
+ {id:'claret',      nom:'Sant\'Antonio M.ª Claret', desc:'Per intercessione del Padre Fondatore.'},
+ {id:'congregazione', nom:'Per la Congregazione', desc:'Identità clarettiana, anniversario della Fondazione e rinnovamento dello spirito.'},
+ {id:'consigli',    nom:'Consigli evangelici e virtù apostoliche', desc:'Povertà, castità, obbedienza e virtù apostoliche.'},
+ {id:'comunita',    nom:'Vita di comunità', desc:'Carità fraterna e preghiera per la propria comunità.'},
+ {id:'missione',    nom:'Missione e apostolato', desc:'Zelo evangelizzatore, missioni e servizio alla Chiesa.'},
+ {id:'vocazioni',   nom:'Vocazioni', desc:'Per chiedere al Signore vocazioni missionarie e la perseveranza.'},
+ {id:'infermi',     nom:'Per gli infermi', desc:'Per i fratelli che soffrono la malattia.'},
+ {id:'defunti',     nom:'Per i defunti', desc:'Per i clarettiani defunti, genitori, familiari e benefattori.'},
+ {id:'angelus',     nom:'Angelus e antifone mariane', desc:'L\'Angelus, il Regina caeli e le antifone di Compieta.'},
+ {id:'eucaristia',  nom:'Eucaristia', desc:'Preghiere davanti al Santissimo Sacramento.'},
+ {id:'riunioni',    nom:'Riunioni e incontri', desc:'Per iniziare e concludere una riunione comunitaria.'},
+ {id:'esercizi',    nom:'Esercizi spirituali', desc:'Per iniziare un ritiro o gli esercizi spirituali.'},
+ {id:'san-giuseppe',nom:'San Giuseppe', desc:'Litanie e preghiere al patrono della Congregazione.'},
+ {id:'martiri',     nom:'Martiri clarettiani', desc:'Ai Beati Martiri della Famiglia Clarettiana.'},
+ {id:'beatificazione', nom:'Beatificazioni', desc:'Petizioni per la beatificazione e canonizzazione.'},
+ {id:'capitolo',    nom:'Capitolo', desc:'Prima del Capitolo, durante la sua celebrazione e per il XXVII Capitolo Generale.'},
+ {id:'mensa',       nom:'Benedizione della mensa', desc:'Per le feste proprie dell\'anno clarettiano.'}
+];
+
+const CIRCUMS = [
+ {t:'Iniziare una riunione',    h:'#/tema/riunioni'},
+ {t:'Concludere una riunione',  h:'#/cerca/Per concludere'},
+ {t:'Benedizione della mensa',  h:'#/tema/mensa'},
+ {t:'Un fratello infermo',      h:'#/tema/infermi'},
+ {t:'Un defunto',               h:'#/tema/defunti'},
+ {t:'Per le vocazioni',         h:'#/tema/vocazioni'},
+ {t:'Rinnovo dei voti',         h:'#/p/50'},
+ {t:'Anniversario della Fondazione', h:'#/cerca/anniversario'},
+ {t:'Litanie',                  h:'#/cerca/Litanie'},
+ {t:'Angelus',                  h:'#/p/101'},
+ {t:'Capitolo Generale',        h:'#/tema/capitolo'}
+];
+
+/* ---------- utilidades ---------- */
+const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const perTema = id => DADES.filter(p=>p.theme===id);
+const idxDe = p => DADES.indexOf(p);
+const troba = id => DADES.find(p=>String(p.id)===String(id));
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const incipit = p => { const l=p.lines.find(l=>l.t==='p'||l.t==='v'); return l?l.x:''; };
+
+/* ---------- favoritos ---------- */
+let favs = new Set(); let favsMem = true;
+async function carregaFavs(){
+  try{ const r = await window.storage.get('cmf-favoriti'); if(r&&r.value){favs=new Set(JSON.parse(r.value)); favsMem=false;} else {favsMem=false;} }
+  catch(e){ favsMem=false; /* clave inexistente: ok */ }
+}
+async function desaFavs(){
+  try{ await window.storage.set('cmf-favoriti', JSON.stringify([...favs])); }catch(e){}
+}
+function toggleFav(id){ if(favs.has(id)) favs.delete(id); else favs.add(id); desaFavs(); render(); }
+
+/* ---------- tamaño del texto ---------- */
+let mida = 1.28;
+function canviaMida(d){ mida = Math.min(2.4, Math.max(.95, mida + d)); document.documentElement.style.setProperty('--fs-preg', mida+'rem'); }
+
+/* ---------- índice lateral ---------- */
+function pintaIdx(temaActiu){
+  const nav = document.getElementById('idxNav');
+  let h = '<div class="idx-titol">Temi</div>';
+  for(const t of TEMES){
+    const n = perTema(t.id).length;
+    h += `<a href="#/tema/${t.id}" class="${temaActiu===t.id?'actiu':''}">${esc(t.nom)}<span class="n">${n}</span></a>`;
+  }
+  if(favs.size) h += `<div class="idx-titol">Preparazione</div><a href="#/favorits" class="${temaActiu==='__fav'?'actiu':''}">Le mie preghiere<span class="n">${favs.size}</span></a>`;
+  nav.innerHTML = h;
+}
+
+/* ---------- búsqueda ---------- */
+function cercaHTML(valor){
+  return `<div class="cerca-wrap"><span class="cerca-ico">⌕</span>
+  <input id="cerca" class="cerca" type="search" value="${esc(valor||'')}" placeholder="Cerca per numero, titolo o parole… (es. «33», «infermi», «Cuore di Maria»)" aria-label="Búsqueda de preghiere" autocomplete="off"></div>`;
+}
+function lligaCerca(){
+  const el = document.getElementById('cerca'); if(!el) return;
+  el.addEventListener('input', ()=>{ const q=el.value.trim();
+    history.replaceState(null,'', q? '#/cerca/'+encodeURIComponent(q) : '#/');
+    pintaResultats(q);
+  });
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const q=el.value.trim(); const ex=DADES.find(p=>String(p.num)===q); if(ex) location.hash='#/p/'+ex.id; } });
+}
+function cercaPreg(q){
+  const nq = norm(q); if(!nq) return [];
+  const res = DADES.map(p=>{
+    let s=0;
+    if(String(p.num||'')===q.trim()) s+=100;
+    else if(String(p.num||'').startsWith(q.trim()) && /^\d/.test(q)) s+=40;
+    if(norm(p.title).includes(nq)) s+=30;
+    if(norm(p.sub||'').includes(nq)) s+=14;
+    if((p.tags||[]).some(t=>norm(t).includes(nq))) s+=14;
+    const cos = norm(p.lines.map(l=>l.x).join(' '));
+    if(cos.includes(nq)) s+=8;
+    return {p,s};
+  }).filter(r=>r.s>0).sort((a,b)=>b.s-a.s).map(r=>r.p);
+  return res;
+}
+function itemHTML(p, mostraTema){
+  const t = TEMES.find(t=>t.id===p.theme);
+  return `<li class="preg-item"><a href="#/p/${p.id}">
+    <span class="foli">${p.num?esc(String(p.num)):'·'}</span>
+    <span><span class="tt">${esc(p.title)}${favs.has(String(p.id))?' <span class="fav-cinta">❧</span>':''}</span>
+    <span class="inc">${esc(incipit(p))}</span></span>
+    ${mostraTema&&t?`<span class="res-tema">${esc(t.nom)}</span>`:(p.sub?`<span class="etq">${esc(p.sub)}</span>`:'')}
+  </a></li>`;
+}
+function pintaResultats(q){
+  const cont = document.getElementById('resultats'); if(!cont) return;
+  if(!q){ cont.innerHTML = portadaCos(); return; }
+  const res = cercaPreg(q);
+  cont.innerHTML = res.length
+    ? `<div class="res-cap">${res.length} preghier${res.length===1?'a trovata':'e trovate'}</div><ul class="llista">${res.map(p=>itemHTML(p,true)).join('')}</ul>`
+    : `<div class="buit">Non è stata trovata nessuna preghiera con «${esc(q)}».<br>Prova con il numero, una parola del titolo o del testo.</div>`;
+}
+
+/* ---------- vistas ---------- */
+function portadaCos(){
+  let h = `<div class="portada">
+    <div class="eyebrow">Raccolta per la preghiera comunitaria</div>
+    <h2>Trova la preghiera per ogni momento</h2>
+    <p class="intro">Ogni preghiera conserva il numero e il titolo della raccolta: chi guida la preghiera può invitare dicendo, ad esempio, «preghiamo con la preghiera 33, La preghiera del clarettiano».</p>
+    <div class="chips">${CIRCUMS.map(c=>`<a class="chip" href="${c.h}">${esc(c.t)}</a>`).join('')}</div>
+    <div class="temes-grid">${TEMES.map(t=>`<a class="tema-card" href="#/tema/${t.id}">
+      <h3>${esc(t.nom)}</h3><div class="desc">${esc(t.desc)}</div>
+      <div class="compta">${perTema(t.id).length} preghiere</div></a>`).join('')}
+    </div></div>`;
+  return h;
+}
+function vistaPortada(q){
+  pintaIdx(null);
+  document.getElementById('pagina').innerHTML = cercaHTML(q) + `<div id="resultats"></div>`;
+  lligaCerca();
+  pintaResultats(q||'');
+  if(q){ const el=document.getElementById('cerca'); el.focus(); el.setSelectionRange(el.value.length,el.value.length); }
+}
+function vistaTema(id){
+  const t = TEMES.find(t=>t.id===id); if(!t){ location.hash='#/'; return; }
+  pintaIdx(id);
+  const pl = perTema(id);
+  const subs = [...new Set(pl.map(p=>p.sub).filter(Boolean))];
+  let llista='';
+  if(subs.length>1){
+    for(const s of subs){ llista += `<div class="sub-grup">${esc(s)}</div><ul class="llista">${pl.filter(p=>p.sub===s).map(p=>itemHTML(p)).join('')}</ul>`; }
+    const sense = pl.filter(p=>!p.sub);
+    if(sense.length) llista = `<ul class="llista">${sense.map(p=>itemHTML(p)).join('')}</ul>` + llista;
+  } else {
+    llista = `<ul class="llista">${pl.map(p=>itemHTML(p)).join('')}</ul>`;
+  }
+  document.getElementById('pagina').innerHTML = cercaHTML('') +
+   `<a class="torna" href="#/">← Tutti i temi</a>
+    <div class="tema-cap"><h2>${esc(t.nom)}</h2><div class="desc">${esc(t.desc)}</div></div>${llista}`;
+  lligaCerca();
+  window.scrollTo(0,0);
+}
+function vistaFavorits(){
+  pintaIdx('__fav');
+  const pl = DADES.filter(p=>favs.has(String(p.id)));
+  document.getElementById('pagina').innerHTML = cercaHTML('') +
+   `<a class="torna" href="#/">← Tutti i temi</a>
+    <div class="tema-cap"><h2>Le mie preghiere</h2><div class="desc">Preghiere contrassegnate per preparare la preghiera comunitaria.</div></div>` +
+   (pl.length?`<ul class="llista">${pl.map(p=>itemHTML(p,true)).join('')}</ul>`
+    :`<div class="buit">Non hai ancora contrassegnato nessuna preghiera.<br>Aprila e tocca «Segna» per salvarla qui.</div>`);
+  lligaCerca(); window.scrollTo(0,0);
+}
+function liniaHTML(l, prev){
+  if(l.t==='rub') return `<p class="rub">${esc(l.x)}</p>`;
+  if(l.t==='v') return `<p class="vers${prev&&prev.t==='r'?' espai':''}">${esc(l.x)}</p>`;
+  if(l.t==='r') return `<p class="resp">${esc(l.x)}</p>`;
+  const espai = prev && (prev.t==='r') ? ' espai':'';
+  return `<p class="${espai.trim()}">${esc(l.x)}</p>`;
+}
+function vistaPreg(id){
+  const p = troba(id); if(!p){ location.hash='#/'; return; }
+  pintaIdx(p.theme);
+  const t = TEMES.find(t=>t.id===p.theme);
+  const i = idxDe(p), ant = DADES[i-1], seg = DADES[i+1];
+  let cos=''; let prev=null;
+  for(const l of p.lines){ cos += liniaHTML(l, prev); prev=l; }
+  const fav = favs.has(String(p.id));
+  document.getElementById('pagina').innerHTML = cercaHTML('') +
+   `<a class="torna" href="#/tema/${p.theme}">← ${esc(t?t.nom:'Temi')}</a>
+    <article class="preg-full">
+      <div class="preg-meta">${esc(t?t.nom:'')}${p.sub?' · '+esc(p.sub):''}</div>
+      ${p.num?`<div class="preg-num">${esc(String(p.num))}</div>`:''}
+      <h2 class="preg-titol">${esc(p.title)}</h2>
+      <div class="preg-eines">
+        <button class="eina surt-lectura" id="btnLectura">📖 Modo preghiera</button>
+        <button class="eina ${fav?'fav-actiu':''}" id="btnFav">${fav?'❧ Segnata':'❧ Segna'}</button>
+        <button class="eina" id="btnCopia">Copia testo</button>
+        <button class="eina" onclick="window.print()">Stampa</button>
+        <span class="mida-grup"><button class="eina mida" id="btnMenys" aria-label="Testo più piccolo">A−</button><button class="eina mida" id="btnMes" aria-label="Testo più grande">A+</button></span>
+      </div>
+      <div class="preg-cos" id="cosPreg">${cos}</div>
+    </article>
+    <nav class="nav-pn">
+      ${ant?`<a href="#/p/${ant.id}"><span class="pn-l">← Precedente</span><span class="pn-t">${ant.num?ant.num+'. ':''}${esc(ant.title)}</span></a>`:'<span></span>'}
+      ${seg?`<a class="seg" href="#/p/${seg.id}"><span class="pn-l">Successiva →</span><span class="pn-t">${seg.num?seg.num+'. ':''}${esc(seg.title)}</span></a>`:''}
+    </nav>`;
+  lligaCerca();
+  document.getElementById('btnFav').onclick = ()=>toggleFav(String(p.id));
+  document.getElementById('btnMes').onclick = ()=>canviaMida(.12);
+  document.getElementById('btnMenys').onclick = ()=>canviaMida(-.12);
+  document.getElementById('btnCopia').onclick = e=>{
+    const txt = (p.num?p.num+'. ':'')+p.title+'\n\n'+p.lines.map(l=>{
+      if(l.t==='v')return 'V/. '+l.x; if(l.t==='r')return 'R/. '+l.x; return l.x;}).join('\n');
+    navigator.clipboard.writeText(txt).then(()=>{e.target.textContent='Copiato ✓'; setTimeout(()=>e.target.textContent='Copia testo',1600);}).catch(()=>{});
+  };
+  const bl = document.getElementById('btnLectura');
+  bl.onclick = ()=>{
+    document.body.classList.toggle('lectura');
+    const on = document.body.classList.contains('lectura');
+    bl.textContent = on ? '✕ Salir del modo preghiera' : '📖 Modo preghiera';
+    if(on && mida<1.6){ mida=1.6; document.documentElement.style.setProperty('--fs-preg',mida+'rem'); }
+    window.scrollTo(0,0);
+  };
+  window.scrollTo(0,0);
+}
+
+/* ---------- router ---------- */
+function render(){
+  document.body.classList.remove('lectura');
+  const h = location.hash || '#/';
+  const m1 = h.match(/^#\/tema\/(.+)$/);
+  const m2 = h.match(/^#\/p\/(.+)$/);
+  const m3 = h.match(/^#\/cerca\/(.+)$/);
+  if(m1) vistaTema(decodeURIComponent(m1[1]));
+  else if(m2) vistaPreg(decodeURIComponent(m2[1]));
+  else if(m3) vistaPortada(decodeURIComponent(m3[1]));
+  else if(h==='#/favorits') vistaFavorits();
+  else vistaPortada('');
+}
+window.addEventListener('hashchange', render);
+document.getElementById('toggleIdx').addEventListener('click', function(){
+  const sp = document.querySelector('.spine'); sp.classList.toggle('open');
+  this.setAttribute('aria-expanded', sp.classList.contains('open'));
+  this.textContent = sp.classList.contains('open') ? "Nascondi l'indice" : 'Indice dei temi';
+});
+document.querySelector('.idx').addEventListener('click', ()=>{ if(innerWidth<=900){ document.querySelector('.spine').classList.remove('open'); }});
+
+carregaFavs().then(render);
+render();
+
+</script>
+</body>
+</html>
