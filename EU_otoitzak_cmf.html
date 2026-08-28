@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klaretar Otoitzak · CMF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --granat:#6E1423; --granat-fosc:#520E1A; --granat-clar:#8C2333;
+  --or:#A87B2D; --or-clar:#C9A45C;
+  --paper:#FAF6ED; --paper-2:#F3EDDF; --paper-3:#ECE4D2;
+  --tinta:#26211A; --tinta-2:#5A5246; --tinta-3:#8A8070;
+  --linia:#DDD3BE;
+  --fs-preg:1.28rem;
+  --serif:'EB Garamond',Georgia,serif;
+  --display:'Cormorant Garamond',Georgia,serif;
+  --ui:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--tinta);font-family:var(--serif);min-height:100vh}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+a{color:inherit}
+
+/* ============ LAYOUT ============ */
+.shell{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+@media(max-width:900px){.shell{grid-template-columns:1fr}}
+
+/* ============ SIDEBAR (llom del llibre) ============ */
+.spine{background:linear-gradient(175deg,var(--granat) 0%,var(--granat-fosc) 100%);color:#F5E9D7;padding:2rem 1.5rem 2.5rem;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--granat-clar) transparent}
+.spine::after{content:'';position:fixed;left:296px;top:0;bottom:0;width:4px;background:linear-gradient(90deg,rgba(0,0,0,.28),transparent);pointer-events:none}
+@media(max-width:900px){
+  .spine{position:relative;height:auto;padding:1.4rem 1.2rem 1.2rem}
+  .spine::after{display:none}
+  .spine .idx{display:none}
+  .spine.open .idx{display:block}
+}
+.marca{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.35rem}
+.marca .creu{font-family:var(--display);font-size:1.5rem;color:var(--or-clar)}
+.marca h1{font-family:var(--display);font-weight:600;font-size:1.62rem;line-height:1.1;letter-spacing:.01em}
+.marca h1 a{text-decoration:none}
+.sub-marca{font-family:var(--ui);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--or-clar);margin-bottom:1.6rem}
+.idx-titol{font-family:var(--ui);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,233,215,.55);margin:1.5rem 0 .55rem;padding-bottom:.4rem;border-bottom:1px solid rgba(245,233,215,.18)}
+.idx a{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;text-decoration:none;padding:.34rem .5rem;margin:0 -.5rem;border-radius:4px;font-size:1.02rem;line-height:1.25;transition:background .15s}
+.idx a:hover,.idx a:focus-visible{background:rgba(255,255,255,.09);outline:none}
+.idx a.actiu{background:rgba(255,255,255,.13)}
+.idx a .n{font-family:var(--ui);font-size:.66rem;color:var(--or-clar);letter-spacing:.05em;flex-shrink:0}
+.toggle-idx{display:none;font-family:var(--ui);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--or-clar);border:1px solid rgba(201,164,92,.5);border-radius:20px;padding:.42rem 1rem;margin-top:.8rem}
+@media(max-width:900px){.toggle-idx{display:inline-block}}
+
+/* ============ PÀGINA ============ */
+.pagina{padding:2.6rem clamp(1.2rem,5vw,4.5rem) 5rem;max-width:880px;width:100%;margin:0 auto}
+@media(max-width:900px){.pagina{padding-top:1.6rem}}
+
+/* cerca */
+.cerca-wrap{position:relative;margin-bottom:1.8rem}
+.cerca{width:100%;font-family:var(--serif);font-size:1.12rem;padding:.85rem 1.1rem .85rem 2.9rem;border:1px solid var(--linia);border-radius:8px;background:#fff;color:var(--tinta);box-shadow:0 1px 3px rgba(60,45,20,.06)}
+.cerca:focus{outline:2px solid var(--granat);outline-offset:-1px}
+.cerca::placeholder{color:var(--tinta-3);font-style:italic}
+.cerca-ico{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--tinta-3);pointer-events:none}
+
+/* portada */
+.eyebrow{font-family:var(--ui);font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;color:var(--granat);margin-bottom:.5rem}
+.portada h2{font-family:var(--display);font-weight:600;font-size:clamp(1.7rem,3.4vw,2.3rem);line-height:1.12;margin-bottom:.7rem}
+.portada p.intro{font-size:1.12rem;color:var(--tinta-2);max-width:56ch;line-height:1.55;margin-bottom:2rem}
+
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.4rem}
+.chip{font-family:var(--ui);font-size:.78rem;font-weight:500;padding:.42rem .95rem;border:1px solid var(--linia);border-radius:100px;background:#fff;color:var(--tinta-2);transition:all .15s;text-decoration:none;display:inline-block}
+.chip:hover,.chip:focus-visible{border-color:var(--granat);color:var(--granat);outline:none}
+
+.temes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.9rem}
+.tema-card{position:relative;background:#fff;border:1px solid var(--linia);border-radius:8px;padding:1.2rem 1.15rem 1.05rem;text-align:left;text-decoration:none;transition:border-color .15s, box-shadow .15s;overflow:hidden;display:block}
+.tema-card:hover,.tema-card:focus-visible{border-color:var(--granat);box-shadow:0 3px 12px rgba(110,20,35,.09);outline:none}
+.tema-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--granat)}
+.tema-card h3{font-family:var(--display);font-weight:600;font-size:1.28rem;line-height:1.15;margin-bottom:.3rem}
+.tema-card .desc{font-size:.95rem;font-style:italic;color:var(--tinta-2);line-height:1.35;margin-bottom:.55rem}
+.tema-card .compta{font-family:var(--ui);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--or)}
+
+/* llista de pregàries */
+.torna{font-family:var(--ui);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--granat);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-bottom:1.4rem}
+.torna:hover{text-decoration:underline}
+.tema-cap h2{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3vw,2.1rem);margin-bottom:.35rem}
+.tema-cap .desc{font-size:1.08rem;font-style:italic;color:var(--tinta-2);margin-bottom:1.7rem;max-width:60ch;line-height:1.5}
+.sub-grup{font-family:var(--ui);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--granat);margin:1.8rem 0 .6rem;display:flex;align-items:center;gap:.8rem}
+.sub-grup::after{content:'';flex:1;height:1px;background:var(--linia)}
+.llista{list-style:none}
+.preg-item{border-bottom:1px solid var(--linia)}
+.preg-item a{display:flex;gap:1rem;align-items:baseline;padding:.85rem .4rem;text-decoration:none;transition:background .12s}
+.preg-item a:hover,.preg-item a:focus-visible{background:rgba(110,20,35,.045);outline:none}
+.foli{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--granat);min-width:2.6rem;text-align:right;flex-shrink:0;font-variant-numeric:oldstyle-nums}
+.preg-item .tt{font-size:1.16rem;line-height:1.3}
+.preg-item .inc{display:block;font-size:.92rem;font-style:italic;color:var(--tinta-3);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58ch}
+.preg-item .etq{font-family:var(--ui);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--or);margin-left:auto;flex-shrink:0}
+.buit{padding:2.5rem 0;text-align:center;color:var(--tinta-3);font-style:italic;font-size:1.08rem}
+
+/* resultat de cerca */
+.res-cap{font-family:var(--ui);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-3);margin-bottom:.8rem}
+.res-tema{font-family:var(--ui);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--or);margin-left:auto;flex-shrink:0}
+
+/* ============ PREGÀRIA ============ */
+.preg-full{background:#fff;border:1px solid var(--linia);border-radius:10px;padding:clamp(1.6rem,4vw,3.2rem) clamp(1.3rem,4.5vw,3.6rem) clamp(2rem,4vw,3rem);box-shadow:0 2px 14px rgba(60,45,20,.07);position:relative}
+.preg-full::before{content:'';position:absolute;top:-1px;left:clamp(1.3rem,4.5vw,3.6rem);width:26px;height:44px;background:var(--granat);clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%)}
+.preg-meta{font-family:var(--ui);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--or);margin-bottom:.9rem;padding-left:3.2rem}
+.preg-num{font-family:var(--display);font-weight:700;font-size:2.6rem;line-height:1;color:var(--granat);float:left;margin:-.3rem 1rem .2rem 0;font-variant-numeric:oldstyle-nums}
+.preg-titol{font-family:var(--display);font-weight:600;font-size:clamp(1.55rem,3vw,2.05rem);line-height:1.15;margin-bottom:1.4rem}
+.preg-cos{clear:both;font-size:var(--fs-preg);line-height:1.62;border-top:1px solid var(--linia);padding-top:1.5rem}
+.preg-cos p{margin-bottom:.16em}
+.preg-cos p.espai{margin-top:.9em}
+.preg-cos .rub{font-family:var(--ui);font-size:.72em;letter-spacing:.16em;text-transform:uppercase;color:var(--or);margin:1.1em 0 .5em;font-style:normal}
+.preg-cos .vers{position:relative;padding-left:1.9em}
+.preg-cos .vers::before{content:'V/.';position:absolute;left:0;font-style:italic;color:var(--tinta-3);font-size:.85em;top:.15em}
+.preg-cos .resp{position:relative;padding-left:1.9em;color:var(--granat);font-style:italic;font-weight:500;margin-bottom:.45em}
+.preg-cos .resp::before{content:'R/.';position:absolute;left:0;color:var(--granat);font-size:.85em;font-style:italic;top:.15em}
+.preg-eines{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.3rem 0 1.6rem;align-items:center}
+.eina{font-family:var(--ui);font-size:.76rem;font-weight:500;padding:.48rem .95rem;border:1px solid var(--linia);border-radius:6px;background:#fff;color:var(--tinta-2);display:inline-flex;align-items:center;gap:.45rem;transition:all .15s}
+.eina:hover,.eina:focus-visible{border-color:var(--granat);color:var(--granat);outline:none}
+.eina.fav-actiu{background:var(--granat);border-color:var(--granat);color:#F5E9D7}
+.mida-grup{display:inline-flex;border:1px solid var(--linia);border-radius:6px;overflow:hidden;margin-left:auto}
+.mida-grup .eina{border:none;border-radius:0;padding:.48rem .8rem}
+.mida-grup .eina+.eina{border-left:1px solid var(--linia)}
+.nav-pn{display:flex;justify-content:space-between;gap:1rem;margin-top:1.6rem}
+.nav-pn a{font-family:var(--ui);font-size:.78rem;color:var(--tinta-2);text-decoration:none;display:flex;flex-direction:column;gap:.15rem;max-width:46%}
+.nav-pn a:hover .pn-t{color:var(--granat)}
+.nav-pn .pn-l{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-3)}
+.nav-pn .pn-t{font-family:var(--serif);font-size:1.02rem;line-height:1.25;transition:color .15s}
+.nav-pn a.seg{text-align:right;margin-left:auto}
+
+/* mode lectura */
+body.lectura .spine,body.lectura .cerca-wrap,body.lectura .torna,body.lectura .preg-eines .eina:not(.surt-lectura):not(.mida),body.lectura .nav-pn,body.lectura .preg-meta{display:none}
+body.lectura .shell{grid-template-columns:1fr}
+body.lectura .pagina{max-width:820px;padding-top:2.2rem}
+body.lectura .preg-full{border:none;box-shadow:none;background:var(--paper)}
+body.lectura .preg-full::before{display:none}
+body.lectura{--fs-preg:1.6rem}
+body.lectura .preg-eines{position:sticky;top:0;background:var(--paper);padding:.6rem 0;z-index:5;margin-top:0}
+
+/* favorits ribbon on list */
+.fav-cinta{color:var(--granat);flex-shrink:0;font-size:.85rem}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+@media print{
+  .spine,.cerca-wrap,.torna,.preg-eines,.nav-pn,.toggle-idx{display:none!important}
+  .shell{display:block}
+  body{background:#fff}
+  .preg-full{border:none;box-shadow:none;padding:0}
+  .preg-full::before{display:none}
+  .pagina{padding:0;max-width:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="spine">
+    <div class="marca"><span class="creu">✠</span><h1><a href="#/">Klaretar Otoitzak</a></h1></div>
+    <div class="sub-marca">Mariaren Bihotz Garbiaren Seme Misiolariak</div>
+    <button class="toggle-idx" id="toggleIdx" aria-expanded="false">Gaien aurkibidea</button>
+    <nav class="idx" id="idxNav" aria-label="Gaien aurkibidea"></nav>
+  </aside>
+  <main class="pagina" id="pagina"></main>
+</div>
+<script>
+const DADES = [
+{id:"1",num:1,title:"Ama Mariaren Seme eta Misiolaria",theme:"mariaren-bihotza",sub:null,tags:[],lines:[
+{"t":"p","x":"Ama Birjina eta Jainkoaren Ama Hori,"},
+{"t":"p","x":"zure seme eta zerbitzari naizela ondo dakizu."},
+{"t":"p","x":"Zeuk Zerorrek sortua"},
+{"t":"p","x":"zure maitasun eta errukiaren sutegian."},
+{"t":"p","x":"Zure esku ahaltsuan jarririk dagoen gezi antzeko bat naiz."},
+{"t":"p","x":"Jaurti nazazu, ene Ama"},
+{"t":"p","x":"Jainkoaren Erregetzaren etsaien aurka"},
+{"t":"p","x":"Zuk bai duzu ahalmena gaitz guztiak ezabatzeko."},
+{"t":"p","x":"Zure babesean sinesturik,"},
+{"t":"p","x":"ilun-ahalmenen aurkako borrokari ekiten diot"},
+{"t":"p","x":"zeruko Hitzaren sorbatz-ezpata daramadala."},
+{"t":"p","x":"Garaipena zeurea, Ama. Amen"}
+]},
+{id:"2",num:2,title:"Ama Mariaren Bihotzari otoitz semekoi eta apostolikoa",theme:"mariaren-bihotza",sub:null,tags:[],lines:[
+{"t":"p","x":"Ama Birjina eta Jainkoaren Ama Hori,"},
+{"t":"p","x":"zure seme eta morroitzat ematen dut ene burua."},
+{"t":"p","x":"Zure amaren maitasunean murgiltzen naiz"},
+{"t":"p","x":"Jesus nire baitan sor dezazun"},
+{"t":"p","x":"Aitaren Semea eta Bidalia"},
+{"t":"p","x":"Espirituak gantzutua"},
+{"t":"p","x":"txiroei Berri Ona iragartzeko."},
+{"t":"p","x":"Zure eskuetan naizen oro jartzen dut"},
+{"t":"p","x":"Berak bidal nazan gizon-emakume guztiongana"},
+{"t":"p","x":"zure seme-alaba eta nire anai-arrebengana."},
+{"t":"p","x":"Egidazu Aita sentiarazi diezaiedala."},
+{"t":"p","x":"Irakats iezadazu Hitza bihotzean gordetzen,"},
+{"t":"p","x":"Zuk bezala"},
+{"t":"p","x":"nire bizitza Jainkoaren Ebanjelioa bilakatu arte."},
+{"t":"p","x":"Bihur nazazu zure amaren maitasunaren tresna bikaina"},
+{"t":"p","x":"Ebanjelioaren bidez seme-alaba berriak haz daitezen."},
+{"t":"p","x":"Ama hori, hona hemen zure semea. Haz nazazu."},
+{"t":"p","x":"Ama hori, hona hemen zure semea. Bidal nazazu."},
+{"t":"p","x":"Ama hori, hona hemen zure semea. Hitz ezazu nire bitartez."},
+{"t":"p","x":"Gorde nazazu"},
+{"t":"p","x":"gainontzekoei Ebanjelioa iragartzen diedan bitartean"},
+{"t":"p","x":"Jainkoaren Erregetzatik alde ez egiteko."},
+{"t":"p","x":"Zuregan, ene Ama hori,"},
+{"t":"p","x":"nire konfiantza osoa oinarritu dut."},
+{"t":"p","x":"Ez naiz behin ere suntsiturik ibiliko. Amen."}
+]},
+{id:"3",num:3,title:"Eskerretako ekintza Mariaren Bihotza dela eta",theme:"mariaren-bihotza",sub:null,tags:[],lines:[
+{"t":"p","x":"Eskerrak ematen dizkizugu, Aita Santu Hori,"},
+{"t":"p","x":"Maria Birjinari"},
+{"t":"p","x":"bihotz jakintsu eta esaneko eman zeniolako"},
+{"t":"p","x":"Zu atsegintzeko prest egon dadin beti;"},
+{"t":"p","x":"bihotz berri eta apala,"},
+{"t":"p","x":"Itun Berriaren legea bertan iragartzeko;"},
+{"t":"p","x":"bihotz xume eta garbia,"},
+{"t":"p","x":"zeinek gauzatu zuen zure Semea birjinen eran sortzea"},
+{"t":"p","x":"eta behin betiko Zu kontenplatzeko gaitasunez hornitu;"},
+{"t":"p","x":"bihotz sendo eta ausart bat"},
+{"t":"p","x":"minaren ezpata, indarrez, jasan ahal izateko"},
+{"t":"p","x":"eta, fedez beterik, zure Semearen Berpizkundea itxaroteko."},
+{"t":"p","x":"Emaiguzu"},
+{"t":"p","x":"bihotz jakintsu eta esaneko bat,"},
+{"t":"p","x":"berri eta apala,"},
+{"t":"p","x":"xume eta garbia,"},
+{"t":"p","x":"sendo eta ausarta"},
+{"t":"p","x":"Bera atzeman dezagun"},
+{"t":"p","x":"eta zure salbamen-eginkizunean leialtasun haundiagoz"},
+{"t":"p","x":"lan egin."},
+{"t":"p","x":"Amen"}
+]},
+{id:"4",num:4,title:"Ama Mariaren Bihotza",theme:"mariaren-bihotza",sub:null,tags:[],lines:[
+{"t":"p","x":"Jauna, gure Jainko"},
+{"t":"p","x":"Ama Maria Birjina aukeratu zenuen"},
+{"t":"p","x":"zure Semearen Ama eta gure Ama bezala;"},
+{"t":"p","x":"egizu, bere amaren Bihotzarekiko leialtasunagatik,"},
+{"t":"p","x":"Kristorekin bat gero eta beteago bilakatu gaitezela"},
+{"t":"p","x":"eta Semearen eginkizuna salbatzaileari gehitu zion lankidetzan"},
+{"t":"p","x":"atzeman dezagula,"},
+{"t":"p","x":"Ebanjelioa leialki aldarrikatzeko misio apostolikoari"},
+{"t":"p","x":"bihotz-zabaltasun haundiagoa emanez"},
+{"t":"p","x":"gauza guztien gainetik maita zaitzagun"},
+{"t":"p","x":"eta anai-arreba txiroenei lagundu."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez. Amen."}
+]},
+{id:"5",num:5,title:"Ama Mariari deia, Elizaren Ama",theme:"mariaren-bihotza",sub:null,tags:[],lines:[
+{"t":"p","x":"Ama Maria, Elizaren Ama"},
+{"t":"p","x":"Eliza osoa jartzen dugu zure esku."},
+{"t":"p","x":"Gogoan izan zure seme-alaba guztiak,"},
+{"t":"p","x":"bero itzazu beren otoitz guztiak Jainkoaren aurrean;"},
+{"t":"p","x":"sendo gorde ezazu beren fedea,"},
+{"t":"p","x":"indar ezazu beren itxaropena"},
+{"t":"p","x":"eta ugariago egizu beren maitasuna."},
+{"t":"p","x":"Zure Bihotz garbian"},
+{"t":"p","x":"jartzen dugu gizadi osoa;"},
+{"t":"p","x":"bidera ezazu Kristo Jesusengana"},
+{"t":"p","x":"salbatzaile bakar eta egiazkoaren ezagumenera;"},
+{"t":"p","x":"eman mundu osoari egian, justizian, askatasunean eta maitasunean"},
+{"t":"p","x":"bilbatutako bakea."},
+{"t":"p","x":"Eta egizu Eliza osoak"},
+{"t":"p","x":"errukiaren Jainkoari zuzen diezaiokeela"},
+{"t":"p","x":"gorespen-ereserkia, esker-on eta alaitasun-ereserkia,"},
+{"t":"p","x":"gauzak haundiak egin bait ditu Jaunak"},
+{"t":"p","x":"Zure bitartez,"},
+{"t":"p","x":"errukitsu, egonkor eta gozo zaren"},
+{"t":"p","x":"Ama Maria Birjin Hori."},
+{"t":"p","x":"Amen."}
+]},
+{id:"6",num:6,title:"Sortzaile eta eredu",theme:"claret",sub:null,tags:[],lines:[
+{"t":"p","x":"Jainko gure Jauna"},
+{"t":"p","x":"Antonio Maria Claret Santua aukeratu zenuen"},
+{"t":"p","x":"gure Familiaren sortzailea izan zedin"},
+{"t":"p","x":"eta maitasunak suturik"},
+{"t":"p","x":"gezur irainetan eta oinazetan alaitzea egin zenuen;"},
+{"t":"p","x":"iguzu, onez,"},
+{"t":"p","x":"bere irakaspenei loturik ibilita,"},
+{"t":"p","x":"zure aintza mundu guztitik hots egin dezagula"},
+{"t":"p","x":"eta onginahiez bila dezagula beti"},
+{"t":"p","x":"gizon-emakume guztien salbamena."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez. Amen."}
+]},
+{id:"7",num:7,title:"Bokazioaren Magnificat",theme:"kongregazioa",sub:null,tags:[],lines:[
+{"t":"p","x":"Ene Jainko, bedeinkatua izan zaitez"},
+{"t":"p","x":"zure zerbitzari apal hauek"},
+{"t":"p","x":"aukeratu nahi izan dituzulako"},
+{"t":"p","x":"zure Ama Bihotz Garbiaren seme izateko!"},
+{"t":"p","x":"Ama Maria bedeinkatua"},
+{"t":"p","x":"hamaika gorespen eman bezate"},
+{"t":"p","x":"zure Bihotz Garbiaren edertasunagatik"},
+{"t":"p","x":"eta zure seme hartuak izan gaituzulako!"},
+{"t":"p","x":"Egizu ene Ama"},
+{"t":"p","x":"hain ontasun haundiaren aurrean erantzun dezagula"},
+{"t":"p","x":"egunero apalago izanez,"},
+{"t":"p","x":"gogo bizikoago"},
+{"t":"p","x":"eta gizon-emakumeen salbamenaren aldekoago."},
+{"t":"p","x":"Amen"}
+]},
+{id:"8",num:8,title:"Klaretar misiolariaren otoitza",theme:"kongregazioa",sub:null,tags:[],lines:[
+{"t":"p","x":"Berrizta ezazu, Jauna, gure kongregazioan"},
+{"t":"p","x":"eta gutariko bakoitzarengan,"},
+{"t":"p","x":"Antonio Maria Claret gure Aita"},
+{"t":"p","x":"berotu zuen espiritua."},
+{"t":"p","x":"Egizu"},
+{"t":"p","x":"Andre Mariaren Bihotz Garbiaren Seme Misiolariok"},
+{"t":"p","x":"maitasunez erretzen gauden eta nonahi ibili han kiskaltzen"},
+{"t":"p","x":"dugun gizonok izan gaitezela."},
+{"t":"p","x":"Egiazki desira dezagula eta oroz ahalegin gaitezela"},
+{"t":"p","x":"Jainko-maitasunaren sutan gizadi osoa bizten."},
+{"t":"p","x":"Ez gaitzala ezerk atzera egin"},
+{"t":"p","x":"ezeukian pozik,"},
+{"t":"p","x":"lan zailari ekin,"},
+{"t":"p","x":"nekeak besarkatu,"},
+{"t":"p","x":"gezur irainak atseginez jasan,"},
+{"t":"p","x":"oinaze eta atsekabetan alai"},
+{"t":"p","x":"eta Jesukristoren gurutzean aintzatan bizi gaitezela."},
+{"t":"p","x":"Otoitzean, lanean, neketan,"},
+{"t":"p","x":"Kristoren jarraitzaile hurbileko eta antzeko izatea"},
+{"t":"p","x":"asmo bakarra dezagun,"},
+{"t":"p","x":"beti eta soilik Jainkoaren aintzarik gorena"},
+{"t":"p","x":"eta gizakien salbamena bilatuz."},
+{"t":"p","x":"Amen"}
+]},
+{id:"9",num:9,title:"Klaretar espirituaren berrikuntzarako",theme:"kongregazioa",sub:null,tags:[],lines:[
+{"t":"p","x":"Berrizta ezazu, Jauna, gure Kongregazioan"},
+{"t":"p","x":"Antonio Maria Claret gure Aita"},
+{"t":"p","x":"berotu zuen espiritua;"},
+{"t":"p","x":"berak bete eta indarturik"},
+{"t":"p","x":"ahalegin gaitezen maite zuen hura maitatzen"},
+{"t":"p","x":"eta ageriko egin dezagun berak irakatsia."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"10",num:10,title:"Gure Kongregazioaren alde",theme:"kongregazioa",sub:null,tags:[],lines:[
+{"t":"r","x":"Begira zerutik gure Kongregazioa, kontutan har eta etor laguntzera."},
+{"t":"v","x":"Zain ezazu, urezta eta neurririk gabe aberastu ezazu."},
+{"t":"r","x":"Gogoan izan Jauna gutariko bakoitza."},
+{"t":"v","x":"Bidal iezaguzu zure argi eta egia."},
+{"t":"r","x":"Bizia emaguzu zure izenari dei diezaiogun."},
+{"t":"v","x":"Eta Ebanjelioa iragartzeko misioa bete dezagun."},
+{"t":"rub","x":"Egin dezagun otoitz"},
+{"t":"p","x":"Arrenka dizugu, Jauna,"},
+{"t":"p","x":"Ama Birjina Santuaren Bihotz Garbiaren bitartez,"},
+{"t":"p","x":"gure Kongregazioa gaitz orotatik aska dezazula"},
+{"t":"p","x":"Claret Aitaren antzera, gogo apal eta eskuzabalez,"},
+{"t":"p","x":"gizakientzako zure salbamen plangintzan ari dadin."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"11",num:11,title:"Klaretar Misiolariaren azalpena",theme:"kongregazioa",sub:null,tags:[],lines:[
+{"t":"v","x":"Jainko Jauna, Andre Mariaren Bihotz Garbiaren bitartez,"},
+{"t":"p","x":"sor ezazu guregan maitasun espiritua"},
+{"t":"p","x":"maitasunez erretzen gauden eta nonahi ibili"},
+{"t":"p","x":"han kiskaltzen dugun gizonok izan gaitezela."},
+{"t":"r","x":"Amen"},
+{"t":"v","x":"Eta egiazki nahi dezagun eta oroz ahalegin gaitezen"},
+{"t":"p","x":"Jainko maitasunaren sutan gizadi osoa bizten."},
+{"t":"r","x":"Amen"},
+{"t":"v","x":"Jainko Jauna, Andre Mariaren Bihotz Garbiaren bitartez"},
+{"t":"p","x":"sor ezazu guregan kemen-espiritua"},
+{"t":"p","x":"ezerk atzera ez gaitzan;"},
+{"t":"p","x":"ezeukian pozik"},
+{"t":"p","x":"lan zailari ekin diezaiogun."},
+{"t":"r","x":"Amen"},
+{"t":"v","x":"Eta nekeak besarkatu,"},
+{"t":"p","x":"gezur irainak atseginez jasan,"},
+{"t":"p","x":"oinaze eta atsekabetan alai"},
+{"t":"p","x":"eta Jesukristoren gurutzean aintzatan bizi gaitezela."},
+{"t":"r","x":"Amen"},
+{"t":"v","x":"Jainko Jauna, Andre Mariaren Bihotz Garbiaren bitartez,"},
+{"t":"p","x":"sor ezazu guregan Jesus, zure Semea,"},
+{"t":"p","x":"berotu zuen espiritu misiolaria,"},
+{"t":"p","x":"otoitzean, lanean, neketan,"},
+{"t":"p","x":"Kristoren jarraitzaile hurbileko eta antzeko izatea"},
+{"t":"p","x":"izan dezagun asmo bakarra."},
+{"t":"r","x":"Amen"},
+{"t":"v","x":"Eta beti eta soilik"},
+{"t":"p","x":"Jainkoaren aintzarik gorena"},
+{"t":"p","x":"eta gizakien salbamena bila dezagun."},
+{"t":"r","x":"Amen"}
+]},
+{id:"12",num:12,title:"Zeu, Aita",theme:"anaidia",sub:null,tags:[],lines:[
+{"t":"p","x":"Zeuk, Aita,"},
+{"t":"p","x":"gure bihotzetan isuri duzu"},
+{"t":"p","x":"zure Espirituaren bitartez"},
+{"t":"p","x":"Zurekiko eta anai-arrebekiko maitasuna."},
+{"t":"p","x":"Aita Hori, gure bizi anaikorra gauzatzen duen maitasuna"},
+{"t":"p","x":"adierazi nahi dugu, gero eta nabariago"},
+{"t":"p","x":"Eukaristian eta elkar otoitzean"},
+{"t":"p","x":"senide bizian"},
+{"t":"p","x":"eta Hitzaren zerbitzuak eskatutako lankidetzan."},
+{"t":"p","x":"Horregatik Aita arrenka dizugu"},
+{"t":"p","x":"gure batasuna eraiki dezazula"},
+{"t":"p","x":"elkarrekiko adi eta entzule egin gaitzazula"},
+{"t":"p","x":"zure Semearen agindua burutzen"},
+{"t":"p","x":"eta gure bizitza misiolari guztia"},
+{"t":"p","x":"maitasunak zuzendua eta eratua egon dadila."},
+{"t":"p","x":"Aita Hori, eskatzen dizugu baita"},
+{"t":"p","x":"gutako bakoitzari emandako misioa"},
+{"t":"p","x":"leial betetzea"},
+{"t":"p","x":"elkartearen bidalketaren arabera"},
+{"t":"p","x":"eta egiazki nabari dezagula"},
+{"t":"p","x":"mundu honen eta Elizaren egoeran"},
+{"t":"p","x":"Zeuk eskaintzen diguzula norberaren betetasuna"},
+{"t":"p","x":"elkarte misiolari honetan horrela lortzeko."}
+]},
+{id:"13",num:13,title:"Elkartearen otoitza",theme:"anaidia",sub:null,tags:[],lines:[
+{"t":"p","x":"Eskerrak ematen dizkizugu, Aita Santu hori,"},
+{"t":"p","x":"elkarte honetan gu biltzeagatik"},
+{"t":"p","x":"bertatik zure Erregetza aldarrikatzeko nahi gaituzula"},
+{"t":"p","x":"bizi sagaratu oso batez"},
+{"t":"p","x":"eta Ebanjelioaren zerbitzurako jartzea erabakiz."},
+{"t":"p","x":"Gure izaeraz eta ekintzaz aldarrikatu nahi ditugu"},
+{"t":"p","x":"Andre Mariaren Bihotzaren benetako seme bezala"},
+{"t":"p","x":"gizon-emakumeen artean isuritako zure maitasunaren miragarriak."},
+{"t":"p","x":"Gure proposamenak berriztatzen ditugu"},
+{"t":"p","x":"egunero hobe izateko"},
+{"t":"p","x":"zure Semearen jarraipenean elkar laguntzeko"},
+{"t":"p","x":"zure Espiritu Santuaren norabideetan lankidetza eskainiz,"},
+{"t":"p","x":"Elizak gogoz eman digun misioa gauzatzean"},
+{"t":"p","x":"sendo iharduteko."},
+{"t":"p","x":"Ez utzi Jauna honako onginahi hau jakingabe indarge geratzen,"},
+{"t":"p","x":"norberekeria, betikokeria edota nagiak direla."},
+{"t":"p","x":"Biztu elkarte apostoliko honen fedea eta itxaropena"},
+{"t":"p","x":"eta zabal itzazu gure bihotz hauek"},
+{"t":"p","x":"birbaketzera eta elkarren barkamenera."},
+{"t":"p","x":"Gure ahuleriaz jakitun,"},
+{"t":"p","x":"zure graziari adi egotea eskatzen dizugu;"},
+{"t":"p","x":"zure Hitzaren etengabeko hausnarketak bizkor gaitzala"},
+{"t":"p","x":"eta elkarbizitzak lagun gaitzala ematen"},
+{"t":"p","x":"munduak sinis dezan behar duen maitasun-testigantza"},
+{"t":"p","x":"eta txiroenen premiek eta beharrizanek"},
+{"t":"p","x":"gure baitatik ateraz gaitzatela"},
+{"t":"p","x":"eta atsedenik gabe beraien alde lan egin."},
+{"t":"p","x":"Andre Mariaren eskuetan gure burua emanik,"},
+{"t":"p","x":"zure Semearen Ama,"},
+{"t":"p","x":"bizitza sagaratuaren eredu izan genuena,"},
+{"t":"p","x":"beraren Bihotzean hezi gaitzala eta jarraitu erazi gaitzala,"},
+{"t":"p","x":"Antonio Maria Claret Aitak bere biziaz eta irakaspenez"},
+{"t":"p","x":"munduan eta Elizan tinkatu zuen"},
+{"t":"p","x":"osotasunaren eta zerbitzu apostolikoaren bidea."},
+{"t":"p","x":"Burutu Jauna zure amaigabeko leialtasunez"},
+{"t":"p","x":"oraingo honetan dugun asmorik benetakoena."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"14",num:14,title:"Maitasun anaikorra",theme:"anaidia",sub:null,tags:[],lines:[
+{"t":"p","x":"Apalik eskatzen dizugu"},
+{"t":"p","x":"Jainko gure Jauna"},
+{"t":"p","x":"bihotz bakar batean"},
+{"t":"p","x":"batera gaitzazula"},
+{"t":"p","x":"Antonio Maria zure zerbitzariaren"},
+{"t":"p","x":"espiritua jarraitzen dugunok;"},
+{"t":"p","x":"elkar maitasunean bat etorrita"},
+{"t":"p","x":"gizon-emakumeen artean"},
+{"t":"p","x":"zure maitasunaren lekuko"},
+{"t":"p","x":"izan gaitezen."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"15",num:15,title:"Nire elkartearen aldeko otoitza",theme:"anaidia",sub:null,tags:[],lines:[
+{"t":"p","x":"Jainko Aita"},
+{"t":"p","x":"gaurko egun honetan"},
+{"t":"p","x":"nire elkartearen anaien alde eskatu nahi dizut."},
+{"t":"p","x":"Diren moduan ezagutzen dituzu Zeuk"},
+{"t":"p","x":"bere izen abizenak,"},
+{"t":"p","x":"beren bertute eta akatsak,"},
+{"t":"p","x":"beren poza eta atsekabeak,"},
+{"t":"p","x":"beren indar eta ahuleriak,"},
+{"t":"p","x":"beren historia guztia ezagutzen Zuk;"},
+{"t":"p","x":"diren moduan onartzen"},
+{"t":"p","x":"eta zure Espirituaz biziarazten dituzu."},
+{"t":"p","x":"Zuk, Jauna, maite dituzu"},
+{"t":"p","x":"ez zintzo direlako"},
+{"t":"p","x":"zure semeak direlako baizik."},
+{"t":"p","x":"Irakasdazu haiek benetan maitatzen"},
+{"t":"p","x":"Jesukristok egingo zuen eran"},
+{"t":"p","x":"ez beren hitz edo ekintzengatik"},
+{"t":"p","x":"beraiengatik baino"},
+{"t":"p","x":"haietako bakoitzarengan igarriz"},
+{"t":"p","x":"batik bat ahulengan"},
+{"t":"p","x":"zure amaigabeko maitasunaren misterioa."},
+{"t":"p","x":"Eskerrak ematen dizkizut Aita"},
+{"t":"p","x":"nire anaiak eman dizkidazulako."},
+{"t":"p","x":"Diren guztiak niretzako opari bat ditut"},
+{"t":"p","x":"benetako \"sakramentu\" bat"},
+{"t":"p","x":"zure Semearen presentziaren"},
+{"t":"p","x":"keinu sentikor eta eraginkorra."},
+{"t":"p","x":"Emadazu Jesusek izandako begirada"},
+{"t":"p","x":"haiek ondo somatzeko"},
+{"t":"p","x":"eta bere bihotza eman ere"},
+{"t":"p","x":"azkeneraino maitatzeko"},
+{"t":"p","x":"neuk ere izan nahi bait dut"},
+{"t":"p","x":"haientzako bakoitzarentzat"},
+{"t":"p","x":"Jesusen presentziaren \"sakramentu\" bizia."},
+{"t":"p","x":"Amen."}
+]},
+{id:"16",num:16,title:"Otoitz apostolikoa",theme:"misioa",sub:null,tags:[],lines:[
+{"t":"p","x":"Jaun eta ene Aita hori"},
+{"t":"p","x":"ezagutu zaitzadala eta ezagutarazi;"},
+{"t":"p","x":"maita zaitzadala eta maitarazi;"},
+{"t":"p","x":"zerbitza zaitzadala eta zerbitzarazi;"},
+{"t":"p","x":"gorets zaitzadala"},
+{"t":"p","x":"eta sorkari guztiek Zu gorestea egin dezadala."},
+{"t":"p","x":"Emadazu, ene Aita,"},
+{"t":"p","x":"bekatari guztiak Kristorengana itzultzea"},
+{"t":"p","x":"zintzo guztiek grazian irautea"},
+{"t":"p","x":"eta gu denok amaigabeko aintza lortzea."},
+{"t":"p","x":"Amen"}
+]},
+{id:"17",num:17,title:"Misiolarien irabazkinen alde",theme:"misioa",sub:null,tags:[],lines:[
+{"t":"p","x":"Ontasunen Aita,"},
+{"t":"p","x":"guk ezer merezi gabe aukeratu gaituzu"},
+{"t":"p","x":"eta zure Seme Jesus bidali zenuen moduan"},
+{"t":"p","x":"gu ere bidaltzen gaituzu."},
+{"t":"p","x":"Emaguzu zure Espiritua"},
+{"t":"p","x":"egin gaitzazu Ebanjelioaren zerbitzari egoki"},
+{"t":"p","x":"eta sor ezazu guregan indar haina"},
+{"t":"p","x":"gizon-emakumeen salbamenezko eginkizunean"},
+{"t":"p","x":"gogoz ari gaitezen."},
+{"t":"p","x":"Eman, Jauna, gure lanei denbora haundiago"},
+{"t":"p","x":"eta egizu zure Hitza den Kristok"},
+{"t":"p","x":"gugan hitz egin dezala."},
+{"t":"p","x":"Bedeinka gaitzazu eta lagundu"},
+{"t":"p","x":"gizon-emakume guztiek Ebanjelioa onar dezaten"},
+{"t":"p","x":"eta egunero maiteago zaitzaten."},
+{"t":"p","x":"Ez baimendu Jauna"},
+{"t":"p","x":"gure bekatuak;"},
+{"t":"p","x":"gorde gaitzazu arrisku orotatik"},
+{"t":"p","x":"eta indar gaitzazu zure graziaz."},
+{"t":"p","x":"Amen."}
+]},
+{id:"18",num:18,title:"Klaretar misioa",theme:"misioa",sub:null,tags:[],lines:[
+{"t":"p","x":"Aita Santu hori,"},
+{"t":"p","x":"Zeuk deitu zenuen Antonio Maria Claret"},
+{"t":"p","x":"zure Semea jarraitzeko,"},
+{"t":"p","x":"eta bere maitasunak bultzaturik"},
+{"t":"p","x":"bere bizi osoan eman zuen"},
+{"t":"p","x":"bere bizi-gakoaren borrokaren alde: Jainkoaren Erregetza."},
+{"t":"p","x":"Erne guregan"},
+{"t":"p","x":"bere espiritu ebanjelizatzailea"},
+{"t":"p","x":"premiazko, egoki eta eraginkorrena somatzeko"},
+{"t":"p","x":"eta fede-hedakuntzaren misioa betetzeko"},
+{"t":"p","x":"Espirituari otzan eta zure borondateari esaneko."},
+{"t":"p","x":"Aita Clareten antzera"},
+{"t":"p","x":"zure Espirituaren indarrak bultzaturik"},
+{"t":"p","x":"geuk ere aukeratu nahi dugu"},
+{"t":"p","x":"Jainkoaren Erregetzaren betekizuna"},
+{"t":"p","x":"eta gogoz onartu nahi"},
+{"t":"p","x":"gure misio ebanjelizatzaileak dakartzan"},
+{"t":"p","x":"salakuntzaren arriskuak"},
+{"t":"p","x":"eta profeten gisako konpromezua."},
+{"t":"p","x":"Bidaliak garen gizon-emakumeen"},
+{"t":"p","x":"bizi eta larri-mina,"},
+{"t":"p","x":"itxaropen eta gabezia,"},
+{"t":"p","x":"gure biziarekin bat egin nahi ditugu."},
+{"t":"p","x":"Eta, zure Semeak gizakien artean bizirik dirauela diogun batera"},
+{"t":"p","x":"sinesgabekeria, gorroto, injustizia,"},
+{"t":"p","x":"gezur, zapalkuntza, oinaze,"},
+{"t":"p","x":"bakardade, gose, ezjakinkeria"},
+{"t":"p","x":"eta beste hainbeste maitasun ezaren aurka"},
+{"t":"p","x":"borrokatu nahi dugu"},
+{"t":"p","x":"Erregetzarako premiazkoa bait da."},
+{"t":"p","x":"Zure Semearen bitartez eskatzen dizugu"},
+{"t":"p","x":"errege eta bizi bait da gizaldiz gizaldi."},
+{"t":"p","x":"Amen"}
+]},
+{id:"19",num:19,title:"Bokazioen aldeko otoitza",theme:"bokazioak",sub:null,tags:[],lines:[
+{"t":"p","x":"Aita Santu Hori,"},
+{"t":"p","x":"zure seme Jesusek esana zigun: \"Egin otoitz uzta-jabeari"},
+{"t":"p","x":"bere uztara langileak bidal ditzan\"."},
+{"t":"p","x":"Apal-apalik eskatzen dizugu"},
+{"t":"p","x":"zure onginahiez"},
+{"t":"p","x":"gure Kongregaziora bidaltzea."},
+{"t":"p","x":"Arnas ezazu zure Espiritua aukeratu dituzunengan"},
+{"t":"p","x":"eta sendo itzazu bokazioan"},
+{"t":"p","x":"zure Ebanjelioa era duin eta emankor batean hots eginez"},
+{"t":"p","x":"Andre Maria Birjina Santuaren"},
+{"t":"p","x":"Bihotz Garbiaren seme"},
+{"t":"p","x":"egiazki dei eta izan gaitezen."},
+{"t":"p","x":"Emaguzu bihotz osoaz Zu maitatzea"},
+{"t":"p","x":"hitzez eta ekintzez"},
+{"t":"p","x":"eta etsi ez dezagula behin ere Zu goresten."},
+{"t":"p","x":"Amen."}
+]},
+{id:"20",num:20,title:"Bokazio misiolarien alde",theme:"bokazioak",sub:null,tags:[],lines:[
+{"t":"p","x":"Jainko Jauna"},
+{"t":"p","x":"gizon-emakume guztien salbamena"},
+{"t":"p","x":"eta egiaren ezagumena iristea nahi duzun Hori;"},
+{"t":"p","x":"erakar Zuganantz zure Semearen jarraitzaileak"},
+{"t":"p","x":"eta bidal itzazu munduko uztara"},
+{"t":"p","x":"sorkari guztiei Ebanjelioa iragar diezaieten"},
+{"t":"p","x":"eta zure herria, biziaren Hitzak bildurik"},
+{"t":"p","x":"eta sakramentuen indarrak eutsita"},
+{"t":"p","x":"salbamen eta maitasun bideetatik ibil dadin."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen."}
+]},
+{id:"21",num:21,title:"Zure izenean elkarturik",theme:"bilerak",sub:null,tags:[],lines:[
+{"t":"p","x":"Jauna, zure izenean biltzean"},
+{"t":"p","x":"zure presentzian egon nahi dugu;"},
+{"t":"p","x":"emaguzu elkarrizketarako espiritua,"},
+{"t":"p","x":"argi itzazu gure burutazioak zure egiaren argiaz,"},
+{"t":"p","x":"eta kemen ezazu gure anai-espiritua"},
+{"t":"p","x":"zure borondatea beti egin eta bila dezagun."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"22",num:22,title:"Bokazioa",theme:"bokazioak",sub:null,tags:[],lines:[
+{"t":"p","x":"Apostoluak deitu zenituen Jainko Jauna"},
+{"t":"p","x":"giza-arrantzale izan zitezen"},
+{"t":"p","x":"dei itzazu kide berriak"},
+{"t":"p","x":"Klaretar Kongregazioari"},
+{"t":"p","x":"lurrarentzako gatza eta munduarentzako argi izan daitezen"},
+{"t":"p","x":"eta leku orotatik Antonio Maria zure zerbitzaria"},
+{"t":"p","x":"bultzatzen zuen maitasuna isuri dezaten."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"23",num:23,title:"Jainkoaren nahia elkarrekin bilatu eta gauzatu",theme:"bilerak",sub:null,tags:[],lines:[
+{"t":"rub","x":"Antifona:"},
+{"t":"p","x":"Jaunak dio: bi edo gehiago nire izenean bildurik daudenean, ni haien artean naute."},
+{"t":"rub","x":"Egin dezagun otoitz:"},
+{"t":"p","x":"Jainko eta Aita gurea,"},
+{"t":"p","x":"zure Semeak bere presentzia promestu egin zien"},
+{"t":"p","x":"bere izenean bildurik zeuden guztiei;"},
+{"t":"p","x":"egizu gure artean Probintzia osoan"},
+{"t":"p","x":"gure bizitza misiolariaren egoera behin premiaz aztertuz"},
+{"t":"p","x":"Espirituari esaneko eta gure karisma misiolariari leialtasun osoz,"},
+{"t":"p","x":"egoki dugun berrikuntza aurrerarazi dezagun"},
+{"t":"p","x":"sentikortasun eta nahi bakarrez."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"24",num:24,title:"Bilera hasteko",theme:"bilerak",sub:null,tags:[],lines:[
+{"t":"p","x":"Hemen gaituzu, Jauna,"},
+{"t":"p","x":"zure izenean bildurik"},
+{"t":"p","x":"eta zure Erregetza zabaltzeko nahiez."},
+{"t":"p","x":"Gure bihotzetara bidali duzun"},
+{"t":"p","x":"eta gure artean zure presentzia bizirik dirauen"},
+{"t":"p","x":"Espiritu Santuak"},
+{"t":"p","x":"irakas diezaigula zer egin behar dugun"},
+{"t":"p","x":"eta norantz ibili"},
+{"t":"p","x":"zure graziak sendoturik"},
+{"t":"p","x":"zure nahia bete dezagun."},
+{"t":"p","x":"Izan zaitez Zeu, Espiritu Santu,"},
+{"t":"p","x":"hedaketaren animatzailea."},
+{"t":"p","x":"Irakasguzu besteoi entzuten"},
+{"t":"p","x":"beren argiek gu argitzen,"},
+{"t":"p","x":"irakasguzu proposatzen eta ez inposatzen"},
+{"t":"p","x":"eta egin gaitzazu egiaren bilakari beti."},
+{"t":"p","x":"Aska gaitzazu"},
+{"t":"p","x":"arrazoia beti eta beti duen itsukeriatik,"},
+{"t":"p","x":"lehenkeriatik"},
+{"t":"p","x":"eta pertsonekiko aurre-iritzietatik."},
+{"t":"p","x":"Batu gaitzazu Zuregan"},
+{"t":"p","x":"egiatik at inoiz alde egin ez dezagun."},
+{"t":"p","x":"Amen"}
+]},
+{id:"25",num:25,title:"Zure Ebanjelioaren beharkizuna aurkitzeko argia",theme:"bilerak",sub:null,tags:[],lines:[
+{"t":"p","x":"Begira, Aita ona,"},
+{"t":"p","x":"zure izenean bildurik dagoen elkarte honi"},
+{"t":"p","x":"anaitasuna elkarbanatu"},
+{"t":"p","x":"eta egian elkarrizketatzeko;"},
+{"t":"p","x":"emaiozu Ebanjelioaren derrigortasunak"},
+{"t":"p","x":"argitasun handiagoz idorotzea,"},
+{"t":"p","x":"lurrarentzat gatza eta munduarentzat argia izateko."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen."}
+]},
+{id:"26",num:26,title:"Esker ona topaketagatik",theme:"bilerak",sub:null,tags:[],lines:[
+{"t":"p","x":"Aita ona,"},
+{"t":"p","x":"eskerrak ematen dizkizugu topaketa honengatik"},
+{"t":"p","x":"gure amets eta etsipenak,"},
+{"t":"p","x":"egitasmo eta zailtasunak"},
+{"t":"p","x":"elkarbanatu egiteagatik;"},
+{"t":"p","x":"egizu, Claret gure Aitaren antzera,"},
+{"t":"p","x":"gure bokazioari eta Elizan dugun misioari"},
+{"t":"p","x":"beti eraginkortasunez erantzun diezaiogula."},
+{"t":"p","x":"Jesukristo gure Jaunaren bitartez."},
+{"t":"p","x":"Amen"}
+]},
+{id:"27",num:27,title:"Espiritu Santuari",theme:"bilerak",sub:null,tags:[],lines:[
+{"t":"p","x":"Zatoz zintzoen barnera,"},
+{"t":"p","x":"Espiritu sortarazle;"},
+{"t":"p","x":"bete graziaz bihotzok,"},
+{"t":"p","x":"Zu bait zaituztegu egile."},
+{"t":"p","x":"Poz-emaile deritzazu,"},
+{"t":"p","x":"Goiko Jaunaren dohaina,"},
+{"t":"p","x":"ur bizi, su-gar, maitasun,"},
+{"t":"p","x":"eta gantzu zerutarra."},
+{"t":"p","x":"Zazpi dohainen isurle,"},
+{"t":"p","x":"Jaungoikoaren beso,"},
+{"t":"p","x":"Aitak agindu bezala"},
+{"t":"p","x":"jasotzen dugun goi-mintzoa."},
+{"t":"p","x":"Argi zaiguzu zentzua,"},
+{"t":"p","x":"maitekor egin bihotza,"},
+{"t":"p","x":"indar iraunkorrez senda"},
+{"t":"p","x":"gaitz-bera dugun gorputza."},
+{"t":"p","x":"Haiza gugandik etsaia"},
+{"t":"p","x":"iguzu, arren, bakea,"},
+{"t":"p","x":"Zu aurretik zaitugula,"},
+{"t":"p","x":"urrun zaiguzu kaltea."},
+{"t":"p","x":"Erakuts zaiguzu Aita,"},
+{"t":"p","x":"erakuts Semea guri;"},
+{"t":"p","x":"bien Arnasa zarela"},
+{"t":"p","x":"sinistu dezagun beti."},
+{"t":"p","x":"Amen."}
+]}
+];
+const TEMES = [
+ {id:'mariaren-bihotza', nom:'Mariaren Bihotza',              desc:'Ama Mariaren Bihotzari otoitzak.'},
+ {id:'claret',           nom:'San Antonio Maria Claret',       desc:'Gure Sortzailearen bidez eskatuz.'},
+ {id:'kongregazioa',     nom:'Kongregazioa',                   desc:'Identitate klaretiarra eta bokazio misiolaria.'},
+ {id:'anaidia',          nom:'Anaidia',                        desc:'Elkarte apostolikoa eta anaitasuna.'},
+ {id:'misioa',           nom:'Misioa',                         desc:'Apostolutza, ebanjelizazioa eta misio klaretiarra.'},
+ {id:'bokazioak',        nom:'Bokazioak',                      desc:'Jaunari bokazioak eskatzeko.'},
+ {id:'bilerak',          nom:'Bilerak eta Topaketak',          desc:'Bilera komunitarioak hasteko eta bukatzeko.'}
+];
+const CIRCUMS = [
+ {t:'Bilera hasteko',         h:'#/p/24'},
+ {t:'Bilera bukatzeko',       h:'#/p/26'},
+ {t:'Bokazioak',              h:'#/tema/bokazioak'},
+ {t:'Misioa',                 h:'#/tema/misioa'},
+ {t:'Anaidia',                h:'#/tema/anaidia'},
+ {t:'Mariaren Bihotza',       h:'#/tema/mariaren-bihotza'},
+ {t:'Espiritu Santuari',      h:'#/p/27'},
+ {t:'Kongregazioa',           h:'#/tema/kongregazioa'}
+];
+/* ---------- utilidades ---------- */
+const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const perTema = id => DADES.filter(p=>p.theme===id);
+const idxDe = p => DADES.indexOf(p);
+const troba = id => DADES.find(p=>String(p.id)===String(id));
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const incipit = p => { const l=p.lines.find(l=>l.t==='p'||l.t==='v'); return l?l.x:''; };
+
+/* ---------- favoritos ---------- */
+let favs = new Set(); let favsMem = true;
+async function carregaFavs(){
+  try{ const r = await window.storage.get('cmf-gogokoak'); if(r&&r.value){favs=new Set(JSON.parse(r.value)); favsMem=false;} else {favsMem=false;} }
+  catch(e){ favsMem=false; /* clave inexistente: ok */ }
+}
+async function desaFavs(){
+  try{ await window.storage.set('cmf-gogokoak', JSON.stringify([...favs])); }catch(e){}
+}
+function toggleFav(id){ if(favs.has(id)) favs.delete(id); else favs.add(id); desaFavs(); render(); }
+
+/* ---------- tamaño del texto ---------- */
+let mida = 1.28;
+function canviaMida(d){ mida = Math.min(2.4, Math.max(.95, mida + d)); document.documentElement.style.setProperty('--fs-preg', mida+'rem'); }
+
+/* ---------- índice lateral ---------- */
+function pintaIdx(temaActiu){
+  const nav = document.getElementById('idxNav');
+  let h = '<div class="idx-titol">Gaiak</div>';
+  for(const t of TEMES){
+    const n = perTema(t.id).length;
+    h += `<a href="#/tema/${t.id}" class="${temaActiu===t.id?'actiu':''}">${esc(t.nom)}<span class="n">${n}</span></a>`;
+  }
+  if(favs.size) h += `<div class="idx-titol">Prestaketa</div><a href="#/favorits" class="${temaActiu==='__fav'?'actiu':''}">Nire otoitzak<span class="n">${favs.size}</span></a>`;
+  nav.innerHTML = h;
+}
+
+/* ---------- búsqueda ---------- */
+function cercaHTML(valor){
+  return `<div class="cerca-wrap"><span class="cerca-ico">⌕</span>
+  <input id="cerca" class="cerca" type="search" value="${esc(valor||'')}" placeholder="Bilatu zenbakiaren, izenburuaren edo hitzen arabera… (ad.: «33», «misioa», «Mariaren Bihotza»)" aria-label="Búsqueda de otoitzak" autocomplete="off"></div>`;
+}
+function lligaCerca(){
+  const el = document.getElementById('cerca'); if(!el) return;
+  el.addEventListener('input', ()=>{ const q=el.value.trim();
+    history.replaceState(null,'', q? '#/cerca/'+encodeURIComponent(q) : '#/');
+    pintaResultats(q);
+  });
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const q=el.value.trim(); const ex=DADES.find(p=>String(p.num)===q); if(ex) location.hash='#/p/'+ex.id; } });
+}
+function cercaPreg(q){
+  const nq = norm(q); if(!nq) return [];
+  const res = DADES.map(p=>{
+    let s=0;
+    if(String(p.num||'')===q.trim()) s+=100;
+    else if(String(p.num||'').startsWith(q.trim()) && /^\d/.test(q)) s+=40;
+    if(norm(p.title).includes(nq)) s+=30;
+    if(norm(p.sub||'').includes(nq)) s+=14;
+    if((p.tags||[]).some(t=>norm(t).includes(nq))) s+=14;
+    const cos = norm(p.lines.map(l=>l.x).join(' '));
+    if(cos.includes(nq)) s+=8;
+    return {p,s};
+  }).filter(r=>r.s>0).sort((a,b)=>b.s-a.s).map(r=>r.p);
+  return res;
+}
+function itemHTML(p, mostraTema){
+  const t = TEMES.find(t=>t.id===p.theme);
+  return `<li class="preg-item"><a href="#/p/${p.id}">
+    <span class="foli">${p.num?esc(String(p.num)):'·'}</span>
+    <span><span class="tt">${esc(p.title)}${favs.has(String(p.id))?' <span class="fav-cinta">❧</span>':''}</span>
+    <span class="inc">${esc(incipit(p))}</span></span>
+    ${mostraTema&&t?`<span class="res-tema">${esc(t.nom)}</span>`:(p.sub?`<span class="etq">${esc(p.sub)}</span>`:'')}
+  </a></li>`;
+}
+function pintaResultats(q){
+  const cont = document.getElementById('resultats'); if(!cont) return;
+  if(!q){ cont.innerHTML = portadaCos(); return; }
+  const res = cercaPreg(q);
+  cont.innerHTML = res.length
+    ? `<div class="res-cap">${res.length} otoitz aurkitu</div><ul class="llista">${res.map(p=>itemHTML(p,true)).join('')}</ul>`
+    : `<div class="buit">Ez da otoitzik aurkitu honela: «${esc(q)}».<br>Saiatu zenbakiarekin, izenburuarekin edo testuarekin.</div>`;
+}
+
+/* ---------- vistas ---------- */
+function portadaCos(){
+  let h = `<div class="portada">
+    <div class="eyebrow">Komunitate-otoitzaren bilduma</div>
+    <h2>Aurkitu unorako otoitza</h2>
+    <p class="intro">Otoitz bakoitzak bildumako zenbakia eta izenburua gordetzen ditu: otoitza gidatzen duenak esan dezake, adibidez, «otoitz egin dezagun 33. otoitzarekin, Klaretar misiolariaren otoitza».</p>
+    <div class="chips">${CIRCUMS.map(c=>`<a class="chip" href="${c.h}">${esc(c.t)}</a>`).join('')}</div>
+    <div class="temes-grid">${TEMES.map(t=>`<a class="tema-card" href="#/tema/${t.id}">
+      <h3>${esc(t.nom)}</h3><div class="desc">${esc(t.desc)}</div>
+      <div class="compta">${perTema(t.id).length} otoitzak</div></a>`).join('')}
+    </div></div>`;
+  return h;
+}
+function vistaPortada(q){
+  pintaIdx(null);
+  document.getElementById('pagina').innerHTML = cercaHTML(q) + `<div id="resultats"></div>`;
+  lligaCerca();
+  pintaResultats(q||'');
+  if(q){ const el=document.getElementById('cerca'); el.focus(); el.setSelectionRange(el.value.length,el.value.length); }
+}
+function vistaTema(id){
+  const t = TEMES.find(t=>t.id===id); if(!t){ location.hash='#/'; return; }
+  pintaIdx(id);
+  const pl = perTema(id);
+  const subs = [...new Set(pl.map(p=>p.sub).filter(Boolean))];
+  let llista='';
+  if(subs.length>1){
+    for(const s of subs){ llista += `<div class="sub-grup">${esc(s)}</div><ul class="llista">${pl.filter(p=>p.sub===s).map(p=>itemHTML(p)).join('')}</ul>`; }
+    const sense = pl.filter(p=>!p.sub);
+    if(sense.length) llista = `<ul class="llista">${sense.map(p=>itemHTML(p)).join('')}</ul>` + llista;
+  } else {
+    llista = `<ul class="llista">${pl.map(p=>itemHTML(p)).join('')}</ul>`;
+  }
+  document.getElementById('pagina').innerHTML = cercaHTML('') +
+   `<a class="torna" href="#/">← Gai guztiak</a>
+    <div class="tema-cap"><h2>${esc(t.nom)}</h2><div class="desc">${esc(t.desc)}</div></div>${llista}`;
+  lligaCerca();
+  window.scrollTo(0,0);
+}
+function vistaFavorits(){
+  pintaIdx('__fav');
+  const pl = DADES.filter(p=>favs.has(String(p.id)));
+  document.getElementById('pagina').innerHTML = cercaHTML('') +
+   `<a class="torna" href="#/">← Gai guztiak</a>
+    <div class="tema-cap"><h2>Nire otoitzak</h2><div class="desc">Komunitate-otoitza prestatzeko hautatutako otoitzak.</div></div>` +
+   (pl.length?`<ul class="llista">${pl.map(p=>itemHTML(p,true)).join('')}</ul>`
+    :`<div class="buit">Oraindik ez duzu otoitzik markatu.<br>Ireki bat eta sakatu «Markatu» hemen gordetzeko.</div>`);
+  lligaCerca(); window.scrollTo(0,0);
+}
+function liniaHTML(l, prev){
+  if(l.t==='rub') return `<p class="rub">${esc(l.x)}</p>`;
+  if(l.t==='v') return `<p class="vers${prev&&prev.t==='r'?' espai':''}">${esc(l.x)}</p>`;
+  if(l.t==='r') return `<p class="resp">${esc(l.x)}</p>`;
+  const espai = prev && (prev.t==='r') ? ' espai':'';
+  return `<p class="${espai.trim()}">${esc(l.x)}</p>`;
+}
+function vistaPreg(id){
+  const p = troba(id); if(!p){ location.hash='#/'; return; }
+  pintaIdx(p.theme);
+  const t = TEMES.find(t=>t.id===p.theme);
+  const i = idxDe(p), ant = DADES[i-1], seg = DADES[i+1];
+  let cos=''; let prev=null;
+  for(const l of p.lines){ cos += liniaHTML(l, prev); prev=l; }
+  const fav = favs.has(String(p.id));
+  document.getElementById('pagina').innerHTML = cercaHTML('') +
+   `<a class="torna" href="#/tema/${p.theme}">← ${esc(t?t.nom:'Gaiak')}</a>
+    <article class="preg-full">
+      <div class="preg-meta">${esc(t?t.nom:'')}${p.sub?' · '+esc(p.sub):''}</div>
+      ${p.num?`<div class="preg-num">${esc(String(p.num))}</div>`:''}
+      <h2 class="preg-titol">${esc(p.title)}</h2>
+      <div class="preg-eines">
+        <button class="eina surt-lectura" id="btnLectura">📖 Modo otoitza</button>
+        <button class="eina ${fav?'fav-actiu':''}" id="btnFav">${fav?'❧ Markatua':'❧ Markatu'}</button>
+        <button class="eina" id="btnCopia">Testua kopiatu</button>
+        <button class="eina" onclick="window.print()">Inprimatu</button>
+        <span class="mida-grup"><button class="eina mida" id="btnMenys" aria-label="Testua txikiago">A−</button><button class="eina mida" id="btnMes" aria-label="Testua handiagoa">A+</button></span>
+      </div>
+      <div class="preg-cos" id="cosPreg">${cos}</div>
+    </article>
+    <nav class="nav-pn">
+      ${ant?`<a href="#/p/${ant.id}"><span class="pn-l">← Aurrekoa</span><span class="pn-t">${ant.num?ant.num+'. ':''}${esc(ant.title)}</span></a>`:'<span></span>'}
+      ${seg?`<a class="seg" href="#/p/${seg.id}"><span class="pn-l">Hurrengoa →</span><span class="pn-t">${seg.num?seg.num+'. ':''}${esc(seg.title)}</span></a>`:''}
+    </nav>`;
+  lligaCerca();
+  document.getElementById('btnFav').onclick = ()=>toggleFav(String(p.id));
+  document.getElementById('btnMes').onclick = ()=>canviaMida(.12);
+  document.getElementById('btnMenys').onclick = ()=>canviaMida(-.12);
+  document.getElementById('btnCopia').onclick = e=>{
+    const txt = (p.num?p.num+'. ':'')+p.title+'\n\n'+p.lines.map(l=>{
+      if(l.t==='v')return 'V/. '+l.x; if(l.t==='r')return 'R/. '+l.x; return l.x;}).join('\n');
+    navigator.clipboard.writeText(txt).then(()=>{e.target.textContent='Kopiatua ✓'; setTimeout(()=>e.target.textContent='Testua kopiatu',1600);}).catch(()=>{});
+  };
+  const bl = document.getElementById('btnLectura');
+  bl.onclick = ()=>{
+    document.body.classList.toggle('lectura');
+    const on = document.body.classList.contains('lectura');
+    bl.textContent = on ? '✕ Salir del modo otoitza' : '📖 Modo otoitza';
+    if(on && mida<1.6){ mida=1.6; document.documentElement.style.setProperty('--fs-preg',mida+'rem'); }
+    window.scrollTo(0,0);
+  };
+  window.scrollTo(0,0);
+}
+
+/* ---------- router ---------- */
+function render(){
+  document.body.classList.remove('lectura');
+  const h = location.hash || '#/';
+  const m1 = h.match(/^#\/tema\/(.+)$/);
+  const m2 = h.match(/^#\/p\/(.+)$/);
+  const m3 = h.match(/^#\/cerca\/(.+)$/);
+  if(m1) vistaTema(decodeURIComponent(m1[1]));
+  else if(m2) vistaPreg(decodeURIComponent(m2[1]));
+  else if(m3) vistaPortada(decodeURIComponent(m3[1]));
+  else if(h==='#/favorits') vistaFavorits();
+  else vistaPortada('');
+}
+window.addEventListener('hashchange', render);
+document.getElementById('toggleIdx').addEventListener('click', function(){
+  const sp = document.querySelector('.spine'); sp.classList.toggle('open');
+  this.setAttribute('aria-expanded', sp.classList.contains('open'));
+  this.textContent = sp.classList.contains('open') ? 'Aurkibidea ezkutatu' : 'Gaien aurkibidea';
+});
+document.querySelector('.idx').addEventListener('click', ()=>{ if(innerWidth<=900){ document.querySelector('.spine').classList.remove('open'); }});
+
+carregaFavs().then(render);
+render();
+
+</script>
+</body>
+</html>
