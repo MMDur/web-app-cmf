@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editor · Oracional CMF</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#7a2137;--gl:#f5ede9;--gm:#c9a0a8;--gold:#c9a227;
+      --txt:#2c2420;--mut:#9a8070;--brd:#ddd8d0;--bg:#f7f4f0;--wh:#fff;--r:6px}
+body{font:14px/1.5 system-ui,-apple-system,sans-serif;color:var(--txt);
+     background:var(--bg);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#topbar{display:flex;align-items:center;gap:10px;padding:8px 14px;
+        background:var(--g);color:#fff;flex-shrink:0}
+#topbar h1{font-size:14px;font-weight:600;flex:1}
+.tbbtn{padding:5px 12px;border-radius:var(--r);cursor:pointer;font:500 12px system-ui;
+       border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff}
+.tbbtn:hover{background:rgba(255,255,255,.25)}
+.tbbtn.accent{background:#fff;color:var(--g);border-color:#fff}
+#shell{display:flex;flex:1;overflow:hidden}
+/* Sidebar */
+#sb{width:290px;flex-shrink:0;background:var(--wh);border-right:1px solid var(--brd);
+    display:flex;flex-direction:column;overflow:hidden}
+#sb-tabs{display:flex;border-bottom:1px solid var(--brd)}
+.sbtab{flex:1;padding:9px 4px;font:600 12px system-ui;color:var(--mut);cursor:pointer;
+       border:none;border-bottom:2px solid transparent;background:none;transition:all .15s}
+.sbtab.on{color:var(--g);border-bottom-color:var(--g)}
+.sbtab:hover:not(.on){color:var(--txt)}
+#lang-row{display:flex;gap:3px;padding:8px 10px 4px}
+.ltab{flex:1;padding:4px 2px;border:1px solid var(--brd);border-radius:var(--r);
+      background:var(--wh);color:var(--mut);font:600 11px system-ui;text-align:center;cursor:pointer;transition:all .12s}
+.ltab.on{background:var(--g);color:#fff;border-color:var(--g)}
+.ltab:hover:not(.on){background:var(--gl);color:var(--g)}
+#sb-filter{padding:6px 10px;border-bottom:1px solid var(--brd)}
+#sb-filter select,#sb-filter input{width:100%;padding:5px 8px;border:1px solid var(--brd);
+  border-radius:var(--r);font:12px system-ui;color:var(--txt);background:var(--wh);margin-bottom:4px}
+#sb-filter select:last-child,#sb-filter input:last-child{margin-bottom:0}
+#plist{flex:1;overflow-y:auto}
+.prow{display:flex;align-items:flex-start;padding:8px 10px;border-bottom:1px solid #f0ece6;
+      cursor:pointer;transition:background .1s;gap:6px}
+.prow:hover{background:var(--gl)}
+.prow:hover .prow-edit{opacity:1}
+.prow.on{background:#f0e0e4}
+.prow-info{flex:1;min-width:0}
+.prow-num{font:700 11px system-ui;color:var(--mut);margin-right:4px}
+.prow-title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow-theme{font-size:11px;color:var(--mut);margin-top:1px}
+.prow-edit{opacity:0;padding:2px 6px;font-size:11px;border:1px solid var(--brd);
+           border-radius:4px;background:var(--wh);cursor:pointer;flex-shrink:0;
+           color:var(--mut);transition:opacity .15s;align-self:center}
+.prow-edit:hover{background:var(--g);color:#fff;border-color:var(--g)}
+#sb-foot{padding:8px 10px;border-top:1px solid var(--brd)}
+/* Carpetes list in sidebar */
+#clist{flex:1;overflow-y:auto}
+.crow{display:flex;align-items:center;padding:9px 10px;border-bottom:1px solid #f0ece6;
+      gap:6px;cursor:pointer}
+.crow:hover{background:var(--gl)}
+.crow.on{background:#f0e0e4}
+.crow-num{font:700 12px system-ui;color:var(--g);width:22px;flex-shrink:0}
+.crow-name{flex:1;font-size:13px}
+.crow-count{font-size:11px;color:var(--mut)}
+/* Main */
+#main{flex:1;overflow-y:auto;background:var(--wh)}
+#splash{display:flex;align-items:center;justify-content:center;height:100%;
+        flex-direction:column;gap:14px;color:var(--mut);text-align:center;padding:2rem}
+#splash .cross{font-size:40px;color:var(--gm)}
+#splash h2{font-size:18px;font-weight:500;color:var(--txt)}
+#splash p{font-size:13px;max-width:320px}
+/* Form shared */
+.form-wrap{padding:16px 20px;max-width:700px}
+.fhead{display:flex;justify-content:space-between;align-items:center;
+       margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--brd)}
+.fhead h3{font-size:15px;font-weight:600}
+.factions{display:flex;gap:7px}
+.frow2{display:grid;grid-template-columns:100px 1fr;gap:10px;margin-bottom:10px}
+.ffield{margin-bottom:10px}
+.flabel{display:block;font:600 11px system-ui;color:var(--mut);
+        letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+input.finput,select.finput,textarea.finput{width:100%;padding:7px 10px;
+  border:1px solid var(--brd);border-radius:var(--r);font:14px system-ui;
+  color:var(--txt);background:var(--wh)}
+input.finput:focus,select.finput:focus,textarea.finput:focus{
+  outline:2px solid var(--gm);outline-offset:1px}
+select.finput{cursor:pointer}
+/* Lines */
+.lines-section{border-top:1px solid var(--brd);padding-top:12px;margin-top:4px}
+.lines-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.lrow{display:flex;gap:5px;margin-bottom:5px;align-items:flex-start}
+.ltype{width:68px;flex-shrink:0;padding:4px 3px;border:1px solid var(--brd);
+       border-radius:var(--r);font:600 11px system-ui;cursor:pointer;background:var(--wh);color:var(--mut)}
+.ltype[data-t=v]{background:#edf4f8;color:#1a5070;border-color:#b0ccdd}
+.ltype[data-t=r]{background:#f5edf8;color:#7a1f8a;border-color:#c8a8d8}
+.ltype[data-t=rub]{background:#f5f0e8;color:#8a6840;border-color:#d8c8a8;font-style:italic}
+.ltxt{flex:1;padding:5px 8px;border:1px solid var(--brd);border-radius:var(--r);
+      font:13px system-ui;resize:none;overflow:hidden;background:var(--wh);
+      color:var(--txt);min-height:32px;line-height:1.5}
+.ltxt[data-t=v]{color:#1a5070;background:#f5fafe}
+.ltxt[data-t=r]{color:#7a1f8a;background:#fcf5ff}
+.ltxt[data-t=rub]{font-style:italic;color:#8a6840}
+.lbtns{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.lbtns button{padding:2px 6px;font-size:12px;border:1px solid var(--brd);
+              border-radius:4px;background:var(--wh);color:var(--mut);cursor:pointer}
+.lbtns button:hover{background:var(--gl);color:var(--g)}
+.lbtns button:disabled{opacity:.3;cursor:default}
+/* Paste */
+.paste-sec{margin-top:14px;border-top:2px dashed #e0d8d0;padding-top:12px}
+.paste-hd{font:600 12px system-ui;color:var(--g);margin-bottom:6px;
+          display:flex;align-items:center;gap:6px}
+.paste-tip{font-size:12px;color:var(--mut);margin-bottom:8px;line-height:1.6}
+#paste-txt{width:100%;min-height:100px;max-height:220px;padding:10px;
+           border:1px solid var(--brd);border-radius:var(--r);
+           font:13px/1.6 system-ui;color:var(--txt);background:#fefcf8;resize:vertical}
+.parse-row{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+/* Carpeta form */
+.lang-fields{margin-bottom:10px;padding:10px;background:var(--bg);
+             border-radius:var(--r);border:1px solid var(--brd)}
+.lang-fields h4{font:600 12px system-ui;color:var(--g);margin-bottom:8px;
+                text-transform:uppercase;letter-spacing:.04em}
+.lang-grid{display:grid;grid-template-columns:1fr 2fr;gap:6px;align-items:start}
+.lang-grid label{font-size:12px;color:var(--mut);padding-top:8px}
+/* Buttons */
+.btn{padding:7px 14px;border-radius:var(--r);cursor:pointer;font:500 13px system-ui;
+     border:1px solid var(--brd);background:var(--wh);color:var(--txt);transition:all .12s}
+.btn:hover{background:var(--gl)}
+.btn-primary{background:var(--g);color:#fff;border-color:var(--g)}
+.btn-primary:hover{background:#621a2b}
+.btn-danger{color:#c0392b;border-color:#f0c8c0}
+.btn-danger:hover{background:#fde8e8}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-full{width:100%;text-align:center}
+/* Notif */
+#notif{display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+       padding:9px 20px;border-radius:20px;font:500 13px system-ui;
+       background:var(--g);color:#fff;z-index:999;pointer-events:none;white-space:nowrap}
+#notif.show{display:block}
+#notif.ok{background:#2e7d52}
+.dirty{width:7px;height:7px;border-radius:50%;background:#f39c12;display:inline-block;vertical-align:middle;margin-left:6px}
+</style>
+</head>
+<body>
+<div id="notif"></div>
+<div id="topbar">
+  <h1>✠ Editor · Oracional CMF <span id="dirty-dot" class="dirty" style="display:none" title="Canvis sense exportar"></span></h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <label style="cursor:pointer">
+      <input type="file" id="finput" accept=".html" style="display:none">
+      <span class="tbbtn" id="fbtn">Carregar fitxer</span>
+    </label>
+    <button class="tbbtn accent" id="exp-btn" onclick="doExport()" style="display:none">↓ Exportar</button>
+  </div>
+</div>
+<div id="shell">
+  <aside id="sb">
+    <div id="sb-tabs" style="display:none">
+      <button class="sbtab on" onclick="setSbView('oracions')" id="tab-or">Oracions</button>
+      <button class="sbtab" onclick="setSbView('carpetes')" id="tab-ca">Carpetes</button>
+    </div>
+    <div id="lang-row"></div>
+    <div id="sb-filter"></div>
+    <div id="plist"></div>
+    <div id="clist"></div>
+    <div id="sb-foot"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<script>
+
+const LANG_CODES=['es','ca','it','fr','eu'];
+const LANG_LABELS={es:'Castellano',ca:'Català',it:'Italiano',fr:'Français',eu:'Euskera'};
+const LANG_ACTIVE=['es','ca','it','fr']; // EU separate
+const DEFAULT_SC={
+  es:"n=>`${n} oración${n===1?' encontrada':'es encontradas'}`",
+  ca:"n=>`${n} pregàri${n===1?'a':'es'} trobad${n===1?'a':'es'}`",
+  it:"n=>`${n} preghier${n===1?'a trovata':'e trovate'}`",
+  fr:"n=>`${n} prière${n===1?' trouvée':'s trouvées'}`",
+  eu:"n=>`${n} otoitz aurkitu`"
+};
+const SCALAR=['appTitle','subTitle','lang','storageKey','myPrayers','myPrayersDesc',
+  'noPrayers','noPrayersHint','backToThemes','searchNone','searchHint','homeSubtitle',
+  'homeTitle','homeIntro','readingMode','exitReadingMode','markFav','markedFav',
+  'copyText','copied','print','prev','next','textSmaller','textLarger','searchLabel',
+  'searchPlaceholder','preparations','themes','themeIndex','hideIndex','prayerUnit'];
+
+let S={html:'',packs:null,scs:{},
+       lang:'es',theme:'',query:'',
+       sbView:'oracions',   // 'oracions' | 'carpetes'
+       selectedId:null,editP:null,isNew:false,
+       editTheme:null,isNewTheme:false,
+       dirty:false};
+
+/* ── helpers ── */
+const dc=x=>JSON.parse(JSON.stringify(x));
+const he=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const lp=()=>S.packs?S.packs[S.lang]:{dades:[],temes:[],circums:[]};
+const temes=()=>lp().temes||[];
+const dades=()=>lp().dades||[];
+const tmLabel=(id)=>{const t=temes(),i=t.findIndex(x=>x.id===id);return i<0?id:`${i+1}. ${t[i].nom}`};
+const tmIdx=(id)=>temes().findIndex(x=>x.id===id)+1;
+
+let _nt;
+function notify(msg,ok=false){
+  const el=document.getElementById('notif');
+  el.textContent=msg;el.className=ok?'show ok':'show';
+  clearTimeout(_nt);_nt=setTimeout(()=>el.className='',2800);
+}
+
+/* ── file load / export ── */
+function loadHtml(content,fname){
+  try{
+    const s0=content.indexOf('<script>')+8,s1=content.lastIndexOf('<'+'/'+'script>');
+    const script=content.slice(s0,s1);
+    const lps=script.indexOf('const LANG_PACKS = {'),lpe=script.indexOf('\nlet DADES',lps);
+    if(lps<0||lpe<0)throw new Error("No s'ha trobat LANG_PACKS");
+    const lpCode=script.slice(lps,lpe);
+    const fn=new Function(lpCode+'\nreturn LANG_PACKS;');
+    const packs=fn();
+    const scRe=/searchCount:\s*(n=>[^\n]+[^,\s])/g;
+    const scs={};let m,i=0;
+    while((m=scRe.exec(lpCode))!==null&&i<5)scs[LANG_CODES[i++]]=m[1].trim().replace(/,$/,'');
+    LANG_CODES.forEach(c=>{if(!scs[c])scs[c]=DEFAULT_SC[c];});
+    S={...S,html:content,packs,scs,lang:'es',theme:'',query:'',sbView:'oracions',
+       selectedId:null,editP:null,isNew:false,editTheme:null,isNewTheme:false,dirty:false};
+    document.getElementById('fbtn').textContent=(fname||'fitxer').slice(0,20);
+    renderAll();
+    const tot=Object.values(packs).reduce((a,p)=>a+(p.dades||[]).length,0);
+    notify(`Carregat: ${tot} oracions`,true);
+  }catch(err){alert('Error en carregar: '+err.message);}
+}
+
+function doExport(){
+  if(!S.packs)return;
+  const html=S.html;
+  const s0=html.indexOf('<script>')+8,s1=html.lastIndexOf('<'+'/'+'script>');
+  const script=html.slice(s0,s1);
+  const lps=script.indexOf('const LANG_PACKS = {'),lpe=script.indexOf('\nlet DADES',lps);
+  const e2=s=>String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const parts=['const LANG_PACKS = {'];
+  for(const code of LANG_CODES){
+    const p=S.packs[code],sc=S.scs[code]||DEFAULT_SC[code];
+    const scalars=SCALAR.map(k=>`    ${k}: '${e2(p[k]||'')}'`).join(',\n');
+    parts.push(`  ${code}: {\n${scalars},\n    searchCount: ${sc},\n    dades: ${JSON.stringify(p.dades)},\n    temes: ${JSON.stringify(p.temes)},\n    circums: ${JSON.stringify(p.circums)}\n  },`);
+  }
+  parts.push('};');
+  const newHtml=html.slice(0,s0)+script.slice(0,lps)+parts.join('\n')+script.slice(lpe)+html.slice(s1);
+  try{
+    const b=new Blob([newHtml],{type:'text/html'});
+    const u=URL.createObjectURL(b);
+    const a=document.createElement('a');a.href=u;a.download='CMF_oracional_5idiomes.html';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(u),2000);
+    S.dirty=false;renderTopbar();notify('Exportat ✓',true);
+  }catch(err){alert('Error: '+err.message);}
+}
+
+/* ── paste parse ── */
+function detectLine(raw){
+  const l=raw.trim();if(!l)return null;
+  if(/^[VvBb][\/.:]\s*/.test(l))return{t:'v',x:l.replace(/^[VvBb][\/.:]\s*/,'').trim()};
+  if(/^[RrDd][\/.:]\s*/.test(l))return{t:'r',x:l.replace(/^[RrDd][\/.:]\s*/,'').trim()};
+  if(/^(preguem|preghiamo|prions|oremos|orons|egin dezagun)/i.test(l)||(l.endsWith(':')&&l.length<50))
+    return{t:'rub',x:l};
+  return{t:'p',x:l};
+}
+function parsePaste(append){
+  const raw=document.getElementById('paste-txt').value.trim();
+  if(!raw){notify('Enganxa primer algun text.');return;}
+  const parsed=raw.split(/\n/).map(l=>detectLine(l.trim())).filter(Boolean);
+  if(!parsed.length){notify('No s\'ha detectat cap línia.');return;}
+  if(append)S.editP.lines=[...S.editP.lines,...parsed];
+  else{
+    if(S.editP.lines.length&&!confirm('Substituir les línies actuals?'))return;
+    S.editP.lines=parsed;
+  }
+  document.getElementById('paste-txt').value='';
+  renderLines();
+  notify(`${parsed.length} línies carregades`,true);
+}
+
+/* ── num helpers ── */
+function nextId(){let max=0;dades().forEach(p=>{const n=parseInt(p.id);if(!isNaN(n)&&n>max)max=n;});return String(max+1);}
+function nextNum(tid){
+  const t=temes().find(x=>x.id===tid);if(!t)return'';
+  if(t.temporal){let max=0;dades().filter(p=>p.theme===tid).forEach(p=>{const n=parseInt(p.num);if(!isNaN(n)&&n>max)max=n;});return String(max+1);}
+  const i=temes().findIndex(x=>x.id===tid);const tn=i+1;let max=0;
+  dades().filter(p=>p.theme===tid).forEach(p=>{const pts=String(p.num).split('.');if(pts[0]==String(tn)){const n=parseInt(pts[1]);if(!isNaN(n)&&n>max)max=n;}});
+  return`${tn}.${max+1}`;
+}
+
+/* ── Theme management ── */
+function startNewTheme(){
+  S.editTheme={id:'',noms:{es:'',ca:'',it:'',fr:'',eu:''},descs:{es:'',ca:'',it:'',fr:'',eu:''},temporal:false};
+  S.isNewTheme=true;S.editP=null;S.selectedId=null;
+  renderMain();
+}
+function editTheme(id){
+  // Collect names/descs from each language pack
+  const noms={},descs={};
+  LANG_CODES.forEach(c=>{const t=(S.packs[c].temes||[]).find(x=>x.id===id);noms[c]=t?t.nom:'';descs[c]=t?t.desc:'';});
+  const isTmp=!!(S.packs[LANG_CODES[0]].temes||[]).find(x=>x.id===id)?.temporal;
+S.editTheme={id,noms,descs,temporal:!!isTmp};S.isNewTheme=false;S.editP=null;S.selectedId=null;
+  renderMain();
+}
+function saveTheme(){
+  const nm=document.getElementById('tm-nom-es').value.trim();
+  if(!nm){notify('El nom en castellà és obligatori.');return;}
+  let tid=S.editTheme.id||nm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  // Collect all names/descs from form
+  const noms={},descs={};
+  LANG_CODES.forEach(c=>{noms[c]=document.getElementById('tm-nom-'+c)?.value||'';descs[c]=document.getElementById('tm-desc-'+c)?.value||'';});
+  // Update / add temes in each language pack
+  const packs=dc(S.packs);
+  LANG_CODES.forEach(c=>{
+    const t=packs[c].temes;
+    const idx=t.findIndex(x=>x.id===tid);
+    const isTmpSave=!!(document.getElementById('tm-temporal')?.checked);
+    const entry=Object.assign({id:tid,nom:noms[c]||noms['es']||tid,desc:descs[c]||''},isTmpSave?{temporal:true}:{});
+    if(idx>=0)t[idx]=entry;else t.push(entry);
+  });
+  S.packs=packs;S.dirty=true;S.editTheme=null;
+  renderAll();notify(S.isNewTheme?'Carpeta creada ✓':'Carpeta actualitzada ✓',true);
+}
+function deleteTheme(id){
+  const cnt=dades().filter(p=>p.theme===id).length;
+  if(cnt>0&&!confirm(`Aquesta carpeta té ${cnt} oracions. Eliminar igualment?`))return;
+  const packs=dc(S.packs);
+  LANG_CODES.forEach(c=>{packs[c].temes=packs[c].temes.filter(t=>t.id!==id);});
+  S.packs=packs;S.dirty=true;S.editTheme=null;
+  renderAll();notify('Carpeta eliminada',false);
+}
+
+/* ── Prayer CRUD ── */
+function selectPrayer(id){
+  const p=dades().find(x=>x.id===id);if(!p)return;
+  S.selectedId=id;S.isNew=false;S.editP=dc(p);S.editTheme=null;
+  renderSidebar();renderMain();
+}
+function startAdd(){
+  const tid=temes()[0]?.id||'';
+  S.editP={id:nextId(),num:nextNum(tid),title:'',theme:tid,sub:null,tags:[],lines:[]};
+  S.isNew=true;S.selectedId=null;S.editTheme=null;
+  renderSidebar();renderMain();
+  setTimeout(()=>document.getElementById('f-title')?.focus(),50);
+}
+function doSave(){
+  const p=S.editP;
+  if(!p?.title?.trim()){notify('El títol és obligatori.');return;}
+  if(!p.lines?.length){notify('Cal almenys una línia de text.');return;}
+  p.num=document.getElementById('f-num').value||p.num;
+  p.title=document.getElementById('f-title').value.trim();
+  p.theme=document.getElementById('f-theme').value;
+  p.sub=document.getElementById('f-sub').value.trim()||null;
+  const packs=dc(S.packs);
+  const ds=packs[S.lang].dades;
+  const idx=ds.findIndex(x=>x.id===p.id);
+  if(idx>=0)ds[idx]=p;else ds.push(p);
+  S.packs=packs;S.selectedId=p.id;S.isNew=false;S.dirty=true;S.editP=dc(p);
+  renderAll();notify('Desada ✓',true);
+}
+function doCancel(){S.editP=null;S.editTheme=null;S.selectedId=null;S.isNew=false;renderSidebar();renderMain();}
+function doDelete(id){
+  if(!confirm('Eliminar aquesta oració?'))return;
+  const packs=dc(S.packs);packs[S.lang].dades=packs[S.lang].dades.filter(p=>p.id!==id);
+  S.packs=packs;S.editP=null;S.selectedId=null;S.dirty=true;renderAll();
+}
+
+/* ── Line mutations ── */
+function autoH(ta){ta.style.height='auto';ta.style.height=Math.max(ta.scrollHeight,32)+'px';}
+function chType(i,v){
+  S.editP.lines[i].t=v;
+  const row=document.querySelector(`.lrow[data-i="${i}"]`);if(!row)return;
+  row.querySelector('.ltype').dataset.t=v;row.querySelector('.ltxt').dataset.t=v;
+}
+function chTxt(i,ta){if(S.editP)S.editP.lines[i].x=ta.value;}
+function moveLine(i,d){const ls=S.editP.lines,j=i+d;if(j<0||j>=ls.length)return;[ls[i],ls[j]]=[ls[j],ls[i]];renderLines();}
+function delLine(i){S.editP.lines.splice(i,1);renderLines();}
+function addLine(){
+  S.editP.lines.push({t:'p',x:''});renderLines();
+  setTimeout(()=>{const rows=document.querySelectorAll('.lrow');const last=rows[rows.length-1];if(last)last.querySelector('.ltxt').focus();},40);
+}
+
+/* ── Render: topbar ── */
+function renderTopbar(){
+  const eb=document.getElementById('exp-btn');if(eb)eb.style.display=S.packs&&S.dirty?'':'none';
+  const dd=document.getElementById('dirty-dot');if(dd)dd.style.display=S.dirty?'inline-block':'none';
+}
+
+/* ── Render: sidebar ── */
+function renderSidebar(){
+  if(!S.packs){
+    document.getElementById('sb-tabs').style.display='none';
+    document.getElementById('lang-row').innerHTML='';
+    document.getElementById('sb-filter').innerHTML='';
+    document.getElementById('plist').innerHTML='';
+    document.getElementById('clist').innerHTML='';
+    document.getElementById('sb-foot').innerHTML='';
+    return;
+  }
+  document.getElementById('sb-tabs').style.display='flex';
+  // Lang tabs
+  document.getElementById('lang-row').innerHTML=LANG_CODES.map(c=>
+    `<button class="ltab${c===S.lang?' on':''}" onclick="setLang('${c}')">${c.toUpperCase()}</button>`
+  ).join('');
+
+  if(S.sbView==='oracions'){
+    // Filter
+    const tmC={};dades().forEach(p=>{tmC[p.theme]=(tmC[p.theme]||0)+1;});
+    document.getElementById('sb-filter').innerHTML=
+      `<select id="theme-sel" onchange="S.theme=this.value;renderSidebar()">
+        <option value="">Totes les carpetes (${dades().length})</option>
+        ${temes().map((t,i)=>`<option value="${t.id}"${S.theme===t.id?' selected':''}>${i+1}. ${he(t.nom)} (${tmC[t.id]||0})</option>`).join('')}
+      </select>
+      <input type="search" id="search-inp" placeholder="Cerca número, títol o text…"
+             value="${he(S.query)}" oninput="S.query=this.value;renderSidebar()">`;
+    // Prayer list
+    const filtered=dades().filter(p=>{
+      const mt=!S.theme||p.theme===S.theme;
+      const q=S.query.trim().toLowerCase();
+      const mq=!q||String(p.num).includes(q)||(p.title||'').toLowerCase().includes(q)||
+                (p.lines||[]).some(l=>l.x.toLowerCase().includes(q));
+      return mt&&mq;
+    });
+    document.getElementById('plist').innerHTML=filtered.length===0
+      ?'<div style="padding:1.5rem;text-align:center;color:var(--mut);font-size:12px">Cap resultat</div>'
+      :filtered.map(p=>`<div class="prow${p.id===S.selectedId?' on':''}" data-id="${p.id}">
+          <div class="prow-info">
+            <div><span class="prow-num">${he(p.num)}</span><span class="prow-title">${he(p.title)}</span></div>
+            <div class="prow-theme">${he(tmLabel(p.theme))}</div>
+          </div>
+          <button class="prow-edit" onclick="selectPrayer('${p.id}');event.stopPropagation()">✎ Edita</button>
+        </div>`).join('');
+    document.getElementById('clist').innerHTML='';
+    document.getElementById('sb-foot').innerHTML=
+      `<button class="btn btn-full" onclick="startAdd()">+ Nova oració</button>`;
+  } else {
+    // Carpetes view
+    document.getElementById('sb-filter').innerHTML='';
+    document.getElementById('plist').innerHTML='';
+    const ts=temes();
+    const tmC={};dades().forEach(p=>{tmC[p.theme]=(tmC[p.theme]||0)+1;});
+    document.getElementById('clist').innerHTML=ts.map((t,i)=>
+      `<div class="crow${S.editTheme?.id===t.id?' on':''}" onclick="editTheme('${t.id}')">
+        <span class="crow-num">${i+1}</span>
+        ${t.temporal?`<span class="crow-name" style="font-style:italic">${he(t.nom)} <sup style="color:#c9a227">T</sup></span>`:`${t.temporal?`<span class="crow-name" style="font-style:italic">${he(t.nom)} <sup style="color:#c9a227;font-size:9px">T</sup></span>`:`<span class="crow-name">${he(t.nom)}</span>`}`}
+        <span class="crow-count">${tmC[t.id]||0}</span>
+      </div>`).join('');
+    document.getElementById('sb-foot').innerHTML=
+      `<button class="btn btn-full" onclick="startNewTheme()">+ Nova carpeta</button>`;
+  }
+}
+
+/* ── Render: lines ── */
+function renderLines(){
+  const lines=S.editP?.lines||[];
+  const c=document.getElementById('lines-cont');if(!c)return;
+  c.innerHTML=lines.map((l,i)=>`
+    <div class="lrow" data-i="${i}">
+      <select class="ltype" data-t="${l.t}" onchange="chType(${i},this.value)">
+        <option value="p"${l.t==='p'?' selected':''}>§ Text</option>
+        <option value="v"${l.t==='v'?' selected':''}>V/.</option>
+        <option value="r"${l.t==='r'?' selected':''}>R/.</option>
+        <option value="rub"${l.t==='rub'?' selected':''}>Rúbr.</option>
+      </select>
+      <textarea class="ltxt" data-t="${l.t}" oninput="chTxt(${i},this);autoH(this)" rows="1">${he(l.x)}</textarea>
+      <div class="lbtns">
+        <button onclick="moveLine(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button onclick="moveLine(${i},1)" ${i===lines.length-1?'disabled':''}>↓</button>
+        <button onclick="delLine(${i})" style="color:#c0392b">×</button>
+      </div>
+    </div>`).join('');
+  const lh=document.getElementById('lines-count');if(lh)lh.textContent=`Línies (${lines.length})`;
+  setTimeout(()=>c.querySelectorAll('.ltxt').forEach(autoH),10);
+}
+
+/* ── Render: main ── */
+function renderMain(){
+  const m=document.getElementById('main');
+
+  // No file loaded
+  if(!S.packs){
+    m.innerHTML=`<div id="splash"><div class="cross">✠</div>
+      <h2>Editor · Oracional CMF</h2>
+      <p>Carrega el fitxer <strong>CMF_oracional_5idiomes.html</strong> per editar les oracions i carpetes</p></div>`;
+    return;
+  }
+
+  // Theme editor
+  if(S.editTheme!==null){
+    const t=S.editTheme,isNew=S.isNewTheme;
+    const langFields=LANG_CODES.map(c=>`
+      <div class="lang-fields">
+        <h4>${LANG_LABELS[c]} ${c==='eu'?'<span style="font-weight:400;color:var(--mut)">(opcional)</span>':''}</h4>
+        <div class="lang-grid">
+          <label class="flabel" style="margin:0">Nom</label>
+          <input class="finput" id="tm-nom-${c}" value="${he(t.noms[c]||'')}"
+                 placeholder="${c==='es'?'Obligatori per generar l\'ID':''}">
+          <label class="flabel" style="margin:0">Descripció</label>
+          <input class="finput" id="tm-desc-${c}" value="${he(t.descs[c]||'')}" placeholder="Breu descripció (opcional)">
+        </div>
+      </div>`).join('');
+    m.innerHTML=`<div class="form-wrap">
+      <div class="fhead">
+        <h3>${isNew?'Nova carpeta':`Editar carpeta: ${he(t.id)}`}</h3>
+        <div class="factions">
+          ${!isNew?`<button class="btn btn-sm btn-danger" onclick="deleteTheme('${t.id}')">Eliminar</button>`:''}
+          <button class="btn btn-sm" onclick="doCancel()">Cancel·lar</button>
+          <button class="btn btn-sm btn-primary" onclick="saveTheme()">Desar</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--mut);margin-bottom:14px">
+        ${isNew?'Posa el nom en castellà primer (s\'usarà per generar l\'identificador). Els altres idiomes són opcionals però recomanables.\'</p>\n      <label style=\'display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;cursor:pointer\'>\n        <input type=\'checkbox\' id=\'tm-temporal\' ${S.editTheme.temporal?\'checked\':\'\'}>\n        Carpeta temporal (novena, trídum...) — <em style=\'color:var(--mut)\'>no es numera</em>\n      </label>\n      <p style=\'display:none\'>':'Modifica el nom i la descripció de la carpeta en cada idioma.'}
+      </p>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;cursor:pointer"><input type="checkbox" id="tm-temporal" ${S.editTheme.temporal?'checked':''}> Carpeta temporal (novena, trídum, aniversari…) — <em style="color:var(--mut)">no es numera</em></label>
+      ${langFields}
+    </div>`;
+    return;
+  }
+
+  // Prayer editor
+  if(S.editP){
+    const p=S.editP,isNew=S.isNew;
+    m.innerHTML=`<div class="form-wrap">
+      <div class="fhead">
+        <h3>${isNew?'Nova oració':`✎ Editant: ${he(p.title||p.num)}`}</h3>
+        <div class="factions">
+          ${!isNew?`<button class="btn btn-sm btn-danger" onclick="doDelete('${p.id}')">Eliminar</button>`:''}
+          <button class="btn btn-sm" onclick="doCancel()">Cancel·lar</button>
+          <button class="btn btn-sm btn-primary" onclick="doSave()">Desar <kbd style="font-size:10px;opacity:.7">⌘S</kbd></button>
+        </div>
+      </div>
+      <div class="frow2">
+        <div><label class="flabel">Número</label>
+          <input class="finput" id="f-num" value="${he(p.num)}"></div>
+        <div><label class="flabel">Carpeta</label>
+          <select class="finput" id="f-theme" onchange="onTmChange(this.value)">
+            ${temes().map((t,i)=>`<option value="${t.id}"${p.theme===t.id?' selected':''}>${i+1}. ${he(t.nom)}</option>`).join('')}
+          </select></div>
+      </div>
+      <div class="ffield"><label class="flabel">Títol</label>
+        <input class="finput" id="f-title" value="${he(p.title)}" placeholder="Títol de l'oració"></div>
+      <div class="ffield"><label class="flabel">Subtítol <span style="font-weight:400;text-transform:none">(opcional)</span></label>
+        <input class="finput" id="f-sub" value="${he(p.sub||'')}" placeholder="ex. del Pare Fundador"></div>
+
+      <div class="lines-section">
+        <div class="lines-hd">
+          <span id="lines-count" style="font:600 11px system-ui;color:var(--mut);text-transform:uppercase;letter-spacing:.04em">Línies</span>
+          <span style="font-size:11px;color:var(--mut);display:flex;gap:5px">
+            <span style="padding:1px 6px;background:#edf4f8;color:#1a5070;border-radius:3px;font-weight:600">V/.</span>
+            <span style="padding:1px 6px;background:#f5edf8;color:#7a1f8a;border-radius:3px;font-weight:600">R/.</span>
+            <span style="padding:1px 6px;background:#f5f0e8;color:#8a6840;border-radius:3px;font-weight:600;font-style:italic">Rúbr.</span>
+          </span>
+        </div>
+        <div id="lines-cont"></div>
+        <button class="btn btn-sm" style="margin-top:6px" onclick="addLine()">+ Afegir línia</button>
+      </div>
+
+      <div class="paste-sec">
+        <div class="paste-hd">⇩ Enganxa text del Word (parseig automàtic)</div>
+        <p class="paste-tip">
+          Copia i enganxa el text directament. Detecta automàticament <strong>V/.</strong> → Versicle,
+          <strong>R/.</strong> → Resposta, <em>Preguem./Prions.</em> → Rúbrica, la resta → Text normal.
+        </p>
+        <textarea id="paste-txt" placeholder="Enganxa aquí el text del Word…&#10;&#10;V/. Guarda des del cel la nostra Congregació&#10;R/. Cuida-la i enriqueix-la&#10;&#10;Preguem.&#10;&#10;Senyor, et demanem..."></textarea>
+        <div class="parse-row">
+          <button class="btn btn-primary btn-sm" onclick="parsePaste(false)">🔄 Parseja i substitueix les línies</button>
+          <button class="btn btn-sm" onclick="parsePaste(true)">+ Afegir al final</button>
+          <span style="font-size:12px;color:var(--mut)">Les línies buides s'ignoren</span>
+        </div>
+      </div>
+    </div>`;
+    renderLines();
+    return;
+  }
+
+  // No prayer selected
+  m.innerHTML=`<div id="splash">
+    <div class="cross">✠</div>
+    <h2>${S.sbView==='carpetes'?'Gestió de carpetes':'Selecciona una oració'}</h2>
+    <p>${S.sbView==='carpetes'
+      ?'Clica una carpeta per editar-ne el nom en cada idioma, o crea\'n una de nova.'
+      :'Clica una oració de la llista per editar-la, o crea\'n una de nova amb el botó inferior.'}</p>
+  </div>`;
+}
+
+function setSbView(v){S.sbView=v;S.editP=null;S.editTheme=null;S.selectedId=null;renderSidebar();renderMain();}
+function setLang(c){S.lang=c;S.theme='';S.query='';S.editP=null;S.editTheme=null;S.selectedId=null;renderAll();}
+function onTmChange(v){S.editP.theme=v;if(S.isNew){const s=nextNum(v);document.getElementById('f-num').value=s;S.editP.num=s;}}
+
+function renderAll(){renderSidebar();renderMain();renderTopbar();}
+
+// Click on prayer row (anywhere in row → edit)
+document.getElementById('plist').addEventListener('click',e=>{
+  const r=e.target.closest('.prow');if(r&&!e.target.closest('.prow-edit'))selectPrayer(r.dataset.id);
+});
+document.getElementById('clist').addEventListener('click',e=>{
+  const r=e.target.closest('.crow');if(r)editTheme(r.querySelector('.crow-num').nextElementSibling.textContent);
+});
+
+// File input
+document.getElementById('finput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>loadHtml(ev.target.result,f.name);
+  r.readAsText(f,'utf-8');this.value='';
+});
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();if(S.editP)doSave();}
+  if(e.key==='Escape'&&(S.editP||S.editTheme))doCancel();
+});
+
+// Sync tab active styles
+const _orig=setSbView;
+setSbView=function(v){
+  _orig(v);
+  document.getElementById('tab-or').className='sbtab'+(v==='oracions'?' on':'');
+  document.getElementById('tab-ca').className='sbtab'+(v==='carpetes'?' on':'');
+};
+renderMain(); // show initial splash
+</script>
+</body>
+</html>
