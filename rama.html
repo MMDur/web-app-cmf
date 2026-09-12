@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rama · Notas con formato</title>
+<style>
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #27334b;
+  background: #f6f7fb;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, select { font: inherit; }
+button, select {
+  border: 1px solid #dce2ed;
+  background: white;
+  color: inherit;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+button { cursor: pointer; }
+button:hover:not(:disabled) { background: #efedff; }
+button:disabled { opacity: .4; cursor: default; }
+:focus-visible { outline: 2px solid #7968dc; outline-offset: 2px; }
+.app {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+}
+aside {
+  background: #f8f9fd;
+  border-right: 1px solid #e1e5ee;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.brand { padding: 22px 18px 15px; }
+.brand h1 { margin: 0; font-size: 26px; letter-spacing: -1px; }
+.brand h1 span { color: #7968dc; }
+.brand p { margin: 5px 0 0; color: #8390a5; font-size: 12px; }
+.search { margin: 0 14px 12px; }
+.search input {
+  width: 100%;
+  border: 1px solid #dde2ed;
+  border-radius: 8px;
+  padding: 10px;
+}
+.actions { display: flex; gap: 7px; padding: 0 14px 12px; }
+.actions button { flex: 1; font-size: 13px; }
+.primary { background: #7160d7; color: white; border-color: #7160d7; }
+.primary:hover:not(:disabled) { background: #5c4cc0; }
+#tree { flex: 1; overflow: auto; padding: 0 10px 15px; }
+#tree ul { list-style: none; margin: 0; padding: 0; }
+#tree ul ul {
+  margin-left: 14px;
+  border-left: 1px solid #dfe4ef;
+  padding-left: 6px;
+}
+.row { display: flex; border-radius: 7px; margin: 3px 0; }
+.row.active { background: #eae6ff; color: #5947bd; }
+.row button { background: transparent; border: 0; }
+.toggle { width: 27px; flex-shrink: 0; padding: 6px 2px; }
+.note {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 14px;
+}
+.backup {
+  padding: 12px;
+  border-top: 1px solid #e1e5ee;
+  display: flex;
+  gap: 7px;
+}
+.backup button { flex: 1; font-size: 12px; }
+main {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+header {
+  min-height: 60px;
+  padding: 12px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #edf0f6;
+}
+#breadcrumb {
+  font-size: 12px;
+  color: #8290a4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#delete { color: #b4485a; font-size: 12px; }
+#workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.document-head { padding: 23px 30px 15px; }
+#title {
+  width: 100%;
+  border: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #28334a;
+  padding: 5px 0 13px;
+}
+.location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #8290a4;
+}
+#parent { max-width: 75%; padding: 5px; font-size: 12px; }
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 20px;
+  background: #fafbfe;
+  border-block: 1px solid #edf0f6;
+}
+.toolbar button { min-width: 34px; padding: 6px 9px; font-size: 14px; }
+.toolbar button[aria-pressed="true"] {
+  color: #5947bd;
+  background: #eae6ff;
+  border-color: #bfb3fa;
+}
+.toolbar select { font-size: 13px; padding: 6px; }
+.separator { width: 1px; height: 23px; background: #dfe4ef; margin: 0 4px; }
+#content {
+  flex: 1;
+  overflow: auto;
+  min-height: 100px;
+  padding: 25px 32px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  color: #3f4d65;
+}
+#content:focus { outline: none; }
+#content:focus-visible { box-shadow: inset 3px 0 #eae6ff; }
+#content:empty::before {
+  content: attr(data-placeholder);
+  color: #98a2b4;
+  pointer-events: none;
+}
+#content h1, #content h2, #content h3 { line-height: 1.3; color: #28334a; }
+#content p { margin: 0 0 12px; }
+#content blockquote {
+  margin: 15px 0;
+  padding: 8px 18px;
+  border-left: 4px solid #8877df;
+  background: #f6f3ff;
+}
+#content a { color: #6a55cb; text-decoration: underline; }
+#content pre { white-space: pre-wrap; background: #f5f6fa; padding: 12px; }
+#empty {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 25px;
+  color: #8290a4;
+}
+#empty h2 { color: #43506a; }
+footer {
+  padding: 11px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid #edf0f6;
+  color: #8793a6;
+  font-size: 11px;
+}
+[hidden] { display: none !important; }
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 32dvh 68dvh; }
+  .brand { padding: 8px 15px; }
+  .brand h1 { font-size: 21px; }
+  .brand p { display: none; }
+  .search { margin-bottom: 7px; }
+  .actions { padding-bottom: 5px; }
+  .backup { padding: 6px 12px; }
+  header { min-height: 43px; padding: 7px 14px; }
+  .document-head { padding: 10px 18px; }
+  #title { font-size: 24px; padding-bottom: 8px; }
+  .toolbar { padding: 7px 10px; gap: 4px; }
+  #content { padding: 16px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside aria-label="Organización de notas">
+    <div class="brand">
+      <h1><span>❋</span> Rama</h1>
+      <p>Tus ideas, conectadas y con estilo.</p>
+    </div>
+    <div class="search">
+      <input id="search" type="search" placeholder="Buscar notas…"
+        aria-label="Buscar por título o contenido">
+    </div>
+    <div class="actions">
+      <button id="addRoot" class="primary">＋ Nota</button>
+      <button id="addChild">＋ Subnota</button>
+    </div>
+    <nav id="tree" aria-label="Árbol de notas"></nav>
+    <div class="backup">
+      <button id="import">↑ Importar</button>
+      <button id="export">↓ Exportar</button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <span id="breadcrumb">Mis notas</span>
+      <button id="delete">Eliminar nota</button>
+    </header>
+
+    <section id="workspace" aria-label="Editor">
+      <div class="document-head">
+        <input id="title" aria-label="Título" placeholder="Sin título" maxlength="200">
+        <div class="location">
+          <label for="parent">Ubicación:</label>
+          <select id="parent"></select>
+        </div>
+      </div>
+
+      <div class="toolbar" role="group" aria-label="Formato del texto">
+        <select id="block" aria-label="Estilo de párrafo">
+          <option value="p">Texto normal</option>
+          <option value="h1">Título 1</option>
+          <option value="h2">Título 2</option>
+          <option value="h3">Título 3</option>
+          <option value="blockquote">Cita</option>
+          <option value="pre">Código</option>
+        </select>
+        <span class="separator" aria-hidden="true"></span>
+        <button data-cmd="bold" title="Negrita (Ctrl/Cmd+B)"
+          aria-label="Negrita"><b>B</b></button>
+        <button data-cmd="italic" title="Cursiva (Ctrl/Cmd+I)"
+          aria-label="Cursiva"><i>I</i></button>
+        <button data-cmd="underline" title="Subrayado (Ctrl/Cmd+U)"
+          aria-label="Subrayado"><u>U</u></button>
+        <button data-cmd="strikeThrough" title="Tachado"
+          aria-label="Tachado"><s>S</s></button>
+        <span class="separator" aria-hidden="true"></span>
+        <button data-cmd="insertUnorderedList" title="Lista con viñetas"
+          aria-label="Lista con viñetas">• ≡</button>
+        <button data-cmd="insertOrderedList" title="Lista numerada"
+          aria-label="Lista numerada">1. ≡</button>
+        <button id="link" title="Insertar enlace" aria-label="Insertar enlace">🔗</button>
+        <button data-cmd="unlink" title="Quitar enlace"
+          aria-label="Quitar enlace">↛</button>
+        <button data-cmd="removeFormat" title="Quitar formato de caracteres"
+          aria-label="Quitar formato de caracteres">Tx</button>
+        <span class="separator" aria-hidden="true"></span>
+        <button data-cmd="undo" title="Deshacer" aria-label="Deshacer">↶</button>
+        <button data-cmd="redo" title="Rehacer" aria-label="Rehacer">↷</button>
+      </div>
+
+      <div id="content" contenteditable="true" role="textbox"
+        aria-label="Contenido con formato" aria-multiline="true"
+        data-placeholder="Empieza a escribir una idea…" spellcheck="true"></div>
+    </section>
+
+    <section id="empty" hidden>
+      <h2>Una idea puede ser el principio de todo.</h2>
+      <p>Crea una nota para empezar.</p>
+    </section>
+
+    <footer>
+      <span id="status" role="status">Listo</span>
+      <span id="stats">0 palabras</span>
+    </footer>
+  </main>
+</div>
+<input id="file" type="file" accept=".json,application/json" hidden>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const editor = $("content");
+  const KEY = "rama-notes-v2";
+  const OLD_KEY = "rama-notes-v1";
+  const uid = () => globalThis.crypto?.randomUUID?.() ??
+    Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+  let nodes = [], selected = null, timer = null;
+  let savedRange = null, storageBlocked = false;
+
+  const current = () => nodes.find(n => n.id === selected);
+  const children = id => nodes.filter(n => n.parent === id);
+  const name = n => n.title.trim() || "Sin título";
+
+  function safeURL(value) {
+    try {
+      const url = new URL(value);
+      return ["http:", "https:", "mailto:"].includes(url.protocol)
+        ? url.href : null;
+    } catch { return null; }
+  }
+
+  // Conserva únicamente elementos de formato y enlaces seguros.
+  function sanitize(html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const allowed = new Set([
+      "P", "DIV", "BR", "B", "STRONG", "I", "EM", "U", "S", "STRIKE",
+      "H1", "H2", "H3", "UL", "OL", "LI", "BLOCKQUOTE", "PRE", "CODE", "A"
+    ]);
+    const discarded = new Set([
+      "SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "SVG", "MATH",
+      "FORM", "INPUT", "BUTTON", "TEXTAREA", "SELECT", "TEMPLATE",
+      "IMG", "VIDEO", "AUDIO"
+    ]);
+    const output = document.createElement("div");
+
+    function copy(source, target) {
+      for (const child of source.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE) {
+          target.append(document.createTextNode(child.textContent));
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (discarded.has(child.tagName)) continue;
+          if (!allowed.has(child.tagName)) {
+            copy(child, target);
+            continue;
+          }
+          const element = document.createElement(child.tagName.toLowerCase());
+          if (child.tagName === "A") {
+            const href = safeURL(child.getAttribute("href") || "");
+            if (href) {
+              element.setAttribute("href", href);
+              element.setAttribute("target", "_blank");
+              element.setAttribute("rel", "noopener noreferrer");
+            }
+          }
+          copy(child, element);
+          target.append(element);
+        }
+      }
+    }
+
+    copy(doc.body, output);
+    return output.innerHTML;
+  }
+
+  function plainToHTML(text) {
+    const div = document.createElement("div");
+    text.split("\n").forEach((line, i) => {
+      if (i) div.append(document.createElement("br"));
+      div.append(document.createTextNode(line));
+    });
+    return div.innerHTML;
+  }
+
+  function plainText(html) {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    div.querySelectorAll("br").forEach(el => el.replaceWith("\n"));
+    div.querySelectorAll("p,div,h1,h2,h3,li,blockquote,pre")
+      .forEach(el => el.append("\n"));
+    return div.textContent || "";
+  }
+
+  function validateHierarchy(list) {
+    if (list.length > 5000) throw new Error("Máximo: 5000 notas.");
+    const map = new Map(list.map(n => [n.id, n]));
+    if (map.size !== list.length) throw new Error("Hay identificadores repetidos.");
+    for (const n of list) {
+      const seen = new Set([n.id]);
+      let parent = n.parent;
+      while (parent !== null) {
+        if (!map.has(parent) || seen.has(parent)) {
+          throw new Error("La jerarquía contiene referencias inválidas.");
+        }
+        seen.add(parent);
+        if (seen.size > 60) throw new Error("Máximo: 60 niveles.");
+        parent = map.get(parent).parent;
+      }
+    }
+  }
+
+  function decode(data) {
+    if (!data || !Array.isArray(data.nodes) || data.nodes.length > 5000) {
+      throw new Error("Archivo de notas no válido.");
+    }
+    if (![undefined, 1, 2].includes(data.version)) {
+      throw new Error("Versión de archivo no compatible.");
+    }
+
+    const list = data.nodes.map(n => {
+      if (!n || typeof n.id !== "string" || !n.id ||
+          typeof n.title !== "string" || n.title.length > 200 ||
+          typeof n.content !== "string" ||
+          !(n.parent === null || typeof n.parent === "string")) {
+        throw new Error("Una nota tiene un formato incorrecto.");
+      }
+      return {
+        id: n.id, parent: n.parent, title: n.title,
+        content: data.version === 2
+          ? sanitize(n.content) : plainToHTML(n.content),
+        collapsed: n.collapsed === true
+      };
+    });
+
+    validateHierarchy(list);
+    return list;
+  }
+
+  function save() {
+    clearTimeout(timer);
+    timer = null;
+    if (storageBlocked) {
+      $("status").textContent = "Guardado no disponible: exporta una copia";
+      return;
+    }
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ version: 2, nodes, selected }));
+      $("status").textContent = "✓ Guardado en este navegador";
+    } catch {
+      $("status").textContent = "No se pudo guardar. Exporta una copia.";
+    }
+  }
+
+  function scheduleSave() {
+    clearTimeout(timer);
+    $("status").textContent = "Guardando…";
+    timer = setTimeout(save, 350);
+  }
+
+  function path(n) {
+    const parts = [];
+    while (n) {
+      parts.unshift(name(n));
+      n = nodes.find(item => item.id === n.parent);
+    }
+    return parts.join(" / ");
+  }
+
+  function descendants(id) {
+    const found = new Set([id]), queue = [id];
+    while (queue.length) {
+      for (const n of children(queue.pop())) {
+        found.add(n.id);
+        queue.push(n.id);
+      }
+    }
+    return found;
+  }
+
+  function stats() {
+    const text = editor.innerText || "";
+    const count = text.trim() ? text.trim().split(/\s+/u).length : 0;
+    $("stats").textContent = current()
+      ? `${count} palabras · ${text.length} caracteres` : "0 palabras";
+  }
+
+  function renderParents() {
+    $("parent").replaceChildren();
+    const n = current();
+    if (!n) return;
+    const excluded = descendants(n.id);
+    $("parent").add(new Option("Mis notas (raíz)", ""));
+    nodes.forEach(item => {
+      if (!excluded.has(item.id)) {
+        $("parent").add(new Option(path(item), item.id));
+      }
+    });
+    $("parent").value = n.parent ?? "";
+  }
+
+  function renderTree() {
+    const query = $("search").value.trim().toLocaleLowerCase();
+    const visible = new Set();
+
+    if (query) {
+      nodes.forEach(n => {
+        if ((n.title + "\n" + plainText(n.content))
+            .toLocaleLowerCase().includes(query)) {
+          let item = n;
+          while (item) {
+            visible.add(item.id);
+            item = nodes.find(x => x.id === item.parent);
+          }
+        }
+      });
+    }
+
+    function branch(parent) {
+      const ul = document.createElement("ul");
+      children(parent).forEach(n => {
+        if (query && !visible.has(n.id)) return;
+        const li = document.createElement("li");
+        const row = document.createElement("div");
+        row.className = "row" + (selected === n.id ? " active" : "");
+        const hasChildren = children(n.id).length > 0;
+        const expanded = !!query || !n.collapsed;
+
+        const toggle = document.createElement("button");
+        toggle.className = "toggle";
+        toggle.textContent = hasChildren ? (expanded ? "▾" : "▸") : "·";
+        toggle.disabled = !hasChildren || !!query;
+        toggle.setAttribute("aria-label",
+          `${expanded ? "Contraer" : "Expandir"} ${name(n)}`);
+        if (hasChildren) toggle.setAttribute("aria-expanded", expanded);
+        toggle.onclick = () => {
+          n.collapsed = !n.collapsed;
+          renderTree();
+          save();
+        };
+
+        const button = document.createElement("button");
+        button.className = "note";
+        button.textContent = name(n);
+        button.title = name(n);
+        if (selected === n.id) button.setAttribute("aria-current", "true");
+        button.onclick = () => {
+          selected = n.id;
+          render();
+          save();
+        };
+
+        row.append(toggle, button);
+        li.append(row);
+        if (hasChildren && expanded) li.append(branch(n.id));
+        ul.append(li);
+      });
+      return ul;
+    }
+
+    const tree = branch(null);
+    $("tree").replaceChildren(tree);
+    if (!tree.children.length) {
+      const p = document.createElement("p");
+      p.textContent = query ? "No hay coincidencias." : "Aún no hay notas.";
+      p.style.cssText = "font-size:13px;color:#8793a6;padding:10px";
+      $("tree").append(p);
+    }
+  }
+
+  function render() {
+    const n = current();
+    savedRange = null;
+    $("workspace").hidden = !n;
+    $("empty").hidden = !!n;
+    $("delete").disabled = !n;
+    $("addChild").disabled = !n;
+    $("breadcrumb").textContent = n ? "Mis notas / " + path(n) : "Mis notas";
+    $("title").value = n?.title || "";
+    editor.innerHTML = n?.content || "";
+    renderTree();
+    renderParents();
+    stats();
+    updateToolbar();
+  }
+
+  function add(parent = null) {
+    const n = {
+      id: uid(), parent, title: "Nueva nota", content: "", collapsed: false
+    };
+    try { validateHierarchy([...nodes, n]); }
+    catch (error) { alert(error.message); return; }
+    nodes.push(n);
+    const p = nodes.find(item => item.id === parent);
+    if (p) p.collapsed = false;
+    selected = n.id;
+    $("search").value = "";
+    render();
+    save();
+    $("title").focus();
+    $("title").select();
+  }
+
+  // Conserva la selección cuando se utiliza la barra de herramientas.
+  function rememberSelection() {
+    const selection = window.getSelection();
+    if (selection.rangeCount) {
+      const range = selection.getRangeAt(0);
+      if (editor.contains(range.startContainer) &&
+          editor.contains(range.endContainer)) {
+        savedRange = range.cloneRange();
+      }
+    }
+  }
+
+  function restoreSelection() {
+    editor.focus();
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    if (savedRange &&
+        editor.contains(savedRange.startContainer) &&
+        editor.contains(savedRange.endContainer)) {
+      selection.addRange(savedRange);
+    } else {
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      selection.addRange(range);
+    }
+  }
+
+  function contentChanged() {
+    const n = current();
+    if (!n) return;
+    n.content = sanitize(editor.innerHTML);
+    stats();
+    if ($("search").value.trim()) renderTree();
+    scheduleSave();
+  }
+
+  function command(cmd, value = null) {
+    if (!current()) return;
+    restoreSelection();
+    // API nativa usada aquí para mantener la aplicación sin dependencias.
+    document.execCommand("styleWithCSS", false, false);
+    document.execCommand(cmd, false, value);
+    rememberSelection();
+    contentChanged();
+    updateToolbar();
+  }
+
+  function updateToolbar() {
+    const selection = window.getSelection();
+    const inside = selection?.anchorNode &&
+      editor.contains(selection.anchorNode);
+    document.querySelectorAll("[data-cmd]").forEach(button => {
+      const cmd = button.dataset.cmd;
+      if (["bold", "italic", "underline", "strikeThrough",
+           "insertOrderedList", "insertUnorderedList"].includes(cmd)) {
+        button.setAttribute("aria-pressed",
+          String(!!inside && document.queryCommandState(cmd)));
+      }
+    });
+    if (inside) {
+      const block = document.queryCommandValue("formatBlock")
+        .replace(/[<>]/g, "").toLowerCase();
+      $("block").value = ["p", "h1", "h2", "h3", "blockquote", "pre"]
+        .includes(block) ? block : "p";
+    } else {
+      $("block").value = "p";
+    }
+  }
+
+  document.addEventListener("selectionchange", () => {
+    rememberSelection();
+    updateToolbar();
+  });
+
+  document.querySelectorAll(".toolbar button").forEach(button => {
+    button.addEventListener("mousedown", event => event.preventDefault());
+  });
+  document.querySelectorAll("[data-cmd]").forEach(button => {
+    button.onclick = () => command(button.dataset.cmd);
+  });
+  $("block").onchange = () => command("formatBlock", $("block").value);
+
+  $("link").onclick = () => {
+    restoreSelection();
+    rememberSelection();
+    const input = prompt("Dirección del enlace (https://… o mailto:…):");
+    if (!input?.trim()) return;
+    let value = input.trim();
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(value)) value = "https://" + value;
+    const url = safeURL(value);
+    if (!url) { alert("Introduce una dirección HTTP, HTTPS o mailto válida."); return; }
+
+    restoreSelection();
+    if (window.getSelection().isCollapsed) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.textContent = input.trim();
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      command("insertHTML", a.outerHTML);
+    } else {
+      command("createLink", url);
+    }
+  };
+
+  editor.addEventListener("input", contentChanged);
+
+  // Al pegar, elimina scripts, imágenes y atributos no permitidos.
+  editor.addEventListener("paste", event => {
+    event.preventDefault();
+    const data = event.clipboardData;
+    if (!data) return;
+    rememberSelection();
+    const html = data.getData("text/html");
+    command("insertHTML", html
+      ? sanitize(html) : plainToHTML(data.getData("text/plain")));
+  });
+
+  // Impide insertar archivos o HTML sin filtrar mediante arrastre.
+  editor.addEventListener("dragover", event => event.preventDefault());
+  editor.addEventListener("drop", event => event.preventDefault());
+
+  // Ctrl/Cmd + clic para abrir enlaces mientras se edita.
+  editor.addEventListener("click", event => {
+    const a = event.target.closest("a");
+    if (!a) return;
+    event.preventDefault();
+    if (event.ctrlKey || event.metaKey) {
+      const url = safeURL(a.getAttribute("href") || "");
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+    }
+  });
+
+  $("title").oninput = () => {
+    const n = current();
+    if (!n) return;
+    n.title = $("title").value;
+    $("breadcrumb").textContent = "Mis notas / " + path(n);
+    renderTree();
+    renderParents();
+    scheduleSave();
+  };
+
+  $("search").oninput = renderTree;
+  $("addRoot").onclick = () => add();
+  $("addChild").onclick = () => { if (current()) add(selected); };
+
+  $("parent").onchange = () => {
+    const n = current();
+    if (!n) return;
+    const previous = n.parent;
+    n.parent = $("parent").value || null;
+    try { validateHierarchy(nodes); }
+    catch (error) {
+      n.parent = previous;
+      renderParents();
+      alert(error.message);
+      return;
+    }
+    let ancestor = nodes.find(item => item.id === n.parent);
+    while (ancestor) {
+      ancestor.collapsed = false;
+      ancestor = nodes.find(item => item.id === ancestor.parent);
+    }
+    render();
+    save();
+  };
+
+  $("delete").onclick = () => {
+    const n = current();
+    if (!n) return;
+    const ids = descendants(n.id);
+    if (!confirm(
+      `¿Eliminar "${name(n)}"?` +
+      (ids.size > 1 ? ` Incluye ${ids.size - 1} subnotas.` : "")
+    )) return;
+    nodes = nodes.filter(item => !ids.has(item.id));
+    selected = n.parent ?? nodes[0]?.id ?? null;
+    render();
+    save();
+  };
+
+  $("export").onclick = () => {
+    const data = JSON.stringify({ version: 2, nodes, selected }, null, 2);
+    const url = URL.createObjectURL(new Blob([data], {
+      type: "application/json"
+    }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `rama-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    $("status").textContent = "Copia con formato exportada";
+  };
+
+  $("import").onclick = () => $("file").click();
+  $("file").onchange = async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      if (file.size > 20 * 1024 * 1024) {
+        throw new Error("El archivo supera los 20 MB.");
+      }
+      const data = JSON.parse(await file.text());
+      const imported = decode(data);
+      if (!confirm(
+        `Se reemplazarán las notas actuales por ${imported.length} notas. ` +
+        "¿Continuar? Exporta antes una copia si quieres conservarlas."
+      )) return;
+      clearTimeout(timer);
+      nodes = imported;
+      selected = nodes.some(n => n.id === data.selected)
+        ? data.selected : nodes[0]?.id ?? null;
+      storageBlocked = false;
+      $("search").value = "";
+      render();
+      save();
+    } catch (error) {
+      alert("No se pudo importar: " + error.message);
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  document.addEventListener("keydown", event => {
+    if (!(event.ctrlKey || event.metaKey)) return;
+    const key = event.key.toLowerCase();
+    if (key === "s") {
+      event.preventDefault();
+      save();
+    } else if (document.activeElement === editor &&
+               ["b", "i", "u"].includes(key)) {
+      event.preventDefault();
+      command({ b: "bold", i: "italic", u: "underline" }[key]);
+    }
+  });
+
+  window.addEventListener("pagehide", () => { if (timer) save(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && timer) save();
+  });
+
+  try {
+    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(OLD_KEY);
+    if (raw !== null) {
+      const data = JSON.parse(raw);
+      nodes = decode(data);
+      selected = nodes.some(n => n.id === data.selected)
+        ? data.selected : nodes[0]?.id ?? null;
+    } else {
+      const id = uid();
+      nodes = [{
+        id, parent: null, title: "Bienvenido a Rama", collapsed: false,
+        content:
+          "<h2>Ideas con personalidad</h2>" +
+          "<p>Ahora puedes escribir con <strong>negrita</strong>, " +
+          "<em>cursiva</em> y <u>subrayado</u>.</p>" +
+          "<ul><li>Organiza tus ideas en notas y subnotas.</li>" +
+          "<li>Selecciona texto y aplica formato con la barra superior.</li>" +
+          "<li>Usa títulos, listas y enlaces.</li></ul>" +
+          "<blockquote>Una pequeña nota puede convertirse en una gran idea.</blockquote>" +
+          "<p>Para abrir un enlace: Ctrl/Cmd + clic.</p>" +
+          "<p>Exporta tus notas periódicamente para conservar una copia.</p>"
+      }];
+      selected = id;
+    }
+    save();
+  } catch {
+    storageBlocked = true;
+    $("status").textContent =
+      "No se pudieron cargar los datos. Guardado desactivado.";
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
