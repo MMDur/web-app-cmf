@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 Llibre → Audiollibre PRO</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh; padding: 16px;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .card {
+    background: white; border-radius: 20px; padding: 22px 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 580px; width: 100%; margin: auto;
+  }
+  h1 { font-size: 21px; margin-bottom: 4px; color: #333; text-align: center; }
+  .sub { text-align: center; color: #888; margin-bottom: 18px; font-size: 12px; }
+
+  .drop {
+    border: 3px dashed #c3c3ff; border-radius: 15px;
+    padding: 22px 14px; text-align: center; cursor: pointer;
+    transition: all 0.3s; background: #fafaff; margin-bottom: 12px;
+  }
+  .drop:active, .drop.active { border-color: #667eea; background: #f0f0ff; }
+  .drop .icon { font-size: 36px; margin-bottom: 4px; }
+  .drop .text { color: #667eea; font-weight: 600; font-size: 14px; }
+  .drop .small { color: #999; font-size: 11px; margin-top: 3px; }
+  input[type=file] { display: none; }
+
+  label { display: block; font-size: 12px; color: #666;
+    margin: 10px 0 4px; font-weight: 600; }
+  select, input[type=range] {
+    width: 100%; padding: 9px; border-radius: 10px;
+    border: 2px solid #e0e0ff; font-size: 14px;
+    font-family: inherit; background: #fafaff;
+  }
+  input[type=range] { padding: 0; }
+
+  /* Panell de capítols */
+  .chapters {
+    max-height: 180px; overflow-y: auto;
+    border: 2px solid #e0e0ff; border-radius: 10px;
+    padding: 8px; background: #fafaff; margin-top: 5px;
+    display: none;
+  }
+  .chapters.show { display: block; }
+  .chapter-item {
+    display: flex; align-items: center; padding: 6px 8px;
+    font-size: 13px; border-radius: 6px; cursor: pointer;
+  }
+  .chapter-item:hover { background: #eef; }
+  .chapter-item input { margin-right: 8px; }
+  .chapter-item .num { color: #999; margin-right: 6px; font-size: 11px; }
+  .chapter-actions {
+    display: flex; gap: 8px; margin-top: 6px; font-size: 12px;
+  }
+  .chapter-actions button {
+    flex: 1; padding: 6px; font-size: 12px;
+    background: #eef; color: #667eea; border: none;
+    border-radius: 6px; cursor: pointer; font-weight: 600;
+  }
+
+  .row { display: flex; gap: 8px; margin-top: 14px; }
+  button { font-family: inherit; cursor: pointer; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-main {
+    flex: 1; padding: 14px; border-radius: 10px; border: none;
+    font-size: 15px; font-weight: 600;
+    background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+    transition: transform 0.2s;
+  }
+  .btn-main:active:not(:disabled) { transform: scale(0.98); }
+
+  .btn-icon {
+    padding: 14px 16px; border-radius: 10px; border: none;
+    background: #eef; color: #667eea; font-size: 15px;
+    font-weight: 600; transition: transform 0.2s;
+  }
+  .btn-icon:active:not(:disabled) { transform: scale(0.95); }
+  .btn-stop { background: #ff4757; color: white; }
+
+  .status {
+    margin-top: 12px; padding: 10px; border-radius: 10px;
+    background: #f0f0ff; color: #667eea; text-align: center;
+    font-size: 12px; display: none;
+  }
+  .status.show { display: block; }
+  .status.error { background: #ffe0e0; color: #c00; }
+  .status.playing { background: #e0ffe0; color: #080; }
+  .status.done { background: #d4edda; color: #155724; }
+
+  .progress {
+    height: 6px; background: #e0e0ff; border-radius: 3px;
+    margin-top: 10px; overflow: hidden; display: none;
+  }
+  .progress.show { display: block; }
+  .progress-bar {
+    height: 100%; background: linear-gradient(90deg, #667eea, #764ba2);
+    width: 0%; transition: width 0.3s;
+  }
+  .info { font-size: 11px; color: #888; text-align: center; margin-top: 8px; }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    background: #eef; color: #667eea; font-size: 10px;
+    font-weight: 600; margin-left: 6px;
+  }
+  .badge.ok { background: #d4edda; color: #155724; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📚 Llibre → Audiollibre</h1>
+  <p class="sub">PDF · EPUB · TXT <span class="badge" id="langBadge" style="display:none"></span></p>
+
+  <div class="drop" id="drop" onclick="document.getElementById('file').click()">
+    <div class="icon">📖</div>
+    <div class="text" id="dropText">Clica per triar un llibre</div>
+    <div class="small">PDF · EPUB · TXT</div>
+  </div>
+  <input type="file" id="file" accept=".pdf,.epub,.txt,application/pdf,application/epub+zip,text/plain">
+
+  <!-- Panell de selecció de capítols -->
+  <div id="chapSection" style="display:none">
+    <label>📖 Capítols a llegir</label>
+    <div class="chapters show" id="chapters"></div>
+    <div class="chapter-actions">
+      <button onclick="seleccionarTots(true)">✅ Tots</button>
+      <button onclick="seleccionarTots(false)">⬜ Cap</button>
+      <button onclick="invertirSeleccio()">🔄 Invertir</button>
+    </div>
+  </div>
+
+  <label>🗣️ Veu</label>
+  <select id="voice"></select>
+
+  <label>⚡ Velocitat: <span id="rateVal">1.0x</span></label>
+  <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+
+  <div class="row">
+    <button class="btn-icon" id="prevBtn" onclick="saltar(-1)" disabled title="Endarrere">⏮️</button>
+    <button class="btn-main" id="btn" onclick="comencar()" disabled>▶️ Escoltar</button>
+    <button class="btn-icon" id="pauseBtn" onclick="pausar()" disabled>⏸️</button>
+    <button class="btn-icon" id="nextBtn" onclick="saltar(1)" disabled title="Endavant">⏭️</button>
+    <button class="btn-icon btn-stop" id="stopBtn" onclick="aturar()" disabled>⏹️</button>
+  </div>
+
+  <div class="progress" id="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="info" id="info"></div>
+</div>
+
+<!-- Llibreries externes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ===== Estat global =====
+let capitols = [];       // [{ titol, text, seleccionat }]
+let trossos = [];        // fragments actuals a llegir
+let indexActual = 0;
+let parlant = false;
+let pausat = false;
+let veuTriada = null;
+let clauGuardat = null;  // clau localStorage per aquest llibre
+
+const STORAGE_KEY = 'audiollibre_progress';
+
+// ===== Veus =====
+function carregarVeus() {
+  const select = document.getElementById('voice');
+  const veus = speechSynthesis.getVoices();
+  if (!veus.length) return;
+
+  select.innerHTML = '';
+  const prioritats = ['ca', 'es', 'en'];
+  veus.sort((a, b) => {
+    const pa = prioritats.findIndex(p => a.lang.startsWith(p));
+    const pb = prioritats.findIndex(p => b.lang.startsWith(p));
+    return (pa === -1 ? 99 : pa) - (pb === -1 ? 99 : pb);
+  });
+
+  veus.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${v.name} (${v.lang})`;
+    select.appendChild(opt);
+  });
+
+  // Recuperar veu guardada
+  const veuGuardada = localStorage.getItem('audiollibre_voice');
+  const catIndex = veus.findIndex(v => v.lang.startsWith('ca'));
+  select.value = veuGuardada !== null ? veuGuardada : (catIndex >= 0 ? catIndex : 0);
+  veuTriada = veus[select.value];
+
+  select.onchange = () => {
+    veuTriada = veus[select.value];
+    localStorage.setItem('audiollibre_voice', select.value);
+  };
+}
+speechSynthesis.onvoiceschanged = carregarVeus;
+carregarVeus();
+
+// ===== Velocitat =====
+const rateInput = document.getElementById('rate');
+const rateGuardada = localStorage.getItem('audiollibre_rate');
+if (rateGuardada) rateInput.value = rateGuardada;
+document.getElementById('rateVal').textContent = rateInput.value + 'x';
+rateInput.oninput = () => {
+  document.getElementById('rateVal').textContent = rateInput.value + 'x';
+  localStorage.setItem('audiollibre_rate', rateInput.value);
+};
+
+// ===== Drag & drop =====
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+['dragover','dragenter'].forEach(e => drop.addEventListener(e, ev => {
+  ev.preventDefault(); drop.classList.add('active');
+}));
+['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => {
+  ev.preventDefault(); drop.classList.remove('active');
+}));
+drop.addEventListener('drop', ev => {
+  if (ev.dataTransfer.files.length) {
+    fileInput.files = ev.dataTransfer.files;
+    carregarLlibre();
+  }
+});
+fileInput.addEventListener('change', carregarLlibre);
+
+// ===== Detecció d'idioma =====
+function detectarIdioma(text) {
+  const mostra = text.slice(0, 3000).toLowerCase();
+  const pistes = {
+    ca: ['que', 'amb', 'els', 'les', 'una', 'és', 'però', 'també', 'això', 'aquest'],
+    es: ['que', 'con', 'los', 'las', 'una', 'pero', 'también', 'esto', 'este', 'para'],
+    en: ['the', 'and', 'that', 'with', 'this', 'have', 'from', 'they', 'which', 'would'],
+    fr: ['que', 'avec', 'les', 'des', 'une', 'mais', 'aussi', 'cette', 'pour', 'dans'],
+    de: ['und', 'der', 'die', 'das', 'mit', 'auch', 'aber', 'nicht', 'eine', 'sich'],
+    it: ['che', 'con', 'gli', 'una', 'però', 'anche', 'questo', 'della', 'sono', 'come'],
+    pt: ['que', 'com', 'uma', 'mas', 'também', 'isso', 'este', 'para', 'não', 'são']
+  };
+
+  const comptador = {};
+  for (const [lang, paraules] of Object.entries(pistes)) {
+    comptador[lang] = paraules.filter(p =>
+      new RegExp('\\b' + p + '\\b', 'i').test(mostra)
+    ).length;
+  }
+
+  let millor = 'ca', max = 0;
+  for (const [lang, count] of Object.entries(comptador)) {
+    if (count > max) { max = count; millor = lang; }
+  }
+  return millor;
+}
+
+// ===== Carregar llibre =====
+async function carregarLlibre() {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('status');
+  status.className = 'status show';
+  status.textContent = '⏳ Llegint el llibre...';
+  document.getElementById('btn').disabled = true;
+  document.getElementById('info').textContent = '';
+  document.getElementById('chapSection').style.display = 'none';
+
+  try {
+    const nom = file.name.toLowerCase();
+    let text = '';
+    let esCapitolat = false;
+
+    if (nom.endsWith('.pdf')) {
+      const resultat = await llegirPDF(file, status);
+      text = resultat.text;
+      capitols = resultat.capitols;
+      esCapitolat = capitols.length > 1;
+    } else if (nom.endsWith('.epub')) {
+      const resultat = await llegirEPUB(file, status);
+      text = resultat.text;
+      capitols = resultat.capitols;
+      esCapitolat = capitols.length > 1;
+    } else if (nom.endsWith('.txt')) {
+      text = await file.text();
+      capitols = [{ titol: 'Text complet', text: text, seleccionat: true }];
+    } else {
+      throw new Error('Format no suportat');
+    }
+
+    // Si no hi ha capítols, tracta-ho com a un de sol
+    if (!capitols.length) {
+      capitols = [{ titol: 'Llibre complet', text: text, seleccionat: true }];
+    }
+
+    // Detecció d'idioma
+    const idioma = detectarIdioma(text);
+    const badge = document.getElementById('langBadge');
+    const noms = { ca:'Català', es:'Castellà', en:'Anglès', fr:'Francès',
+                   de:'Alemany', it:'Italià', pt:'Portuguès' };
+    badge.textContent = '🌍 ' + (noms[idioma] || idioma.toUpperCase());
+    badge.className = 'badge ok';
+    badge.style.display = 'inline-block';
+
+    // Canviar la veu automàticament si no n'hi ha de català
+    const veus = speechSynthesis.getVoices();
+    const veuMatch = veus.find(v => v.lang.toLowerCase().startsWith(idioma));
+    if (veuMatch) {
+      const idx = veus.indexOf(veuMatch);
+      document.getElementById('voice').value = idx;
+      veuTriada = veuMatch;
+    }
+
+    // Clau única per aquest llibre
+    clauGuardat = 'book_' + file.name + '_' + file.size;
+
+    // Mostrar capítols si n'hi ha més d'un
+    if (esCapitolat) {
+      mostrarCapitols();
+    }
+
+    // Preparar fragments
+    prepararTrossos();
+
+    document.getElementById('dropText').textContent = '✅ ' + file.name;
+    status.className = 'status show';
+    status.textContent = `✅ Llibre carregat · ${capitols.length} capítol(s)`;
+    document.getElementById('btn').disabled = false;
+
+    const totalChars = text.replace(/\s+/g,' ').length;
+    document.getElementById('info').textContent =
+      `${totalChars.toLocaleString()} caràcters · ${trossos.length} fragments`;
+
+    // Comprovar progrés guardat
+    comprovarProgresGuardat();
+
+  } catch (e) {
+    status.className = 'status show error';
+    status.textContent = '❌ ' + e.message;
+  }
+}
+
+// ===== Llegir PDF (dividit per pàgines com a capítols) =====
+async function llegirPDF(file, status) {
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const capitols = [];
+  let tot = '';
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const t = content.items.map(it => it.str).join(' ');
+    if (t.trim()) {
+      capitols.push({
+        titol: `Pàgina ${i}`,
+        text: t.trim(),
+        seleccionat: true
+      });
+      tot += t + '\n\n';
+    }
+    status.textContent = `⏳ Llegint pàgina ${i} de ${pdf.numPages}...`;
+  }
+  return { text: tot, capitols };
+}
+
+// ===== Llegir EPUB (cada HTML és un capítol) =====
+async function llegirEPUB(file, status) {
+  status.textContent = '⏳ Descomprimint EPUB...';
+  const buffer = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(buffer);
+
+  const fitxers = [];
+  zip.forEach((path, entry) => {
+    if (/\.(x?html?|htm)$/i.test(path) && !entry.dir) {
+      fitxers.push({ path, entry });
+    }
+  });
+
+  if (!fitxers.length) throw new Error('EPUB sense capítols');
+
+  fitxers.sort((a, b) => a.path.localeCompare(b.path));
+
+  const capitols = [];
+  let tot = '';
+
+  for (let i = 0; i < fitxers.length; i++) {
+    status.textContent = `⏳ Capítol ${i + 1} de ${fitxers.length}...`;
+    const html = await fitxers[i].entry.async('string');
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    // Intentar trobar el títol del capítol
+    let titol = doc.querySelector('h1, h2, h3, title');
+    titol = titol ? titol.textContent.trim().slice(0, 50) : `Capítol ${i + 1}`;
+    if (!titol) titol = `Capítol ${i + 1}`;
+
+    const text = (doc.body ? doc.body.textContent : '').replace(/\s+/g, ' ').trim();
+    if (text) {
+      capitols.push({ titol, text, seleccionat: true });
+      tot += text + '\n\n';
+    }
+  }
+  return { text: tot, capitols };
+}
+
+// ===== Mostrar capítols =====
+function mostrarCapitols() {
+  const cont = document.getElementById('chapters');
+  cont.innerHTML = '';
+  document.getElementById('chapSection').style.display = 'block';
+
+  capitols.forEach((cap, i) => {
+    const div = document.createElement('div');
+    div.className = 'chapter-item';
+    div.onclick = (e) => {
+      if (e.target.tagName !== 'INPUT') {
+        const cb = div.querySelector('input');
+        cb.checked = !cb.checked;
+      }
+      capitols[i].seleccionat = div.querySelector('input').checked;
+      prepararTrossos();
+    };
+    div.innerHTML = `
+      <input type="checkbox" ${cap.seleccionat ? 'checked' : ''}>
+      <span class="num">${i + 1}.</span>
+      <span>${cap.titol}</span>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function seleccionarTots(valor) {
+  capitols.forEach((c, i) => {
+    c.seleccionat = valor;
+    const cb = document.querySelectorAll('.chapter-item input')[i];
+    if (cb) cb.checked = valor;
+  });
+  prepararTrossos();
+}
+
+function invertirSeleccio() {
+  capitols.forEach((c, i) => {
+    c.seleccionat = !c.seleccionat;
+    const cb = document.querySelectorAll('.chapter-item input')[i];
+    if (cb) cb.checked = c.seleccionat;
+  });
+  prepararTrossos();
+}
+
+// ===== Preparar fragments només dels capítols seleccionats =====
+function prepararTrossos() {
+  const textSeleccionat = capitols
+    .filter(c => c.seleccionat)
+    .map(c => c.text)
+    .join('\n\n')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!textSeleccionat) {
+    trossos = [];
+    document.getElementById('btn').disabled = true;
+    return;
+  }
+
+  trossos = [];
+  const frases = textSeleccionat.match(/[^.!?]+[.!?]+/g) || [textSeleccionat];
+  let actual = '';
+  for (const f of frases) {
+    if ((actual + f).length < 200) {
+      actual += f;
+    } else {
+      if (actual) trossos.push(actual.trim());
+      actual = f;
+    }
+  }
+  if (actual) trossos.push(actual.trim());
+
+  document.getElementById('btn').disabled = false;
+  const seleccionats = capitols.filter(c => c.seleccionat).length;
+  document.getElementById('info').textContent =
+    `${seleccionats} capítol(s) · ${trossos.length} fragments`;
+}
+
+// ===== Guardar / recuperar progrés =====
+function guardarProgres() {
+  if (!clauGuardat || !trossos.length) return;
+  const dades = {
+    index: indexActual,
+    total: trossos.length,
+    titol: document.getElementById('dropText').textContent.replace('✅ ', ''),
+    data: Date.now()
+  };
+  try {
+    const tots = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    tots[clauGuardat] = dades;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tots));
+  } catch(e) {}
+}
+
+function comprovarProgresGuardat() {
+  if (!clauGuardat) return;
+  try {
+    const tots = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const p = tots[clauGuardat];
+    if (p && p.index > 0 && p.index < p.total) {
+      const continuar = confirm(
+        `📖 Tens un progrés guardat:\n\n` +
+        `Fragment ${p.index + 1} de ${p.total}\n\n` +
+        `Vols continuar on ho vas deixar?`
+      );
+      if (continuar) {
+        indexActual = p.index;
+        // Actualitzem info
+        document.getElementById('info').textContent +=
+          ` · ▶️ Començarà al fragment ${p.index + 1}`;
+      } else {
+        indexActual = 0;
+      }
+    }
+  } catch(e) {}
+}
+
+// ===== Llegir =====
+function comencar() {
+  if (!trossos.length) return;
+  parlant = true;
+  pausat = false;
+  actualitzarBotons();
+  document.getElementById('progress').classList.add('show');
+  document.getElementById('pauseBtn').textContent = '⏸️';
+  llegirTros();
+}
+
+function llegirTros() {
+  if (!parlant || pausat || indexActual >= trossos.length) {
+    if (parlant && indexActual >= trossos.length) aturar(true);
+    return;
+  }
+
+  const status = document.getElementById('status');
+  status.className = 'status show playing';
+  status.textContent = `🔊 Llegint ${indexActual + 1} de ${trossos.length}`;
+
+  const pct = ((indexActual + 1) / trossos.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  const utter = new SpeechSynthesisUtterance(trossos[indexActual]);
+  utter.voice = veuTriada;
+  utter.rate = parseFloat(rateInput.value);
+  utter.lang = veuTriada ? veuTriada.lang : 'ca-ES';
+
+  utter.onend = () => {
+    if (pausat) return;
+    indexActual++;
+    guardarProgres();
+    llegirTros();
+  };
+  utter.onerror = () => {
+    if (pausat) return;
+    indexActual++;
+    llegirTros();
+  };
+
+  speechSynthesis.speak(utter);
+}
+
+function pausar() {
+  if (!parlant) return;
+  if (pausat) {
+    // Reprèn
+    pausat = false;
+    document.getElementById('pauseBtn').textContent = '⏸️';
+    speechSynthesis.cancel();
+    // Retrocedim un perquè el que s'estava llegint no es perdi
+    llegirTros();
+  } else {
+    // Pausa
+    pausat = true;
+    document.getElementById('pauseBtn').textContent = '▶️';
+    speechSynthesis.cancel();
+    const status = document.getElementById('status');
+    status.className = 'status show';
+    status.textContent = '⏸️ Pausat';
+  }
+}
+
+function saltar(delta) {
+  if (!trossos.length) return;
+  const estavaParlant = parlant;
+  indexActual = Math.max(0, Math.min(trossos.length - 1, indexActual + delta));
+  speechSynthesis.cancel();
+  guardarProgres();
+  if (estavaParlant && !pausat) {
+    setTimeout(llegirTros, 100);
+  } else {
+    const pct = ((indexActual + 1) / trossos.length) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('status').className = 'status show';
+    document.getElementById('status').textContent =
+      `⏭️ Fragment ${indexActual + 1} de ${trossos.length}`;
+  }
+}
+
+function aturar(acabat) {
+  parlant = false;
+  pausat = false;
+  speechSynthesis.cancel();
+  actualitzarBotons();
+
+  const status = document.getElementById('status');
+  if (acabat) {
+    status.className = 'status show done';
+    status.textContent = '✅ Acabat! 🎉';
+    // Esborrar progrés guardat
+    if (clauGuardat) {
+      try {
+        const tots = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        delete tots[clauGuardat];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tots));
+      } catch(e) {}
+    }
+    indexActual = 0;
+    document.getElementById('progressBar').style.width = '0%';
+  } else {
+    status.className = 'status show';
+    status.textContent = '⏹️ Aturat';
+    guardarProgres();
+  }
+  document.getElementById('progress').classList.remove('show');
+}
+
+function actualitzarBotons() {
+  const playing = parlant;
+  document.getElementById('btn').disabled = playing;
+  document.getElementById('pauseBtn').disabled = !playing;
+  document.getElementById('stopBtn').disabled = !playing;
+  document.getElementById('prevBtn').disabled = !playing && !trossos.length;
+  document.getElementById('nextBtn').disabled = !playing && !trossos.length;
+}
+
+// Guardar progrés en tancar
+window.addEventListener('beforeunload', guardarProgres);
+</script>
+</body>
+</html>
