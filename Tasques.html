@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organitzador de Tasques</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; }
+header { text-align: center; color: white; margin-bottom: 30px; }
+header h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+.file-bar { margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; }
+.file-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: white; transition: transform 0.2s; }
+.file-btn:hover { transform: translateY(-2px); }
+.file-btn.obre { background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%); }
+.file-btn.desa { background: linear-gradient(135deg, #51cf66 0%, #40c057 100%); }
+.file-btn.desa-com { background: linear-gradient(135deg, #845ef7 0%, #7048e8 100%); }
+.estat-fitxer { color: rgba(255,255,255,0.95); font-size: 0.85rem; font-style: italic; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; }
+.app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 1024px) { .app-grid { grid-template-columns: 1fr; } }
+.panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.panel h2 { color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #667eea; }
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; color: #555; font-weight: 600; font-size: 0.9rem; }
+input, select, textarea { width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+textarea { resize: vertical; min-height: 60px; }
+.btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; width: 100%; }
+.btn:hover { transform: translateY(-2px); }
+.btn-small { padding: 6px 12px; font-size: 0.85rem; width: auto; }
+.btn-danger { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); }
+.btn-success { background: linear-gradient(135deg, #51cf66 0%, #40c057 100%); }
+.project-item { background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #667eea; }
+.project-header { display: flex; justify-content: space-between; align-items: center; }
+.project-name { font-weight: 700; color: #333; font-size: 1.1rem; }
+.project-color { width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; }
+.task-item { background: #f8f9fa; border-radius: 10px; padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 12px; border-left: 4px solid #ddd; }
+.task-item.completed { opacity: 0.6; }
+.task-item.completed .task-title { text-decoration: line-through; color: #999; }
+.task-checkbox { width: 20px; height: 20px; cursor: pointer; margin-top: 2px; accent-color: #667eea; }
+.task-content { flex: 1; }
+.task-title { font-weight: 600; color: #333; margin-bottom: 4px; }
+.task-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; }
+.task-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; color: white; }
+.task-date { background: #e9ecef; color: #495057; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.task-date.overdue { background: #ff6b6b; color: white; }
+.task-date.today { background: #ffd43b; color: #333; }
+.task-actions { display: flex; gap: 5px; }
+.icon-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 4px; border-radius: 5px; }
+.icon-btn:hover { background: #e0e0e0; }
+.filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-btn { padding: 8px 16px; border: 2px solid #e0e0e0; background: white; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #666; }
+.filter-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.calendar-nav { display: flex; gap: 10px; align-items: center; }
+.calendar-nav button { background: #667eea; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
+.calendar-month { font-size: 1.3rem; font-weight: 700; color: #333; min-width: 200px; text-align: center; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.calendar-day-header { text-align: center; font-weight: 700; color: #667eea; padding: 10px 0; font-size: 0.85rem; }
+.calendar-day { aspect-ratio: 1; background: #f8f9fa; border-radius: 8px; padding: 5px; cursor: pointer; overflow: hidden; min-height: 60px; }
+.calendar-day:hover { background: #e9ecef; }
+.calendar-day.other-month { opacity: 0.4; }
+.calendar-day.today { background: #fff3bf; border: 2px solid #ffd43b; }
+.calendar-day.selected { background: #d0d7ff; border: 2px solid #667eea; }
+.calendar-day-number { font-weight: 600; font-size: 0.85rem; color: #333; }
+.calendar-tasks { display: flex; flex-direction: column; gap: 2px; margin-top: 3px; }
+.calendar-task-dot { font-size: 0.65rem; padding: 1px 4px; border-radius: 3px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.empty-state { text-align: center; padding: 40px 20px; color: #999; }
+.empty-state .icon { font-size: 3rem; margin-bottom: 10px; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal { background: white; border-radius: 15px; padding: 25px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 20px; color: #333; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-actions .btn { flex: 1; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.stat-card { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
+.stat-number { font-size: 1.8rem; font-weight: 700; color: #667eea; }
+.stat-label { font-size: 0.8rem; color: #666; margin-top: 5px; }
+.section-title { font-size: 1rem; font-weight: 700; color: #555; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 2px solid #e0e0e0; }
+.selected-date-tasks { margin-top: 15px; padding-top: 15px; border-top: 2px solid #e0e0e0; }
+</style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📋 Organitzador de Tasques</h1>
+        <p>Gestiona els teus projectes i tasques al calendari</p>
+        <div class="file-bar">
+            <button class="file-btn obre" onclick="obreFitxer()">📂 Obrir fitxer</button>
+            <button class="file-btn desa" onclick="desaFitxer()">💾 Desar fitxer</button>
+            <button class="file-btn desa-com" onclick="desaFitxerCom()">💾 Desar com...</button>
+            <input type="file" id="inputObrir" accept=".json,application/json" style="display: none;" onchange="carregarFitxer(event)">
+            <span id="estatFitxer" class="estat-fitxer">Cap fitxer obert</span>
+        </div>
+    </header>
+
+    <div class="app-grid">
+        <div class="panel">
+            <h2>📁 Projectes</h2>
+            <div class="form-group">
+                <label>Nom del projecte</label>
+                <input type="text" id="projectName" placeholder="Ex: Desenvolupament web">
+            </div>
+            <div class="form-group">
+                <label>Color</label>
+                <input type="color" id="projectColor" value="#667eea">
+            </div>
+            <button class="btn" onclick="addProject()">➕ Afegir Projecte</button>
+            <div id="projectsList" style="margin-top: 20px;"></div>
+
+            <div class="section-title">✅ Nova Tasca</div>
+            <div class="form-group">
+                <label>Títol de la tasca</label>
+                <input type="text" id="taskTitle" placeholder="Ex: Dissenyar la pàgina d'inici">
+            </div>
+            <div class="form-group">
+                <label>Projecte</label>
+                <select id="taskProject"></select>
+            </div>
+            <div class="form-group">
+                <label>Data límit</label>
+                <input type="date" id="taskDate">
+            </div>
+            <div class="form-group">
+                <label>Descripció (opcional)</label>
+                <textarea id="taskDescription" placeholder="Detalls de la tasca..."></textarea>
+            </div>
+            <button class="btn btn-success" onclick="addTask()">➕ Afegir Tasca</button>
+        </div>
+
+        <div class="panel">
+            <h2>📅 Calendari</h2>
+            <div class="stats">
+                <div class="stat-card"><div class="stat-number" id="totalTasks">0</div><div class="stat-label">Total</div></div>
+                <div class="stat-card"><div class="stat-number" id="pendingTasks">0</div><div class="stat-label">Pendents</div></div>
+                <div class="stat-card"><div class="stat-number" id="completedTasks">0</div><div class="stat-label">Completades</div></div>
+            </div>
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button onclick="changeMonth(-1)">‹</button>
+                    <div class="calendar-month" id="currentMonth"></div>
+                    <button onclick="changeMonth(1)">›</button>
+                </div>
+                <button class="btn btn-small" onclick="goToToday()">Avui</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="selected-date-tasks" id="selectedDateTasks"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3>✏️ Editar Tasca</h3>
+        <input type="hidden" id="editTaskId">
+        <div class="form-group"><label>Títol</label><input type="text" id="editTaskTitle"></div>
+        <div class="form-group"><label>Projecte</label><select id="editTaskProject"></select></div>
+        <div class="form-group"><label>Data límit</label><input type="date" id="editTaskDate"></div>
+        <div class="form-group"><label>Descripció</label><textarea id="editTaskDescription"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-danger" onclick="closeEditModal()">Cancel·lar</button>
+            <button class="btn" onclick="saveEditedTask()">Guardar</button>
+        </div>
+    </div>
+</div>
+<script>
+let projects = [];
+let tasks = [];
+let currentDate = new Date();
+let selectedDate = null;
+let currentFilter = 'all';
+let fitxerActual = null;
+
+function formatDate(date) {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatDateDisplay(dateStr) {
+    const date = new Date(dateStr + 'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+    const dateOnly = new Date(dateStr + 'T00:00:00');
+    if (dateOnly.getTime() === today.getTime()) return 'Avui';
+    if (dateOnly.getTime() === tomorrow.getTime()) return 'Demà';
+    if (dateOnly.getTime() === yesterday.getTime()) return 'Ahir';
+    return date.toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' });
+}
+
+function mostrarToast(msg) {
+    document.querySelectorAll('.toast-app').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'toast-app';
+    toast.textContent = msg;
+    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#2d3748;color:white;padding:14px 24px;border-radius:10px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:9999;transition:transform 0.3s;max-width:90%;text-align:center;';
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => { toast.style.transform = 'translateX(-50%) translateY(0)'; });
+    setTimeout(() => {
+        toast.style.transform = 'translateX(-50%) translateY(100px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function actualitzarEstatFitxer(text) {
+    const el = document.getElementById('estatFitxer');
+    if (el) el.textContent = text;
+}
+
+function loadData() {
+    try { projects = JSON.parse(localStorage.getItem('projects') || '[]'); } catch(e) { projects = []; }
+    try { tasks = JSON.parse(localStorage.getItem('tasks') || '[]'); } catch(e) { tasks = []; }
+}
+
+function saveData() {
+    localStorage.setItem('projects', JSON.stringify(projects));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+/* ====== FITXERS ====== */
+function obreFitxer() {
+    document.getElementById('inputObrir').click();
+}
+
+function carregarFitxer(event) {
+    const fitxer = event.target.files[0];
+    if (!fitxer) return;
+    const lector = new FileReader();
+    lector.onload = (e) => {
+        let dades;
+        try { dades = JSON.parse(e.target.result); }
+        catch (err) { alert('❌ El fitxer no és JSON vàlid.\n\n' + err.message); event.target.value=''; return; }
+        if (!Array.isArray(dades.projects) || !Array.isArray(dades.tasks)) {
+            alert('❌ El fitxer no té el format correcte.'); event.target.value = ''; return;
+        }
+        if (projects.length > 0 || tasks.length > 0) {
+            const ok = confirm(`📂 ${fitxer.name}\n\nConté ${dades.projects.length} projectes i ${dades.tasks.length} tasques.\n\nActualment tens ${projects.length} projectes i ${tasks.length} tasques.\n\n👉 OK = SUBSTITUIR\n👉 Cancel·lar = CANCEL·LAR`);
+            if (!ok) { event.target.value=''; return; }
+        }
+        projects = dades.projects;
+        tasks = dades.tasks;
+        fitxerActual = fitxer.name;
+        actualitzarEstatFitxer(`📄 ${fitxer.name}`);
+        saveData();
+        localStorage.setItem('fitxerActual', fitxer.name);
+        render();
+        mostrarToast(`✅ Carregat: ${fitxer.name}`);
+        event.target.value = '';
+    };
+    lector.onerror = () => { alert('❌ Error llegint.'); event.target.value=''; };
+    lector.readAsText(fitxer);
+}
+
+function desaFitxer() {
+    if (projects.length === 0 && tasks.length === 0) { alert('No hi ha res per desar.'); return; }
+    const nom = fitxerActual || `tasques-${formatDate(new Date())}.json`;
+    descarregarJSON(nom);
+}
+
+function desaFitxerCom() {
+    if (projects.length === 0 && tasks.length === 0) { alert('No hi ha res per desar.'); return; }
+    const suggerit = fitxerActual || `tasques-${formatDate(new Date())}.json`;
+    const nom = prompt('Nom del fitxer:', suggerit);
+    if (!nom) return;
+    const nomFinal = nom.endsWith('.json') ? nom : nom + '.json';
+    fitxerActual = nomFinal;
+    actualitzarEstatFitxer(`📄 ${nomFinal}`);
+    localStorage.setItem('fitxerActual', nomFinal);
+    descarregarJSON(nomFinal);
+}
+
+function descarregarJSON(nom) {
+    const backup = { app: 'Organitzador de Tasques', version: 1, exportDate: new Date().toISOString(), projects, tasks };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nom;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    mostrarToast(`💾 Desat: ${nom}`);
+}
+
+/* ====== PROJECTES ====== */
+function addProject() {
+    const name = document.getElementById('projectName').value.trim();
+    const color = document.getElementById('projectColor').value;
+    if (!name) { alert('Introdueix un nom'); return; }
+    projects.push({ id: Date.now(), name, color });
+    document.getElementById('projectName').value = '';
+    saveData();
+    render();
+    mostrarToast(`✅ Projecte: ${name}`);
+}
+
+function deleteProject(id) {
+    if (!confirm('Eliminar aquest projecte i les seves tasques?')) return;
+    projects = projects.filter(p => p.id !== id);
+    tasks = tasks.filter(t => t.projectId !== id);
+    saveData();
+    render();
+}
+
+/* ====== TASQUES ====== */
+function addTask() {
+    const title = document.getElementById('taskTitle').value.trim();
+    const projectId = parseInt(document.getElementById('taskProject').value);
+    const date = document.getElementById('taskDate').value;
+    const description = document.getElementById('taskDescription').value.trim();
+    if (!title) { alert('Introdueix un títol'); return; }
+    if (!projectId) { alert('Selecciona un projecte'); return; }
+    tasks.push({ id: Date.now(), title, projectId, date: date || formatDate(new Date()), description, completed: false });
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDescription').value = '';
+    document.getElementById('taskDate').value = '';
+    saveData();
+    render();
+    mostrarToast('✅ Tasca afegida');
+}
+
+function toggleTask(id) {
+    const t = tasks.find(x => x.id === id);
+    if (t) { t.completed = !t.completed; saveData(); render(); }
+}
+
+function deleteTask(id) {
+    if (!confirm('Eliminar aquesta tasca?')) return;
+    tasks = tasks.filter(t => t.id !== id);
+    saveData();
+    render();
+}
+
+function editTask(id) {
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById('editTaskId').value = t.id;
+    document.getElementById('editTaskTitle').value = t.title;
+    document.getElementById('editTaskProject').value = t.projectId;
+    document.getElementById('editTaskDate').value = t.date;
+    document.getElementById('editTaskDescription').value = t.description || '';
+    document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+}
+
+function saveEditedTask() {
+    const id = parseInt(document.getElementById('editTaskId').value);
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    t.title = document.getElementById('editTaskTitle').value.trim();
+    t.projectId = parseInt(document.getElementById('editTaskProject').value);
+    t.date = document.getElementById('editTaskDate').value;
+    t.description = document.getElementById('editTaskDescription').value.trim();
+    saveData();
+    closeEditModal();
+    render();
+}
+
+/* ====== CALENDARI ====== */
+function changeMonth(delta) {
+    currentDate.setMonth(currentDate.getMonth() + delta);
+    render();
+}
+
+function goToToday() {
+    currentDate = new Date();
+    selectedDate = formatDate(new Date());
+    render();
+}
+
+function selectDay(dateStr) {
+    selectedDate = selectedDate === dateStr ? null : dateStr;
+    render();
+}
+
+function setFilter(f) {
+    currentFilter = f;
+    render();
+}
+
+/* ====== RENDER ====== */
+function render() {
+    renderProjects();
+    renderTaskProjectSelects();
+    renderCalendar();
+    renderStats();
+    renderSelectedDateTasks();
+}
+
+function renderProjects() {
+    const c = document.getElementById('projectsList');
+    if (projects.length === 0) {
+        c.innerHTML = '<div class="empty-state"><div class="icon">📁</div><p>No hi ha projectes</p></div>';
+        return;
+    }
+    c.innerHTML = projects.map(p => {
+        const tc = tasks.filter(t => t.projectId === p.id).length;
+        const cc = tasks.filter(t => t.projectId === p.id && t.completed).length;
+        return `<div class="project-item" style="border-left-color:${p.color}">
+            <div class="project-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="project-color" style="background:${p.color}"></div>
+                    <div>
+                        <div class="project-name">${escapeHtml(p.name)}</div>
+                        <div style="font-size:0.8rem;color:#666;">${cc}/${tc} tasques</div>
+                    </div>
+                </div>
+                <button class="icon-btn" onclick="deleteProject(${p.id})">🗑️</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderTaskProjectSelects() {
+    const opts = projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    document.getElementById('taskProject').innerHTML = opts || '<option value="">(cap projecte)</option>';
+    document.getElementById('editTaskProject').innerHTML = opts;
+}
+
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const noms = ['Gener','Febrer','Març','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre'];
+    document.getElementById('currentMonth').textContent = `${noms[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startingDay = (firstDay.getDay() + 6) % 7;
+    const totalDays = lastDay.getDate();
+    const todayStr = formatDate(new Date());
+
+    let html = '';
+    ['Dl','Dt','Dc','Dj','Dv','Ds','Dg'].forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
+
+    const prevLast = new Date(year, month, 0).getDate();
+    for (let i = startingDay - 1; i >= 0; i--) {
+        const day = prevLast - i;
+        html += `<div class="calendar-day other-month"><div class="calendar-day-number">${day}</div></div>`;
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+        const dateStr = formatDate(new Date(year, month, day));
+        const isToday = dateStr === todayStr;
+        const isSel = dateStr === selectedDate;
+        const dayTasks = tasks.filter(t => t.date === dateStr);
+        let cls = 'calendar-day';
+        if (isToday) cls += ' today';
+        if (isSel) cls += ' selected';
+
+        let th = '';
+        dayTasks.slice(0, 3).forEach(t => {
+            const p = projects.find(x => x.id === t.projectId);
+            const color = p ? p.color : '#999';
+            const op = t.completed ? '0.5' : '1';
+            const txt = t.title.length > 8 ? t.title.substring(0,8)+'…' : t.title;
+            th += `<div class="calendar-task-dot" style="background:${color};opacity:${op};" title="${escapeHtml(t.title)}">${escapeHtml(txt)}</div>`;
+        });
+        if (dayTasks.length > 3) th += `<div style="font-size:0.65rem;color:#666;font-weight:600;">+${dayTasks.length-3}</div>`;
+
+        html += `<div class="${cls}" onclick="selectDay('${dateStr}')">
+            <div class="calendar-day-number">${day}</div>
+            <div class="calendar-tasks">${th}</div>
+        </div>`;
+    }
+
+    const totalCells = startingDay + totalDays;
+    const rem = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    for (let i = 1; i <= rem; i++) {
+        html += `<div class="calendar-day other-month"><div class="calendar-day-number">${i}</div></div>`;
+    }
+
+    document.getElementById('calendarGrid').innerHTML = html;
+}
+
+function renderStats() {
+    document.getElementById('totalTasks').textContent = tasks.length;
+    document.getElementById('pendingTasks').textContent = tasks.filter(t => !t.completed).length;
+    document.getElementById('completedTasks').textContent = tasks.filter(t => t.completed).length;
+}
+
+function renderSelectedDateTasks() {
+    const c = document.getElementById('selectedDateTasks');
+    if (!selectedDate) { c.innerHTML = ''; return; }
+
+    const dateObj = new Date(selectedDate + 'T00:00:00');
+    const dateFmt = dateObj.toLocaleDateString('ca-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    let dayTasks = tasks.filter(t => t.date === selectedDate);
+    if (currentFilter === 'pending') dayTasks = dayTasks.filter(t => !t.completed);
+    else if (currentFilter === 'completed') dayTasks = dayTasks.filter(t => t.completed);
+
+    let html = `<div style="margin-bottom:15px;"><h3 style="color:#333;font-size:1.1rem;text-transform:capitalize;">📅 ${dateFmt}</h3></div>
+        <div class="filters">
+            <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">Totes</button>
+            <button class="filter-btn ${currentFilter==='pending'?'active':''}" onclick="setFilter('pending')">Pendents</button>
+            <button class="filter-btn ${currentFilter==='completed'?'active':''}" onclick="setFilter('completed')">Completades</button>
+        </div>`;
+
+    if (dayTasks.length === 0) {
+        html += '<div class="empty-state"><div class="icon">📭</div><p>No hi ha tasques per aquest dia</p></div>';
+    } else {
+        html += dayTasks.map(t => {
+            const p = projects.find(x => x.id === t.projectId);
+            const pc = p ? p.color : '#999';
+            const pn = p ? p.name : 'Sense projecte';
+            const todayStr = formatDate(new Date());
+            let dc = 'task-date';
+            if (t.date < todayStr && !t.completed) dc += ' overdue';
+            else if (t.date === todayStr) dc += ' today';
+
+            return `<div class="task-item ${t.completed?'completed':''}" style="border-left-color:${pc}">
+                <input type="checkbox" class="task-checkbox" ${t.completed?'checked':''} onchange="toggleTask(${t.id})">
+                <div class="task-content">
+                    <div class="task-title">${escapeHtml(t.title)}</div>
+                    ${t.description ? `<div style="font-size:0.85rem;color:#666;margin-bottom:5px;">${escapeHtml(t.description)}</div>` : ''}
+                    <div class="task-meta">
+                        <span class="task-badge" style="background:${pc}">${escapeHtml(pn)}</span>
+                        <span class="${dc}">${formatDateDisplay(t.date)}</span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="icon-btn" onclick="editTask(${t.id})">✏️</button>
+                    <button class="icon-btn" onclick="deleteTask(${t.id})">🗑️</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+    c.innerHTML = html;
+}
+
+/* ====== INICIALITZACIÓ ====== */
+function init() {
+    loadData();
+    selectedDate = formatDate(new Date());
+    const nomGuardat = localStorage.getItem('fitxerActual');
+    if (nomGuardat) {
+        fitxerActual = nomGuardat;
+        actualitzarEstatFitxer(`📄 ${nomGuardat} (còpia local)`);
+    }
+    render();
+
+    document.getElementById('editModal').addEventListener('click', (e) => {
+        if (e.target.id === 'editModal') closeEditModal();
+    });
+    document.getElementById('projectName').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addProject();
+    });
+    document.getElementById('taskTitle').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTask();
+    });
+}
+
+init();
+</script>
+</body>
+</html>
