@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TreeNotes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: -apple-system, system-ui, sans-serif; font-size: 15px; }
+  body { display: flex; flex-direction: column; background: #f4f5f7; color: #222; overflow: hidden; }
+
+  #toolbar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px; background: #2d3748; color: #fff;
+    flex-wrap: wrap; padding-top: max(8px, env(safe-area-inset-top));
+  }
+  #toolbar button, #toolbar label.btn {
+    background: #4a5568; color: #fff; border: none; border-radius: 6px;
+    padding: 8px 12px; cursor: pointer; font-size: 14px; touch-action: manipulation;
+  }
+  #toolbar button:active, #toolbar label.btn:active { background: #5a6a82; }
+  #toolbar .sep { width: 1px; height: 24px; background: #5a6a82; margin: 0 4px; }
+  #toolbar .title { font-weight: 600; margin-right: 6px; font-size: 15px; }
+  #fileInput { display: none; }
+
+  #main { flex: 1; display: flex; overflow: hidden; }
+
+  /* Arbre: a iPad el fem més ample i amb zones tàctils grans */
+  #treePane {
+    width: 42%; min-width: 220px; max-width: 420px;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    background: #fff; border-right: 1px solid #d1d5db;
+    padding: 8px 4px;
+  }
+  .node {
+    display: flex; align-items: center;
+    padding: 10px 8px; border-radius: 8px;
+    cursor: pointer; user-select: none; -webkit-user-select: none;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    touch-action: manipulation; min-height: 40px;
+  }
+  .node:active { background: #edf2f7; }
+  .node.selected { background: #3182ce; color: #fff; }
+  .node.drag-over { background: #f6e05e; color: #222; }
+  .node.drag-over-child { background: #68d391; color: #222; }
+  .node .arrow {
+    width: 22px; display: inline-block; text-align: center;
+    font-size: 12px; color: #666; padding: 4px 0;
+  }
+  .node.selected .arrow { color: #fff; }
+  .node .label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .children { margin-left: 16px; }
+
+  #editorPane { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; }
+
+  #noteTitle {
+    font-size: 19px; font-weight: 600;
+    border: none; outline: none;
+    padding: 14px 16px; border-bottom: 1px solid #e2e8f0;
+    -webkit-appearance: none; background: #fff;
+  }
+  #formatBar {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 8px 10px; border-bottom: 1px solid #e2e8f0; background: #fafafa;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  #formatBar button {
+    background: #fff; border: 1px solid #cbd5e0; border-radius: 6px;
+    padding: 8px 12px; cursor: pointer; font-size: 14px;
+    touch-action: manipulation; min-height: 38px; flex: 0 0 auto;
+  }
+  #formatBar button:active { background: #edf2f7; }
+  #formatBar select {
+    border: 1px solid #cbd5e0; border-radius: 6px; padding: 8px;
+    background: #fff; font-size: 14px; min-height: 38px; flex: 0 0 auto;
+  }
+  #formatBar .sep { width: 1px; background: #cbd5e0; margin: 0 4px; flex: 0 0 auto; }
+
+  #noteBody {
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 16px 20px; padding-bottom: max(40px, env(safe-area-inset-bottom));
+    outline: none; line-height: 1.7; font-size: 16px;
+  }
+  #noteBody:empty:before { content: "Escriu aquí…"; color: #a0aec0; }
+  #noteBody h1 { font-size: 1.7em; margin: 0.5em 0; }
+  #noteBody h2 { font-size: 1.4em; margin: 0.5em 0; }
+  #noteBody h3 { font-size: 1.2em; margin: 0.5em 0; }
+  #noteBody p { margin: 0.5em 0; }
+  #noteBody ul, #noteBody ol { margin: 0.5em 0 0.5em 1.4em; }
+  #noteBody blockquote { border-left: 3px solid #cbd5e0; padding-left: 10px; color: #555; margin: 0.5em 0; }
+  #noteBody pre {
+    background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 10px; font-family: ui-monospace, Menlo, monospace; white-space: pre-wrap; margin: 0.5em 0;
+    font-size: 14px;
+  }
+  #noteBody a { color: #3182ce; }
+  #noteBody table { border-collapse: collapse; margin: 0.5em 0; }
+  #noteBody table td, #noteBody table th { border: 1px solid #cbd5e0; padding: 6px 10px; }
+
+  #status {
+    padding: 6px 12px; background: #edf2f7; color: #555;
+    font-size: 12px; border-top: 1px solid #d1d5db;
+    display: flex; justify-content: space-between;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  #ctxMenu {
+    position: fixed; background: #fff; border: 1px solid #cbd5e0;
+    border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+    padding: 6px; display: none; z-index: 1000; min-width: 220px;
+    font-size: 15px;
+  }
+  #ctxMenu div { padding: 12px 14px; cursor: pointer; border-radius: 6px; }
+  #ctxMenu div:active { background: #edf2f7; }
+  #ctxMenu .danger { color: #c53030; }
+
+  /* Modal per a mòbil (substitueix prompt/confirm) */
+  #modalBg {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: center; justify-content: center; z-index: 2000;
+    padding: 20px;
+  }
+  #modalBg.show { display: flex; }
+  #modal {
+    background: #fff; border-radius: 12px; padding: 20px;
+    width: 100%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,.3);
+  }
+  #modal h3 { font-size: 17px; margin-bottom: 12px; }
+  #modal input, #modal textarea {
+    width: 100%; padding: 12px; font-size: 16px;
+    border: 1px solid #cbd5e0; border-radius: 8px; margin-bottom: 14px;
+    -webkit-appearance: none;
+  }
+  #modal .btns { display: flex; gap: 8px; justify-content: flex-end; }
+  #modal button {
+    padding: 10px 18px; font-size: 15px; border: none; border-radius: 8px;
+    cursor: pointer; touch-action: manipulation;
+  }
+  #modal .cancel { background: #edf2f7; color: #333; }
+  #modal .ok { background: #3182ce; color: #fff; }
+  #modal .ok.danger { background: #c53030; }
+
+  @media (max-width: 700px) {
+    #main { flex-direction: column; }
+    #treePane { width: 100%; max-width: none; max-height: 40vh; border-right: none; border-bottom: 1px solid #d1d5db; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <span class="title">🌳 TreeNotes</span>
+  <button onclick="addNote(null,'child')">+ Filla</button>
+  <button onclick="addNote(null,'sibling')">+ Germana</button>
+  <span class="sep"></span>
+  <button onclick="renameNote()">✏️</button>
+  <button onclick="deleteNote()">🗑️</button>
+  <span class="sep"></span>
+  <button onclick="expandAll(true)">⬇️</button>
+  <button onclick="expandAll(false)">➡️</button>
+  <span class="sep"></span>
+  <button onclick="exportDB()">💾 Exporta</button>
+  <label class="btn" for="fileInput">📂 Importa</label>
+  <input type="file" id="fileInput" accept=".json" onchange="importDB(event)">
+  <button onclick="exportHTML()">🌐 HTML</button>
+</div>
+
+<div id="main">
+  <div id="treePane"><div id="tree"></div></div>
+  <div id="editorPane">
+    <input id="noteTitle" placeholder="Títol de la nota" oninput="onTitleChange()">
+    <div id="formatBar">
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmt('bold')"><b>B</b></button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmt('italic')"><i>I</i></button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmt('underline')"><u>U</u></button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmt('strikeThrough')"><s>S</s></button>
+      <span class="sep"></span>
+      <select onchange="fmtBlock(this.value); this.value='';">
+        <option value="">Format…</option>
+        <option value="p">Paràgraf</option>
+        <option value="h1">Títol 1</option>
+        <option value="h2">Títol 2</option>
+        <option value="h3">Títol 3</option>
+        <option value="pre">Codi</option>
+        <option value="blockquote">Cita</option>
+      </select>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmt('insertUnorderedList')">• Llista</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmt('insertOrderedList')">1. Llista</button>
+      <span class="sep"></span>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="setColor('#c53030')">🔴</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="setColor('#2b6cb0')">🔵</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="setColor('#2f855a')">🟢</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="setHighlight('#fefcbf')">🖍️</button>
+      <span class="sep"></span>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="insertLink()">🔗</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="insertTable()">▦</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="insertCode()">&lt;/&gt;</button>
+      <button onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="document.execCommand('removeFormat')">🧹</button>
+    </div>
+    <div id="noteBody" contenteditable="true" oninput="onBodyChange()"></div>
+  </div>
+</div>
+
+<div id="status">
+  <span id="statusLeft">Preparat</span>
+  <span id="statusRight"></span>
+</div>
+
+<div id="ctxMenu"></div>
+
+<div id="modalBg">
+  <div id="modal">
+    <h3 id="modalTitle"></h3>
+    <input id="modalInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="sentences">
+    <div class="btns">
+      <button class="cancel" onclick="closeModal(false)">Cancel·la</button>
+      <button class="ok" id="modalOk" onclick="closeModal(true)">D'acord</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   TreeNotes — versió iPad (touch-friendly)
+   ========================================================= */
+const LS_KEY = 'treenotes_db_v1';
+let db = null;
+let draggedId = null;
+
+const uid = () => 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const $  = s => document.querySelector(s);
+
+/* ---- Modal (substitueix prompt/confirm) ---- */
+let modalResolve = null;
+function openModal({ title, value = '', danger = false, okText = "D'acord" }) {
+  return new Promise(res => {
+    modalResolve = res;
+    $('#modalTitle').textContent = title;
+    $('#modalInput').value = value;
+    $('#modalInput').style.display = 'block';
+    const ok = $('#modalOk');
+    ok.textContent = okText;
+    ok.className = 'ok' + (danger ? ' danger' : '');
+    $('#modalBg').classList.add('show');
+    setTimeout(() => { $('#modalInput').focus(); $('#modalInput').select(); }, 100);
+    $('#modalInput').onkeydown = (e) => { if (e.key === 'Enter') closeModal(true); };
+  });
+}
+function openConfirm(title, danger = false, okText = "Sí") {
+  return new Promise(res => {
+    modalResolve = res;
+    $('#modalTitle').textContent = title;
+    $('#modalInput').style.display = 'none';
+    const ok = $('#modalOk');
+    ok.textContent = okText;
+    ok.className = 'ok' + (danger ? ' danger' : '');
+    $('#modalBg').classList.add('show');
+  });
+}
+function closeModal(ok) {
+  $('#modalBg').classList.remove('show');
+  const v = $('#modalInput').style.display === 'none' ? ok : (ok ? $('#modalInput').value : null);
+  if (modalResolve) { modalResolve(v); modalResolve = null; }
+}
+
+/* ---- BD ---- */
+function blankDB() {
+  const id = uid();
+  return {
+    rootIds: [id],
+    nodes: { [id]: { id, title:'Nota arrel', html:'<p>Benvingut a <b>TreeNotes</b>.</p>', children:[], collapsed:false } },
+    selected: id
+  };
+}
+function loadDB() {
+  const raw = localStorage.getItem(LS_KEY);
+  if (raw) { try { db = JSON.parse(raw); } catch(e){ db = blankDB(); } }
+  else db = blankDB();
+}
+function saveDB(silent) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(db));
+    if (!silent) setStatus('Desat ' + new Date().toLocaleTimeString());
+  } catch(e) {
+    setStatus('⚠️ No s\'ha pogut desar (memòria plena?)');
+  }
+}
+
+/* ---- Arbre ---- */
+function renderTree() {
+  const tree = $('#tree');
+  tree.innerHTML = '';
+  const build = (ids, container) => {
+    for (const id of ids) {
+      const n = db.nodes[id];
+      if (!n) continue;
+      const div = document.createElement('div');
+      div.className = 'node' + (id === db.selected ? ' selected' : '');
+      div.dataset.id = id;
+      div.draggable = true;
+
+      const arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.textContent = n.children.length ? (n.collapsed ? '▶' : '▼') : '';
+      arrow.onclick = (e) => { e.stopPropagation(); n.collapsed = !n.collapsed; saveDB(true); renderTree(); };
+
+      const label = document.createElement('span');
+      label.className = 'label';
+      label.textContent = n.title || '(sense títol)';
+
+      div.appendChild(arrow);
+      div.appendChild(label);
+
+      div.onclick = (e) => { e.stopPropagation(); selectNote(id); };
+
+      // Long-press per al menú contextual (iPad)
+      let lpTimer = null;
+      let longPressed = false;
+      const startLP = (e) => {
+        longPressed = false;
+        lpTimer = setTimeout(() => {
+          longPressed = true;
+          const t = e.touches ? e.touches[0] : e;
+          openCtxMenu({ clientX: t.clientX, clientY: t.clientY, preventDefault:()=>{} }, id);
+          if (navigator.vibrate) navigator.vibrate(15);
+        }, 500);
+      };
+      const cancelLP = () => { clearTimeout(lpTimer); };
+      div.addEventListener('touchstart', startLP, {passive:true});
+      div.addEventListener('touchend', cancelLP);
+      div.addEventListener('touchmove', cancelLP);
+      div.addEventListener('mousedown', startLP);
+      div.addEventListener('mouseup', cancelLP);
+      div.addEventListener('mouseleave', cancelLP);
+      div.addEventListener('click', (e) => { if (longPressed) { e.stopPropagation(); } }, true);
+
+      // Clic dret escriptori
+      div.oncontextmenu = (e) => { e.preventDefault(); openCtxMenu(e, id); };
+
+      // Drag & drop (funciona a Safari iPad amb long-press)
+      div.ondragstart = (e) => { draggedId = id; e.dataTransfer.effectAllowed = 'move'; };
+      div.ondragover = (e) => {
+        if (!draggedId || draggedId === id) return;
+        e.preventDefault();
+        const rect = div.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        div.classList.remove('drag-over','drag-over-child');
+        if (y < rect.height * 0.25) div.classList.add('drag-over');
+        else if (y > rect.height * 0.75) div.classList.add('drag-over');
+        else div.classList.add('drag-over-child');
+      };
+      div.ondragleave = () => div.classList.remove('drag-over','drag-over-child');
+      div.ondrop = (e) => {
+        e.preventDefault();
+        const rect = div.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        div.classList.remove('drag-over','drag-over-child');
+        if (y < rect.height * 0.25) moveNote(draggedId, id, 'before');
+        else if (y > rect.height * 0.75) moveNote(draggedId, id, 'after');
+        else moveNote(draggedId, id, 'child');
+        draggedId = null;
+      };
+
+      container.appendChild(div);
+      if (n.children.length && !n.collapsed) {
+        const kids = document.createElement('div');
+        kids.className = 'children';
+        build(n.children, kids);
+        container.appendChild(kids);
+      }
+    }
+  };
+  build(db.rootIds, tree);
+}
+
+/* ---- Editor ---- */
+function selectNote(id) {
+  flushEditor();
+  db.selected = id;
+  const n = db.nodes[id];
+  if (!n) return;
+  $('#noteTitle').value = n.title;
+  $('#noteBody').innerHTML = n.html || '';
+  renderTree();
+}
+function onTitleChange() {
+  const n = db.nodes[db.selected];
+  if (!n) return;
+  n.title = $('#noteTitle').value;
+  saveDB(true); renderTree();
+}
+function onBodyChange() {
+  const n = db.nodes[db.selected];
+  if (!n) return;
+  n.html = $('#noteBody').innerHTML;
+  clearTimeout(onBodyChange._t);
+  onBodyChange._t = setTimeout(() => saveDB(true), 500);
+}
+function flushEditor() {
+  const n = db.nodes[db.selected];
+  if (!n) return;
+  n.title = $('#noteTitle').value;
+  n.html = $('#noteBody').innerHTML;
+}
+
+/* ---- CRUD ---- */
+function addNote(parentId, mode) {
+  flushEditor();
+  const id = uid();
+  db.nodes[id] = { id, title:'Nova nota', html:'', children:[], collapsed:false };
+  if (mode === 'child') {
+    const pid = parentId || db.selected;
+    if (pid && db.nodes[pid]) { db.nodes[pid].children.push(id); db.nodes[pid].collapsed = false; }
+    else db.rootIds.push(id);
+  } else {
+    const sel = db.selected;
+    if (!sel) db.rootIds.push(id);
+    else {
+      const parent = findParent(sel);
+      if (parent) { const i = parent.children.indexOf(sel); parent.children.splice(i+1, 0, id); }
+      else { const i = db.rootIds.indexOf(sel); db.rootIds.splice(i+1, 0, id); }
+    }
+  }
+  db.selected = id;
+  saveDB(); renderTree(); selectNote(id);
+  setTimeout(() => { $('#noteTitle').focus(); $('#noteTitle').select(); }, 120);
+}
+function findParent(id) {
+  for (const k in db.nodes) if (db.nodes[k].children.includes(id)) return db.nodes[k];
+  return null;
+}
+async function renameNote() {
+  const n = db.nodes[db.selected];
+  if (!n) return;
+  const v = await openModal({ title:'Nou títol', value:n.title, okText:'Canvia' });
+  if (v !== null) { n.title = v; saveDB(); renderTree(); $('#noteTitle').value = v; }
+}
+async function deleteNote() {
+  const id = db.selected;
+  const n = db.nodes[id];
+  if (!n) return;
+  const ok = await openConfirm(`Esborrar "${n.title}" i tots els seus fills?`, true, 'Esborra');
+  if (!ok) return;
+  removeRecursive(id);
+  const anyId = db.rootIds[0] || Object.keys(db.nodes)[0];
+  if (anyId) selectNote(anyId);
+  else db = blankDB();
+  saveDB(); renderTree();
+}
+function removeRecursive(id) {
+  const n = db.nodes[id];
+  if (!n) return;
+  for (const c of [...n.children]) removeRecursive(c);
+  const parent = findParent(id);
+  if (parent) parent.children = parent.children.filter(x => x !== id);
+  else db.rootIds = db.rootIds.filter(x => x !== id);
+  delete db.nodes[id];
+}
+function moveNote(srcId, targetId, position) {
+  if (!srcId || srcId === targetId) return;
+  if (isDescendant(targetId, srcId)) { setStatus('No pots moure un pare dins d\'un fill'); return; }
+  const oldParent = findParent(srcId);
+  if (oldParent) oldParent.children = oldParent.children.filter(x => x !== srcId);
+  else db.rootIds = db.rootIds.filter(x => x !== srcId);
+  if (position === 'child') { db.nodes[targetId].children.push(srcId); db.nodes[targetId].collapsed = false; }
+  else {
+    const parent = findParent(targetId);
+    if (parent) { const i = parent.children.indexOf(targetId); parent.children.splice(position==='before'?i:i+1, 0, srcId); }
+    else { const i = db.rootIds.indexOf(targetId); db.rootIds.splice(position==='before'?i:i+1, 0, srcId); }
+  }
+  saveDB(); renderTree(); selectNote(srcId);
+}
+function isDescendant(maybeChild, ancestor) {
+  const n = db.nodes[ancestor];
+  if (!n) return false;
+  if (n.children.includes(maybeChild)) return true;
+  return n.children.some(c => isDescendant(maybeChild, c));
+}
+
+/* ---- Format ---- */
+function fmt(cmd) { document.execCommand(cmd, false, null); $('#noteBody').focus(); onBodyChange(); }
+function fmtBlock(tag) { if (!tag) return; document.execCommand('formatBlock', false, tag); $('#noteBody').focus(); onBodyChange(); }
+function setColor(c) { document.execCommand('foreColor', false, c); $('#noteBody').focus(); onBodyChange(); }
+function setHighlight(c) { document.execCommand('hiliteColor', false, c); $('#noteBody').focus(); onBodyChange(); }
+async function insertLink() {
+  const url = await openModal({ title:'URL de l\'enllaç', value:'https://', okText:'Insereix' });
+  if (url) document.execCommand('createLink', false, url);
+  $('#noteBody').focus(); onBodyChange();
+}
+function insertHR() { document.execCommand('insertHorizontalRule'); $('#noteBody').focus(); onBodyChange(); }
+function insertCode() {
+  const sel = window.getSelection();
+  const text = sel.toString() || 'codi';
+  document.execCommand('insertHTML', false, '<pre>' + text.replace(/</g,'&lt;') + '</pre><p><br></p>');
+  onBodyChange();
+}
+function insertTable() {
+  let html = '<table>';
+  for (let i=0;i<3;i++){ html+='<tr>'; for (let j=0;j<3;j++) html += i===0?'<th>&nbsp;</th>':'<td>&nbsp;</td>'; html+='</tr>'; }
+  html += '</table><p><br></p>';
+  document.execCommand('insertHTML', false, html);
+  onBodyChange();
+}
+function expandAll(open) { for (const k in db.nodes) db.nodes[k].collapsed = !open; saveDB(true); renderTree(); }
+
+/* ---- Menú contextual ---- */
+function openCtxMenu(e, id) {
+  const menu = $('#ctxMenu');
+  menu.innerHTML = '';
+  const items = [
+    ['+ Nota filla',     () => addNote(id, 'child')],
+    ['+ Nota germana',   () => { selectNote(id); addNote(null, 'sibling'); }],
+    ['✏️ Reanomena',     () => { selectNote(id); renameNote(); }],
+    ['⬆️ Puja',          () => moveUp(id)],
+    ['⬇️ Baixa',         () => moveDown(id)],
+    ['↪️ Mou a…',        () => moveToDialog(id)],
+    ['🗑️ Esborra',       () => { selectNote(id); deleteNote(); }, 'danger'],
+  ];
+  items.forEach(([label, fn, cls]) => {
+    const d = document.createElement('div');
+    d.textContent = label;
+    if (cls) d.className = cls;
+    d.onclick = () => { menu.style.display='none'; fn(); };
+    menu.appendChild(d);
+  });
+  // Ajusta perquè no surti fora de la pantalla a iPad
+  const w = 240, h = items.length * 50;
+  let x = e.clientX, y = e.clientY;
+  if (x + w > window.innerWidth)  x = window.innerWidth  - w - 10;
+  if (y + h > window.innerHeight) y = window.innerHeight - h - 10;
+  menu.style.left = x + 'px';
+  menu.style.top  = y + 'px';
+  menu.style.display = 'block';
+}
+document.addEventListener('click', () => $('#ctxMenu').style.display = 'none');
+document.addEventListener('touchstart', (e) => {
+  if (!e.target.closest('#ctxMenu') && !e.target.closest('.node')) {
+    $('#ctxMenu').style.display = 'none';
+  }
+}, {passive:true});
+
+function moveUp(id) {
+  const parent = findParent(id);
+  const list = parent ? parent.children : db.rootIds;
+  const i = list.indexOf(id);
+  if (i > 0) { [list[i-1], list[i]] = [list[i], list[i-1]]; saveDB(); renderTree(); }
+}
+function moveDown(id) {
+  const parent = findParent(id);
+  const list = parent ? parent.children : db.rootIds;
+  const i = list.indexOf(id);
+  if (i >= 0 && i < list.length - 1) { [list[i+1], list[i]] = [list[i], list[i+1]]; saveDB(); renderTree(); }
+}
+function moveToDialog(srcId) {
+  // Llista de possibles destinacions en un modal simple
+  const options = [];
+  const collect = (ids, prefix) => {
+    for (const id of ids) {
+      if (id === srcId || isDescendant(id, srcId)) continue;
+      options.push({ id, label: prefix + db.nodes[id].title });
+      collect(db.nodes[id].children, prefix + '  ');
+    }
+  };
+  collect(db.rootIds, '');
+  const choice = prompt('Escriu el número de la nota destí:\n\n' +
+    options.map((o,i) => `${i+1}. ${o.label}`).join('\n'));
+  const n = parseInt(choice);
+  if (n >= 1 && n <= options.length) moveNote(srcId, options[n-1].id, 'child');
+}
+
+/* ---- Import / Export ---- */
+function exportDB() {
+  flushEditor();
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'treenotes-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  setStatus('BD exportada');
+}
+function importDB(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data.nodes || !data.rootIds) throw new Error('Format incorrecte');
+      const ok = await openConfirm('Substituir la BD actual?', true, 'Substitueix');
+      if (!ok) return;
+      db = data;
+      saveDB(); renderTree();
+      selectNote(db.selected || db.rootIds[0]);
+      setStatus('BD importada');
+    } catch(err) { alert('Error important: ' + err.message); }
+    ev.target.value = '';
+  };
+  reader.readAsText(file);
+}
+function exportHTML() {
+  flushEditor();
+  const html = [];
+  html.push('<!DOCTYPE html><html lang="ca"><head><meta charset="utf-8"><title>TreeNotes export</title>');
+  html.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
+  html.push('<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:20px auto;padding:0 16px;line-height:1.6;}');
+  html.push('details{margin
