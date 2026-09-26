@@ -3,7 +3,7 @@
   "short_name": "Oracional CMF",
   "description": "Recull de pregàries claretianes en català, castellà, italià, francès i euskera",
   "lang": "ca",
-  "start_url": "./CMF_oracional_5idiomes.html",
+  "start_url": "./CMF_oracional_6idiomes.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
