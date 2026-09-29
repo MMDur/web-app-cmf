@@ -1,69 +1,46 @@
-/* ─────────────────────────────────────────────────────────────────
-   Oracional CMF · Service Worker
-   
-   ⚠️  Cada vegada que publiquis una nova versió de l'app,
-   canvia el número de versió aquí (v1 → v2, etc.)
-   perquè els dispositius descarreguin la versió nova.
-   ───────────────────────────────────────────────────────────────── */
-const VERSION = 'oracional-cmf-v1';
+// Service Worker · Oracional CMF
+// Estrategia: "red primero". Si hay conexión, SIEMPRE se sirve la versión
+// real del servidor (y de paso se actualiza la copia de reserva). Solo si
+// no hay conexión se usa la última copia guardada. Así se evita el problema
+// de ver contenido antiguo cuando en realidad hay una versión nueva.
 
-const TO_CACHE = [
-  './CMF_oracional_5idiomes.html',
+const VERSION = 'v1'; // Súbelo (v2, v3...) si alguna vez quieres forzar
+                       // que se borren las copias de reserva antiguas.
+const CACHE_NAME = 'oracional-cmf-' + VERSION;
+const ASSETS = [
+  './CMF_oracional_6idiomes.html',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon.svg',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-/* ── Instal·lació: guarda en caché ── */
-self.addEventListener('install', e => {
+self.addEventListener('install', (event) => {
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(VERSION).then(cache => cache.addAll(TO_CACHE))
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
   );
 });
 
-/* ── Activació: esborra caché antiga ── */
-self.addEventListener('activate', e => {
-  e.waitUntil(
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(k => k !== VERSION).map(k => caches.delete(k))
+      .then((keys) => Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );
 });
 
-/* ── Fetch: xarxa primer per l'HTML principal, caché per la resta ── */
-self.addEventListener('fetch', e => {
-  const url = e.request.url;
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
 
-  // Per a l'HTML principal: intenta xarxa i actualitza la caché,
-  // si no hi ha connexió serveix la versió guardada.
-  if (url.includes('CMF_oracional_5idiomes')) {
-    e.respondWith(
-      fetch(e.request)
-        .then(response => {
-          const copy = response.clone();
-          caches.open(VERSION).then(c => c.put(e.request, copy));
-          return response;
-        })
-        .catch(() => caches.match(e.request))
-    );
-    return;
-  }
-
-  // Per a la resta (icones, manifest, fonts): caché primer.
-  e.respondWith(
-    caches.match(e.request)
-      .then(cached => cached || fetch(e.request)
-        .then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(VERSION).then(c => c.put(e.request, copy));
-          }
-          return response;
-        })
-      )
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
