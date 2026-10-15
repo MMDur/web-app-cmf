@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía de Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F5F7; --surface:#FFFFFF; --surface2:#ECEEF2; --ink:#1A2030; --muted:#5A6275; --line:#DADEE6;
+  --p1:#2F63C8; --p2:#8E4A9E; --p3:#1F8A63; --p4:#B7791F; --p5:#C2415D; --p6:#5B6578;
+  --font-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --font-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --side:292px;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151C; --surface:#1A1F29; --surface2:#232A36; --ink:#E8EBF2; --muted:#98A1B3; --line:#2E3645;
+    --p1:#7BA2F2; --p2:#C48BD4; --p3:#55C79B; --p4:#E0B04F; --p5:#EE8099; --p6:#9AA6BA;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151C; --surface:#1A1F29; --surface2:#232A36; --ink:#E8EBF2; --muted:#98A1B3; --line:#2E3645;
+  --p1:#7BA2F2; --p2:#C48BD4; --p3:#55C79B; --p4:#E0B04F; --p5:#EE8099; --p6:#9AA6BA;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--font-body);-webkit-font-smoothing:antialiased;min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:40}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pc,var(--p1));outline-offset:2px;border-radius:4px}
+mark{background:color-mix(in srgb,var(--pc,var(--p1)) 30%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Sidebar ---------- */
+.side{position:fixed;left:0;top:0;bottom:0;width:var(--side);padding:calc(env(safe-area-inset-top,0px) + 20px) 14px calc(env(safe-area-inset-bottom,0px) + 20px);overflow-y:auto;border-right:1px solid var(--line);background:var(--bg);z-index:30}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 21px/1 var(--font-display);letter-spacing:-.02em;padding:4px 8px 18px}
+.mark{display:grid;grid-template-columns:repeat(3,7px);gap:2px}
+.mark i{width:7px;height:7px;border-radius:2px;display:block}
+.mark i:nth-child(1){background:var(--p1)}.mark i:nth-child(2){background:var(--p2)}.mark i:nth-child(3){background:var(--p3)}
+.mark i:nth-child(4){background:var(--p4)}.mark i:nth-child(5){background:var(--p5)}.mark i:nth-child(6){background:var(--p6)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:500;font-size:15px}
+.nav:hover{background:var(--surface2)}
+.nav.active,.sub a.active{background:var(--ink);color:var(--bg)}
+.cnt{font-size:12.5px;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.active .cnt{color:inherit;opacity:.8}
+.divider{height:1px;background:var(--line);margin:14px 6px}
+.grp{margin:0}
+.grp summary{list-style:none;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14.5px;user-select:none}
+.grp summary::-webkit-details-marker{display:none}
+.grp summary:hover{background:var(--surface2)}
+.grp summary .cnt{margin-left:auto}
+.grp summary::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;margin-left:4px}
+.grp[open] summary::after{transform:rotate(45deg)}
+.dot{width:10px;height:10px;border-radius:3px;background:var(--pc);flex:none;display:inline-block}
+.sub{list-style:none;margin:2px 0 8px 14px;padding:0 0 0 10px;border-left:2px solid color-mix(in srgb,var(--pc) 45%,var(--line))}
+.sub a{display:flex;gap:8px;align-items:baseline;padding:5px 8px;border-radius:6px;text-decoration:none;font-size:14px;line-height:1.35}
+.sub a:hover{background:var(--surface2)}
+.sub .n{min-width:20px;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12.5px}
+.sub a.active .n{color:inherit}
+.sub .tick{margin-left:auto;width:6px;height:6px;border-radius:50%;background:transparent;flex:none;align-self:center}
+.sub a.done .tick{background:var(--pc)}
+.sub a.active.done .tick{background:var(--bg)}
+.sub .all{font-weight:600;font-size:13px;color:var(--muted)}
+
+/* ---------- Main ---------- */
+.main{margin-left:var(--side);min-height:100vh}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:10px;padding:12px 28px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.ib{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:10px;cursor:pointer;flex:none}
+.ib:hover{background:var(--surface2)}
+#menuBtn{display:none}
+.search{position:relative;flex:1;max-width:640px}
+.search svg.si{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{width:100%;height:40px;padding:0 74px 0 40px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;font:400 15.5px var(--font-body)}
+.search input::placeholder{color:var(--muted)}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:500 12px var(--font-body);color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 7px;background:var(--surface2);pointer-events:none}
+.search .clr{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;background:transparent;cursor:pointer;display:none;place-items:center;color:var(--muted);border-radius:6px}
+.search.has .clr{display:grid}.search.has kbd{display:none}
+.wrap{max-width:940px;margin:0 auto;padding:36px 28px 96px}
+.reading{max-width:720px;margin:0 auto}
+
+/* ---------- Home ---------- */
+.hero h1{font:700 clamp(64px,14vw,156px)/.86 var(--font-display);letter-spacing:-.045em;margin:8px 0 22px}
+.hero p.sub{max-width:560px;font-size:19px;line-height:1.5;margin:0 0 30px;color:var(--muted)}
+.hero p.sub b{color:var(--ink);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.seg a{display:block;height:14px;border-radius:4px;background:color-mix(in srgb,var(--pc) 22%,var(--surface2));position:relative;overflow:hidden}
+.seg a i{position:absolute;inset:0 auto 0 0;width:var(--f);background:var(--pc);transition:width .4s}
+.segl{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:6px}
+.segl span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 10px;font-size:15px;color:var(--muted)}
+.prog b{color:var(--ink);font-weight:600}
+.roll{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;margin:34px 0 8px}
+.btn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 18px;border-radius:9px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font:600 15.5px var(--font-body);cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{opacity:.9}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface2);opacity:1}
+.btn.sm{height:38px;padding:0 14px;font-size:14.5px}
+.btn:disabled{opacity:.55;cursor:default}
+.ticker{flex:1 1 260px;min-height:46px;display:flex;align-items:center;padding:0 16px;border-left:4px solid var(--pc,var(--line));background:var(--surface);border-radius:0 9px 9px 0;font:600 17px/1.25 var(--font-display);color:var(--ink)}
+.ticker.idle{font:400 15px var(--font-body);color:var(--muted)}
+.part{margin:56px 0 0}
+.part h2{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;font:700 26px/1.15 var(--font-display);letter-spacing:-.02em;margin:0 0 6px}
+.part h2 a{text-decoration:none}
+.part h2 a:hover{text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:var(--pc)}
+.part .blurb{margin:0 0 16px;color:var(--muted);max-width:640px}
+.pnum{font:600 14px var(--font-body);color:var(--muted)}
+.closing{margin:72px 0 0;padding:32px 0 0;border-top:1px solid var(--line)}
+.closing h2{font:700 38px/1.05 var(--font-display);letter-spacing:-.03em;margin:0 0 12px}
+.closing p{max-width:560px;color:var(--muted);font-size:17px;margin:0 0 6px}
+
+/* ---------- Lists ---------- */
+.head h1{font:700 40px/1.05 var(--font-display);letter-spacing:-.03em;margin:4px 0 6px}
+.head p{margin:0;color:var(--muted)}
+.filters{display:flex;flex-direction:column;gap:10px;margin:22px 0 18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font:500 14px var(--font-body)}
+.chip:hover{background:var(--surface2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .dot{width:9px;height:9px}
+.sep{width:1px;background:var(--line);margin:2px 4px}
+.rows{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:start;padding:15px 10px 15px 14px;border-bottom:1px solid var(--line);border-left:4px solid var(--pc);text-decoration:none;color:inherit}
+.row:hover{background:var(--surface)}
+.rn{font:700 22px/1.2 var(--font-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.rb{display:flex;flex-direction:column;gap:3px;min-width:0}
+.rt{font:600 17.5px/1.3 var(--font-display);letter-spacing:-.01em}
+.rd{color:var(--muted);font-size:14.5px;line-height:1.45}
+.snip{font-size:13.5px;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;margin-top:5px;line-height:1.45}
+.rf{display:flex;gap:8px;align-items:center;padding-top:3px}
+.fl{display:inline-flex;color:var(--pc)}
+.fl.fav svg{fill:currentColor}
+.pill{font-size:12px;font-weight:600;border:1px solid var(--line);color:var(--muted);padding:1px 8px;border-radius:999px;white-space:nowrap}
+.empty{padding:44px 0;color:var(--muted);max-width:520px}
+.empty h2{font:700 22px var(--font-display);color:var(--ink);margin:0 0 8px}
+.empty .btn{margin-top:14px}
+
+/* ---------- Item ---------- */
+.crumb{display:inline-flex;align-items:center;gap:9px;font-size:14.5px;color:var(--muted);text-decoration:none;margin-bottom:18px}
+.crumb:hover{color:var(--ink);text-decoration:underline}
+.item h1{display:flex;gap:18px;align-items:flex-start;font:700 clamp(30px,5vw,44px)/1.08 var(--font-display);letter-spacing:-.03em;margin:0 0 14px}
+.bign{flex:none;min-width:1.1em;font-size:1.35em;line-height:.9;color:var(--pc);padding-top:.02em}
+.lede{font-size:19px;line-height:1.5;color:var(--muted);margin:0 0 22px}
+.acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:6px}
+.tog[aria-pressed="true"]{background:color-mix(in srgb,var(--pc) 16%,var(--surface));border-color:var(--pc)}
+.tog[aria-pressed="true"] .st svg{fill:currentColor}
+.prose p{margin:0 0 14px;font-size:17px;line-height:1.65}
+.prose ul{margin:0 0 16px;padding-left:20px}
+.prose li{margin:5px 0;font-size:17px}
+.item h2{font:700 21px/1.2 var(--font-display);letter-spacing:-.015em;margin:34px 0 10px}
+.how{margin:0;padding:14px 16px;background:var(--surface);border-left:4px solid var(--pc);border-radius:0 8px 8px 0;font-size:16.5px}
+.note{margin:22px 0;padding:12px 16px;border:1px dashed color-mix(in srgb,var(--pc) 60%,var(--line));border-radius:8px;font-size:16px}
+.prompt{margin:26px 0;border:1px solid var(--line);border-left:4px solid var(--pc);background:var(--surface);border-radius:10px;overflow:hidden}
+.prompt>header{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.prompt h3{margin:0;font:600 16px/1.3 var(--font-display)}
+.fields{padding:14px 16px 4px;background:var(--surface2);border-bottom:1px solid var(--line)}
+.fields .hint{margin:0 0 12px;font-size:14px;color:var(--muted)}
+.field{margin:0 0 12px}
+.field label{display:block;font-size:13.5px;font-weight:600;margin-bottom:4px}
+.field textarea{width:100%;resize:none;overflow:hidden;min-height:38px;padding:8px 10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;font:400 15px/1.45 var(--font-body)}
+.field .chips{margin-top:6px;gap:6px}
+.field .chip{padding:3px 10px;font-size:13px}
+.ptext{margin:0;padding:16px 18px;white-space:pre-wrap;word-break:break-word;font:400 15.5px/1.65 var(--font-body)}
+.ptext.code{font:13.5px/1.6 var(--mono)}
+.ph{background:color-mix(in srgb,var(--pc) 16%,transparent);border-radius:4px;padding:0 3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.ph.on{background:color-mix(in srgb,var(--pc) 34%,transparent)}
+.pact{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.mynotes textarea{width:100%;min-height:96px;padding:12px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;font:400 16px/1.5 var(--font-body);resize:vertical}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 0}
+.tags .chip{font-size:13px;padding:3px 11px}
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:44px;padding-top:22px;border-top:1px solid var(--line)}
+.pn a{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:8px;text-decoration:none;font:600 16px/1.3 var(--font-display)}
+.pn a small{font:400 13px var(--font-body);color:var(--muted)}
+.pn a:hover{background:var(--surface)}
+.pn a.nx{text-align:right;border-left:1px solid var(--line);border-right:4px solid var(--pc)}
+.pn span{min-height:1px}
+
+/* ---------- Toast & drawer ---------- */
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:500;font-size:15px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:60}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.scrim{display:none}
+
+@media (max-width:900px){
+  :root{--side:min(86vw,320px)}
+  .side{transform:translateX(-102%);transition:transform .2s;box-shadow:none;z-index:50}
+  .side.open{transform:none;box-shadow:0 0 0 100vmax rgba(10,12,20,.45)}
+  .main{margin-left:0}
+  #menuBtn{display:grid}
+  .top{padding:10px 14px}
+  .wrap{padding:24px 18px 80px}
+  .search kbd{display:none}
+  .segl{display:none}
+  .hero p.sub{font-size:17px}
+  .item h1{gap:12px}
+  .pn{grid-template-columns:1fr}
+  .row{grid-template-columns:30px 1fr auto;padding-left:10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<aside class="side" id="side" aria-label="Menú"></aside>
+
+<div class="main">
+  <div class="top">
+    <button class="ib" id="menuBtn" data-act="menu" aria-label="Abrir menú" aria-expanded="false"></button>
+    <div class="search" id="searchBox" role="search">
+      <svg class="si" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <label for="q" class="sr">Buscar</label>
+      <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Busca una función, un prompt o una palabra">
+      <kbd>/</kbd>
+      <button class="clr" data-act="clearq" aria-label="Borrar búsqueda" id="clrBtn"></button>
+    </div>
+    <button class="ib" id="themeBtn" data-act="theme" aria-label="Cambiar entre tema claro y oscuro"></button>
+  </div>
+  <main class="wrap" id="view" tabindex="-1"></main>
+</div>
+<div class="scrim" id="scrim" data-act="menu"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ====================== DATOS ====================== */
+const PARTS=[
+ {id:1,short:"En el chat",name:"Lo que ya tienes en el chat y no usas",blurb:"Cuatro funciones del chat que se configuran en minutos y te ahorran repetirte."},
+ {id:2,short:"Roles",name:"Dale un rol y cambia por completo",blurb:"Claude no tiene por qué ser un asistente de IA genérico. Con un rol concreto cambia las preguntas que te hace, lo que te discute y lo que no te deja pasar. Copia cualquiera de estos prompts al principio de un chat nuevo."},
+ {id:3,short:"Fuera del chat",name:"Claude fuera del chat",blurb:"Navegador, archivos, tareas que se ejecutan solas, skills y código."},
+ {id:4,short:"Para devs",name:"Para devs",blurb:"Ahorro y velocidad si usas la API de Claude."},
+ {id:5,short:"Lo más curioso",name:"Lo más curioso",blurb:"Vídeo sin editor, conectores con tus apps y fotos convertidas en datos."},
+ {id:6,short:"Extras",name:"Más formas de usar Claude",blurb:"Funciones y roles que no estaban en el manual original y se parecen a lo que ya tienes aquí."}
+];
+
+const ITEMS=[
+/* ---------- PARTE 1 ---------- */
+{n:1,part:1,short:"Proyectos",title:"Proyectos: deja de explicarte en cada chat",
+ tag:"Sube tus documentos y unas instrucciones fijas, y Claude las tiene presentes en todos los chats del proyecto.",
+ body:["Cada chat nuevo empieza de cero. No sabe quién eres, a qué te dedicas ni cómo te gusta que te respondan. Y la mayoría lo acepta y repite el mismo contexto una y otra vez.",
+       "Los Proyectos lo solucionan. Creas uno, subes tus documentos, escribes unas instrucciones fijas y Claude las tiene presentes en todos los chats de ese proyecto. Vuelves la semana que viene y sigue sabiendo de qué va.",
+       "Si nunca has usado Proyectos, empieza por aquí."],
+ how:"Crea un proyecto, sube tus documentos y escribe unas instrucciones fijas.",
+ prompts:[{l:"Ejemplo de instrucciones para pegar en el proyecto",t:`Eres mi asistente de investigación de contenido. Tengo una newsletter sobre IA y tecnología para un público que ya sabe del tema.
+
+No expliques conceptos básicos (qué es un LLM, qué es una API).
+
+Cuando te pase un tema o un artículo:
+1. Sácame los 3 ángulos más sorprendentes o contraintuitivos
+2. Conéctalo con noticias recientes que se me hayan podido escapar
+3. Propón cómo contarlo como historia, no como resumen
+
+Tono: directo, sin lenguaje corporativo, sin relleno.
+Formato: párrafos cortos, sin listas salvo que te las pida.
+Nunca empieces con "¡Buena pregunta!" ni frases parecidas.`}],
+ note:"Es un ejemplo: cambia el tema y el público por los tuyos.",
+ tags:["contexto","instrucciones fijas","documentos"]},
+
+{n:2,part:1,short:"Artifacts",title:"Artifacts: apps que funcionan dentro del chat",
+ tag:"Calculadoras, trackers, minijuegos o dashboards que abres y usas ahí mismo, y compartes con un enlace.",
+ body:["Mucha gente cree que Claude solo escribe texto. Error.",
+       "Con los artifacts, Claude construye cosas que funcionan de verdad: una calculadora, un tracker de hábitos, un minijuego, un dashboard con gráficas. No es código que tengas que copiar a otro sitio. Lo abres, lo tocas y lo usas ahí mismo. Y puedes compartirlo con un enlace.",
+       "También hace gráficos SVG, diagramas y visualizaciones interactivas."],
+ prompts:[{l:"Pruébalo: un tracker de hábitos",t:`Hazme un tracker de hábitos como app web funcional.
+Quiero seguir 5 hábitos diarios y marcarlos cada día.
+Muestra una racha de 7 días para cada hábito.
+Si fallo un día, la racha vuelve a cero.
+Diseño: fondo oscuro, minimalista.
+Que marcar un hábito tenga una pequeña animación satisfactoria.
+Los datos se tienen que guardar aunque recargue la página.`}],
+ tags:["apps","gráficos","diagramas","compartir"]},
+
+{n:3,part:1,short:"Razonamiento extendido",title:"Razonamiento extendido: que piense antes de responder",
+ tag:"Para decisiones complicadas o análisis estratégico: Claude razona paso a paso y puedes ver ese proceso.",
+ body:["Con el razonamiento extendido activado, Claude analiza el problema paso a paso antes de darte la respuesta. Y puedes ver ese proceso.",
+       "Para preguntas rápidas no hace falta. Para decisiones complicadas, análisis estratégico o cualquier cosa donde quieras que piense de verdad, la diferencia se nota mucho.",
+       "Haz la prueba: misma pregunta, con y sin, y compara."],
+ prompts:[{l:"Para cuando tengas que decidir algo importante",t:`Tengo que elegir entre dos opciones y quiero que lo pienses con calma antes de responder.
+
+Opción A: [describe la opción A]
+Opción B: [describe la opción B]
+Mi situación: [contexto, limitaciones, qué es lo que más me importa]
+
+Antes de contestar, analiza:
+- Las consecuencias de segundo y tercer orden de cada opción
+- Qué estoy sobrevalorando o infravalorando por emociones
+- Qué información me falta que podría cambiar la decisión
+- Qué opción me protege mejor si las cosas salen mal
+
+Después dame tu recomendación real y por qué.`}],
+ tags:["decisiones","análisis","estrategia"]},
+
+{n:4,part:1,short:"Memoria",title:"Memoria: que sepa quién eres sin repetírselo",
+ tag:"Claude guarda lo importante sobre ti y lo tiene en cada chat nuevo.",
+ body:["Con la memoria activada, Claude va guardando lo importante sobre ti: a qué te dedicas, en qué proyectos estás, cómo te gusta que te hable.",
+       "Abres un chat totalmente nuevo y ya tiene el contexto. Se acabó presentarte cada vez."],
+ how:"Se activa en Ajustes. Y si quieres acelerar el proceso, díselo tú directamente con el prompt de abajo.",
+ prompts:[{l:"Cuéntale lo esencial para que lo guarde",t:`Quiero que recuerdes esto sobre mí para no tener que repetirlo:
+
+Me llamo [nombre]. Trabajo como [puesto] en [empresa o proyecto].
+Ahora mismo estoy centrado en [en qué trabajas].
+Mi público o mis clientes son [quiénes].
+Cuando te pida ayuda, da por hecho este contexto salvo que te diga lo contrario.
+
+Cómo prefiero que me hables: [directo / detallado / informal / formal].
+Lo que me molesta en las respuestas: [ej. listas, introducciones largas, demasiadas advertencias].
+
+Guárdalo en tu memoria.`}],
+ tags:["contexto","ajustes","preferencias"]},
+
+/* ---------- PARTE 2 ---------- */
+{n:5,part:2,short:"El psicólogo",title:"El psicólogo que te hace pensar",
+ tag:"Un terapeuta cognitivo-conductual que pregunta en vez de aconsejar y cuestiona tu forma de pensar.",
+ body:["Lo normal es contarle un problema y que te responda «entiendo que es difícil» más cinco consejos genéricos.",
+       "Este prompt lo convierte en algo más parecido a un terapeuta cognitivo-conductual: pregunta en vez de aconsejar y cuestiona tu forma de pensar en vez de darte la razón.",
+       "Sirve para decisiones a las que no paras de dar vueltas o para ver una situación desde fuera."],
+ note:"Ojo: es una herramienta para ordenar ideas, no sustituye a un profesional si lo estás pasando mal de verdad.",noteFirst:true,
+ prompts:[{l:"Prompt de rol",t:`Actúa como un terapeuta cognitivo-conductual con 20 años de experiencia. Te voy a contar algo que me preocupa.
+
+Cómo quiero que trabajes:
+- No me des consejos de entrada. Hazme preguntas para que entienda mis propios patrones de pensamiento.
+- Detecta distorsiones cognitivas (catastrofismo, pensamiento blanco o negro, leer la mente, adivinar el futuro) y señálamelas.
+- Una pregunta cada vez. No me agobies.
+- El objetivo es que llegue yo a la conclusión. No me la des hecha.
+- Cercano pero honesto. Si mi razonamiento está distorsionado, no me des la razón.
+- Si notas que evito algo importante, dímelo claramente.
+
+Sin presentaciones clínicas. Pregúntame directamente qué me pasa.`}],
+ tags:["rol","reflexión","preguntas"]},
+
+{n:6,part:2,short:"El mentor sin filtro",title:"El mentor sin filtro",
+ tag:"Quita el modo amable y busca las suposiciones flojas y el punto exacto donde tu plan se rompe.",
+ body:["Por defecto, Claude tiende a sumarse a tus ideas y buscarles lo positivo. Para validar un plan, eso es justo lo que no necesitas.",
+       "Este prompt le quita el modo amable. Busca las suposiciones flojas, lo que no has tenido en cuenta y el punto exacto donde tu plan se rompe.",
+       "Escuece. Por eso funciona."],
+ prompts:[{l:"Prompt de rol",t:`Eres un mentor brutalmente honesto. Has montado y hundido varias empresas. Has visto a cientos de personas cometer los mismos errores convencidísimas de que tenían razón.
+
+Tu trabajo no es animarme, es protegerme de mis puntos ciegos antes de que cometa un error caro.
+
+Reglas:
+- Si crees que me equivoco, dímelo y explica por qué de forma concreta.
+- Señala lo que no estoy viendo, sobre todo lo que evito porque quiero que el plan salga bien.
+- Hazme las preguntas incómodas que no me he hecho.
+- Si algo es mala idea, dilo. Sin compensarlo con "por otro lado...".
+- Termina siempre con lo más importante que debería pensar antes de seguir.
+
+Te voy a contar una idea. No seas amable.`}],
+ tags:["rol","planes","crítica","negocio"]},
+
+{n:7,part:2,short:"El entrenador",title:"El entrenador personal",
+ tag:"Un plan de entreno de 12 semanas que tiene en cuenta tu horario, tu material y tus limitaciones, y se ajusta cada semana.",
+ body:["Hay mil planes de entreno genéricos en internet. Ninguno tiene en cuenta tu horario, tus lesiones, tu material ni tu objetivo real.",
+       "Dale tus datos y Claude te monta un plan de verdad. Y lo ajusta cuando le cuentas cómo te va."],
+ prompts:[{l:"Prompt de rol con tus datos",t:`Actúa como entrenador personal y nutricionista deportivo experto. Quiero que me diseñes un programa completo.
+
+Mi situación:
+Edad: [edad]
+Peso / composición corporal: [datos]
+Objetivo: [perder grasa / ganar músculo / resistencia / forma general]
+Material: [gimnasio / casa / solo mancuernas / etc.]
+Días por semana: [número]
+Tiempo por sesión: [minutos]
+Lesiones o limitaciones: [detalles o "ninguna"]
+Nivel actual: [principiante / intermedio / avanzado]
+
+Diseña un programa de 12 semanas con ejercicios, series, repeticiones y descansos de cada semana. Explícame la lógica de la estructura, quiero entenderla, no solo seguirla. Te iré contando cada semana cómo va para que lo ajustes.`}],
+ tags:["rol","deporte","planificación"]},
+
+{n:8,part:2,short:"Ensayar una conversación",title:"Ensaya una conversación difícil",
+ tag:"Claude hace de la otra persona y te rebate hasta que tu argumento aguanta.",
+ body:["Casi todo el mundo llega a las conversaciones difíciles sin preparar. Sabe lo que quiere decir, pero no lo que le van a contestar.",
+       "Claude hace de la otra persona. De forma realista: te responde como lo haría ella, te rebate si tu argumento es flojo y te obliga a ganarte el resultado. Después de un par de ensayos, la conversación real cuesta mucho menos."],
+ prompts:[{l:"Prompt de rol",t:`Tengo que preparar una conversación difícil y quiero que hagas de la otra persona para practicar.
+
+La persona: [quién es: jefe, cliente, socio, etc.]
+Lo que tengo que decirle: [qué necesitas pedir o contar]
+Por qué me cuesta: [qué temes que pase]
+Cómo es: [personalidad, cómo suele reaccionar, qué le importa]
+
+Mantente en el personaje. Responde como lo haría esa persona de verdad, no como me gustaría a mí. Si digo algo flojo o poco convincente, rebátemelo.
+
+Después de cada intercambio, sal un momento del personaje para decirme qué ha funcionado y qué no, y vuelve a entrar. Al final, dame un análisis completo: qué hice bien, qué cambiar y qué tener en cuenta para la conversación real.
+
+Empieza en el personaje y espera a que yo abra.`}],
+ tags:["rol","simulación","comunicación"]},
+
+{n:9,part:2,short:"El abogado del diablo",title:"El abogado del diablo",
+ tag:"Cinco minutos antes de lanzarte: el caso completo en contra y las tres formas más realistas de que salga mal.",
+ body:["Ya lo has decidido. Ya has pensado en las pegas. Estás convencido.",
+       "Justo ese es el momento de pedirle a Claude que ataque la decisión. Nada de «preocupaciones» educadas: el caso completo en contra y las tres formas más realistas en las que puede salir mal.",
+       "Cinco minutos antes de lanzarte. No después."],
+ prompts:[{l:"Prompt de rol",t:`He tomado una decisión y quiero que construyas el argumento más sólido posible en contra antes de comprometerme.
+
+La decisión: [qué vas a hacer exactamente]
+Mi razonamiento: [por qué crees que es buena idea]
+Lo que ya he considerado: [objeciones que ya has pensado]
+
+Tu trabajo:
+- Construye el mejor argumento EN CONTRA.
+- No lo equilibres con lo positivo. Eso ya me lo creo yo.
+- Encuentra las suposiciones que doy por hechas y pueden ser falsas.
+- Describe las 3 formas más realistas en que esto sale mal.
+- Dime qué estoy subestimando.
+- Dime qué tendría que creer para que esto fuera realmente mala idea.
+
+Sin piedad. Si es un error, necesito saberlo ahora.`}],
+ tags:["rol","decisiones","riesgos"]},
+
+/* ---------- PARTE 3 ---------- */
+{n:10,part:3,short:"Claude en Chrome",title:"Claude en Chrome: ve lo mismo que tú",
+ tag:"Una extensión que lee la pestaña abierta, hace clic, rellena formularios y navega por ti.",
+ body:["Lo habitual es tener Claude en una pestaña y copiar y pegar todo a mano. Es la forma lenta.",
+       "Claude en Chrome es una extensión que le da acceso a la pestaña que tienes abierta y le permite actuar en ella: lee la página, hace clic, rellena formularios y navega a otras URLs. Le explicas la tarea con tus palabras y te olvidas."],
+ how:"Busca «Claude» en la Chrome Web Store, instálala, inicia sesión con tu cuenta y abre el panel lateral desde el icono.",
+ prompts:[{l:"Tarea de ejemplo",t:`Estoy en esta página de ofertas de empleo.
+Revisa todas las ofertas visibles y saca: puesto, empresa, rango salarial si aparece y los 3 requisitos principales.
+
+Hazme una tabla comparativa ordenada por salario, de mayor a menor.
+Si hay más páginas, pasa a la siguiente y sigue hasta cubrirlas todas.`}],
+ tags:["navegador","extensión","tablas"]},
+
+{n:11,part:3,short:"Tus archivos",title:"Trabajo con tus archivos: Claude en tu ordenador",
+ tag:"Con la app de escritorio, Claude lee y edita tus archivos reales y se encarga de tareas largas mientras haces otra cosa.",
+ body:["En la web, Claude no ve tu ordenador. Tienes que pegarle todo a mano.",
+       "Con la app de escritorio puedes conectarle carpetas de tu equipo. Lee tus archivos reales, edita documentos, crea nuevos y ordena carpetas sin que copies nada al chat. Y puede encargarse de tareas largas mientras tú haces otra cosa: le pides el resultado final y te lo entrega terminado.",
+       "Lo que antes era una app aparte (Cowork) ahora está integrado directamente en Claude."],
+ how:"Instala la app de escritorio y conéctale las carpetas de tu equipo que quieras que use.",
+ prompts:[{l:"Ejemplo de tarea",added:true,t:`Mira la carpeta [carpeta] y propón una estructura para ordenarla.
+Antes de mover nada, enséñame el plan: qué archivos irían a qué subcarpeta.
+Cuando te diga que sí, hazlo y dame una lista de lo que has cambiado.`}],
+ tags:["escritorio","archivos","carpetas","cowork"]},
+
+{n:12,part:3,short:"Tareas programadas",title:"Tareas programadas: trabaja mientras duermes",
+ tag:"Configuras algo una vez y Claude lo ejecuta solo: cada mañana, cada lunes, cada hora.",
+ body:["La mayoría usa Claude solo cuando lo abre. Pides algo, esperas, cierras.",
+       "Con las tareas programadas configuras algo una vez y Claude lo ejecuta solo cuando tú digas: cada mañana, cada lunes, cada hora. Sin que tengas que hacer nada."],
+ how:"Solo tienes que pedírselo en el chat.",
+ prompts:[{l:"Ejemplo: un briefing diario de noticias",ignore:["fecha"],t:`Crea una tarea programada para cada día laborable a las 7:30:
+1. Busca las noticias más importantes de IA de las últimas 24 horas
+2. Elige las 5 que más importan: sorprendentes, contraintuitivas o con impacto real para quien construye con IA
+3. Para cada una escribe: titular, resumen de 2 frases y por qué importa
+4. Guárdalo como "brief-[fecha]"
+
+Tono directo y analítico. Sin relleno. Que se lea en 3 minutos.`}],
+ tags:["automatización","rutinas","noticias"]},
+
+{n:13,part:3,short:"Skills",title:"Skills: instala capacidades nuevas como si fueran apps",
+ tag:"Paquetes de instrucciones que enseñan a Claude una tarea concreta, para no explicarla cada vez.",
+ body:["Las skills son paquetes de instrucciones que enseñan a Claude a hacer un tipo de tarea concreta. En vez de explicarle cada vez cómo lo quieres, la instalas una vez y ya sabe hacerlo: crear un PowerPoint, trabajar con PDFs, seguir un flujo de trabajo de tu empresa…",
+       "Piensa en el móvil: funciona sin apps, pero con las adecuadas hace mucho más.",
+       "Puedes usar las que vienen incluidas, añadir las de tu organización o pedirle a Claude que te cree una a partir de un proceso que repitas a menudo."],
+ prompts:[{l:"Pídele que cree una skill",added:true,t:`Quiero crear una skill a partir de un proceso que repito a menudo: [describe el proceso].
+Hazme las preguntas que necesites, de una en una, y después escribe la skill.`}],
+ tags:["skills","procesos","reutilizar"]},
+
+{n:14,part:3,short:"CLAUDE.md",title:"CLAUDE.md: reglas que lee siempre",
+ tag:"Un archivo en la carpeta del proyecto que Claude Code lee al empezar cada sesión.",
+ body:["En Claude Code puedes crear un archivo CLAUDE.md en la carpeta del proyecto. Claude lo lee al empezar cada sesión sin que se lo pidas.",
+       "Tus convenciones de código, tus reglas de estilo, la terminología propia de tu empresa, la voz de marca. Lo escribes una vez y lo sigue en todas las sesiones de ese proyecto."],
+ prompts:[{l:"Ejemplo de CLAUDE.md",code:true,t:`# Proyecto: Newsletter de IA
+
+## Sobre el proyecto
+Newsletter semanal de IA para builders e inversores. 35.000 suscriptores. Tono directo, analítico y con algo de ironía.
+
+## Reglas de escritura
+- Párrafos cortos. Máximo 3 frases.
+- Nada de listas en el contenido editorial. Solo prosa.
+- Sin guiones largos. Usa comas o reescribe la frase.
+- Los números ganan a los adjetivos: "ahorra 3 horas", no "ahorra mucho tiempo".
+- Prohibido: "revolucionario", "disruptivo", "sinergia", "apalancar".
+
+## Reglas de contenido
+- El lector sabe qué es un LLM. No expliques lo básico.
+- Empieza por lo más sorprendente.
+- Cada artículo necesita un "¿y qué?" claro: qué debería hacer o pensar distinto el lector.
+
+## Estructura de archivos
+- Borradores en /borradores
+- Publicados en /publicados con fecha delante: AAAA-MM-DD-titulo.md
+- Notas de investigación en /investigacion`}],
+ tags:["claude code","reglas","estilo","proyecto"]},
+
+{n:15,part:3,short:"Claude Code",title:"Claude Code: programa, prueba y arregla por ti",
+ tag:"Trabaja dentro de tu entorno: lee tu código, ejecuta los tests, lee los errores y los corrige en bucle.",
+ body:["Todavía hay gente que no sabe que Claude programa. Y no hablo de fragmentos sueltos: funcionalidades enteras, refactorizaciones complejas, código listo para producción.",
+       "Claude Code va un paso más allá. Trabaja dentro de tu entorno de desarrollo: lee tu código, escribe código nuevo, ejecuta los tests, lee los errores y los corrige en bucle hasta terminar.",
+       "Lo tienes en la terminal, en la web, en la app de escritorio y en el móvil. Se integra con VS Code y JetBrains, y lo puedes meter en GitHub Actions para que revise o escriba pull requests sin que toques nada."],
+ prompts:[{l:"Ejemplo de tarea",added:true,t:`Los tests de [módulo o carpeta] fallan.
+Ejecútalos, lee los errores y arréglalos de uno en uno.
+Explícame la causa de cada fallo antes de tocar el código y al final dime qué has cambiado.`}],
+ tags:["código","tests","terminal","github"]},
+
+{n:16,part:3,short:"Diseño",title:"Diseño: landing pages y presentaciones sin abrir Figma",
+ tag:"One-pagers, presentaciones, prototipos y landing pages en un lienzo que puedes editar y exportar.",
+ body:["Mucha gente no sabe que Claude también diseña. One-pagers, presentaciones, prototipos, pantallas de app, landing pages.",
+       "Describes lo que necesitas y lo construye en un lienzo que puedes editar tú mismo. Después lo exportas en el formato que te haga falta. Para quien no es diseñador, convierte 3 horas de Figma en 10 minutos de conversación."],
+ prompts:[{l:"Ejemplo: una landing page",t:`Diseña una landing page para [producto].
+Público: [a quién va].
+Una sección hero con titular y CTA, tres beneficios con iconos, testimonios y un formulario de contacto.
+Estilo oscuro, moderno, tipografía grande.`}],
+ tags:["diseño","presentaciones","landing"]},
+
+/* ---------- PARTE 4 ---------- */
+{n:17,part:4,short:"Prompt caching",title:"Prompt caching: hasta un 90% menos en tokens repetidos",
+ tag:"Si tus llamadas a la API repiten un bloque grande de contexto, guárdalo en caché y deja de pagarlo cada vez.",
+ body:["Si usas la API de Claude y tus llamadas repiten un bloque grande de contexto (un system prompt largo, un documento de referencia, un codebase), estás pagando por procesar los mismos tokens en cada llamada.",
+       "El prompt caching guarda ese contenido en el servidor y las llamadas siguientes lo reutilizan. Resultado:",
+       ["Hasta un 90% más barato en los tokens cacheados","Respuestas bastante más rápidas"],
+       "Si estás construyendo a escala y no lo usas, estás tirando dinero."],
+ how:`Añade "cache_control": {"type": "ephemeral"} al bloque que quieras cachear. Por defecto la caché dura 5 minutos y se renueva cada vez que se usa. Funciona con system prompts, documentos largos y definiciones de herramientas.`,
+ prompts:[{l:"Ejemplo de llamada a la API",code:true,t:`{
+  "model": "claude-opus-5-5",
+  "system": [
+    {
+      "type": "text",
+      "text": "[tu system prompt largo o documento de referencia]",
+      "cache_control": {"type": "ephemeral"}
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "[mensaje del usuario, cambia en cada llamada]"
+    }
+  ]
+}`}],
+ note:"La primera llamada guarda el system prompt en caché. Las siguientes, dentro de esos 5 minutos, lo reutilizan: más barato y más rápido.",
+ tags:["api","coste","tokens","caché"]},
+
+/* ---------- PARTE 5 ---------- */
+{n:18,part:5,short:"Edición de vídeo",title:"Edición de vídeo sin abrir un editor",
+ tag:"Claude escribe y ejecuta el código (normalmente ffmpeg) que corta, une, comprime o convierte tus vídeos.",
+ body:["Esto casi nadie lo sabe: Claude puede editar vídeo. No con una línea de tiempo, sino escribiendo y ejecutando el código que lo hace (normalmente con ffmpeg, la herramienta que usan por debajo muchos editores).",
+       "Funciona en Claude Code y en la app cuando trabaja con tus archivos. Le pasas el vídeo, le dices lo que quieres y te devuelve el resultado.",
+       "Lo que puede hacer:",
+       ["Cortar trozos, unir clips y quitar silencios","Pasar un vídeo horizontal a vertical 9:16 para Reels, TikTok o Shorts","Extraer el audio, comprimir o cambiar de formato","Acelerar, ralentizar o convertir un fragmento en GIF","Procesar 50 vídeos de golpe con los mismos ajustes"],
+       "No sustituye a Premiere para un montaje creativo. Pero para el trabajo repetitivo te ahorra horas."],
+ prompts:[{l:"Ejemplo de tarea",t:`Te paso este vídeo. Quiero:
+1. Recortar del segundo 0:12 al 1:45
+2. Pasarlo a vertical 9:16 centrado en la persona
+3. Comprimirlo para que pese menos de 20 MB
+4. Sacar también un GIF de los primeros 5 segundos
+Devuélveme los dos archivos.`}],
+ tags:["vídeo","ffmpeg","redes sociales"]},
+
+{n:19,part:5,short:"Conectores",title:"Conectores: Claude dentro de tu Gmail, Calendar o Notion",
+ tag:"Claude busca, lee y cruza información entre tus apps sin que copies y pegues nada.",
+ body:["Por defecto, Claude no ve tu correo ni tu agenda. Con los conectores sí.",
+       "Conectas Gmail, Google Calendar, Drive, Notion y muchas más apps desde los ajustes, y Claude puede buscar, leer y cruzar información entre ellas. Sin copiar y pegar nada."],
+ how:"Conecta tus apps desde los ajustes.",
+ prompts:[{l:"Ejemplo de tarea",t:`Revisa mis correos de esta semana y mi calendario de mañana.
+Dime qué reuniones tengo, qué correos necesitan respuesta antes de esas reuniones y prepárame un borrador para los dos más urgentes.`}],
+ tags:["gmail","calendar","drive","notion","correo"]},
+
+{n:20,part:5,short:"De foto a hoja de cálculo",title:"De foto a hoja de cálculo",
+ tag:"Claude entiende imágenes: tickets, capturas, pizarras y webs se convierten en tablas, soluciones, tareas o maquetas.",
+ body:["Claude entiende imágenes. Y eso da para mucho más que describir fotos.",
+       ["Foto de un ticket o una factura → tabla con concepto, importe e IVA","Captura de un error → te dice qué falla y cómo arreglarlo","Foto de una pizarra con notas → resumen ordenado con tareas","Captura de una web que te gusta → la maqueta en HTML"]],
+ prompts:[{l:"Ejemplo: tickets de gastos",t:`Te paso fotos de 8 tickets de gastos.
+Saca de cada uno: fecha, comercio, importe total e IVA.
+Hazme una hoja de cálculo con una fila por ticket y el total al final.`}],
+ tags:["imágenes","tickets","hoja de cálculo","pizarra"]},
+
+/* ---------- PARTE 6: EXTRAS ---------- */
+{n:21,part:6,added:true,short:"Búsqueda e investigación",title:"Búsqueda web e investigación profunda",
+ tag:"Para datos recientes o para contrastar: Claude busca en la web y prepara un informe con fuentes.",
+ body:["Claude puede buscar en la web y, con la investigación profunda, preparar un informe a partir de varias fuentes. Es lo que necesitas cuando importa que el dato sea reciente o que esté contrastado.",
+       "Cuanto más concreta sea la pregunta y más claro el uso que le vas a dar, mejor sale el informe."],
+ how:"Actívalo desde el chat o en Ajustes (búsqueda web e investigación profunda).",
+ prompts:[{l:"Informe con fuentes y sin humo",t:`Investiga [tema] y prepárame un informe con fuentes.
+Qué necesito saber: [pregunta concreta]
+Para qué lo voy a usar: [uso]
+
+Reglas:
+- Usa fuentes fiables y cita cada dato clave con su enlace.
+- Separa lo confirmado en varias fuentes de lo dudoso o inferido.
+- Si dos fuentes se contradicen, enséñame las dos.
+- Termina con lo que no has podido verificar.`}],
+ tags:["investigación","fuentes","web"]},
+
+{n:22,part:6,added:true,short:"Analizar documentos",title:"Sube documentos y pídele que los trabaje",
+ tag:"PDFs, Word, Excel o imágenes: resúmenes, datos clave y preguntas que te va a hacer el lector.",
+ body:["Puedes adjuntar documentos al chat y pedirle a Claude que los lea contigo. Sirve para resumir informes largos, sacar datos y fechas, comparar versiones o preparar una reunión.",
+       "Si el documento es importante, pídele que indique dónde ha encontrado cada dato, para poder comprobarlo."],
+ prompts:[{l:"Lectura con criterio",t:`Te paso [tipo de documento]. Quiero:
+1. Un resumen de 10 líneas
+2. Los puntos que requieren una decisión mía
+3. Todas las fechas y cifras importantes, con la página donde aparecen
+4. Las 5 preguntas más difíciles que me haría alguien que lo haya leído con atención
+
+Si algo no queda claro en el documento, dímelo en vez de suponerlo.`}],
+ tags:["documentos","pdf","resumen"]},
+
+{n:23,part:6,added:true,short:"Estilos de escritura",title:"Estilos: que escriba como tú",
+ tag:"Personaliza cómo escribe Claude para que sus textos suenen a ti y no a un asistente genérico.",
+ body:["Claude permite personalizar su estilo de escritura. Un buen punto de partida es pedirle que describa tu estilo a partir de textos tuyos y que lo convierta en instrucciones que puedas reutilizar."],
+ prompts:[{l:"Describe mi estilo a partir de mis textos",t:`Te voy a pasar tres textos escritos por mí. Analiza mi estilo: longitud de las frases, vocabulario, tono, cómo abro y cómo cierro, qué recursos repito.
+
+Después escríbeme una descripción de mi estilo como instrucciones breves, listas para pegar y que otro Claude pueda seguir.
+
+Textos:
+[pega aquí tus textos]`}],
+ tags:["estilo","escritura","tono"]},
+
+{n:24,part:6,added:true,short:"Preferencias personales",title:"Preferencias: tus reglas de siempre",
+ tag:"Deja en Ajustes cómo quieres las respuestas (tono, formato, idioma) y se aplican en todos tus chats.",
+ body:["Además de la memoria, puedes dejar preferencias personales: tono, formato, nivel de detalle. Si no sabes cómo redactarlas, deja que Claude te entreviste."],
+ how:"Está en Ajustes. Las preferencias personales de tono y formato van en el apartado de preferencias.",
+ prompts:[{l:"Que Claude te ayude a redactarlas",t:`Ayúdame a redactar mis preferencias para que las apliques en todos mis chats.
+Hazme 8 preguntas, de una en una, sobre cómo quiero que me respondas: tono, longitud, formato, idioma, qué te prohíbo y qué espero siempre.
+Al final escribe las preferencias en un texto corto, listo para pegar en Ajustes.`}],
+ tags:["preferencias","ajustes","formato"]},
+
+{n:25,part:6,added:true,short:"Buscar en chats anteriores",title:"Buscar en tus chats anteriores",
+ tag:"Recupera lo que ya hablaste con Claude sin tener que rebuscarlo a mano.",
+ body:["Claude puede buscar y consultar tus conversaciones anteriores si esa opción está activada en Ajustes. Es útil para retomar un tema sin volver a explicarlo todo."],
+ how:"Actívalo en Ajustes (búsqueda y referencia de chats anteriores).",
+ prompts:[{l:"Retomar un tema",t:`Busca en mis chats anteriores lo que hablamos sobre [tema].
+Hazme un resumen con las decisiones que tomamos, lo que quedó pendiente y lo último que me dijiste que hiciera.`}],
+ tags:["historial","ajustes","retomar"]},
+
+{n:26,part:6,added:true,short:"Modo voz",title:"Modo voz: piensa en voz alta",
+ tag:"Conversación hablada, sin manos, en la app del móvil.",
+ body:["En la app puedes hablar con Claude en una conversación hablada, sin teclear. En iOS también funciona en el coche con Apple CarPlay.",
+       "Va bien para ordenar ideas mientras caminas o conduces. Conviene pedirle respuestas cortas para que la conversación fluya."],
+ how:"Abre la app de Claude en el móvil y usa el modo voz.",
+ prompts:[{l:"Pensar en voz alta",t:`Quiero pensar en voz alta sobre [tema].
+Hazme una pregunta cada vez y responde con un máximo de 3 frases.
+Cuando te diga "resumen", dime en 5 puntos lo que hemos concluido.`}],
+ tags:["voz","móvil","coche"]},
+
+{n:27,part:6,added:true,short:"Excel, PowerPoint y Workspace",title:"Claude en Excel, PowerPoint y Google Workspace",
+ tag:"Extensiones que llevan a Claude dentro de tus hojas de cálculo, presentaciones y documentos.",
+ body:["Hay extensiones que integran a Claude en Excel, en PowerPoint y en un panel lateral de Google Docs, Sheets y Slides. Trabaja sobre el archivo que tienes abierto, sin pasar por el chat.",
+       "Útiles para limpiar datos, montar fórmulas, ordenar una presentación o revisar un documento."],
+ prompts:[{l:"Ejemplo para una hoja de cálculo",t:`Esta hoja tiene [descripción de los datos].
+Limpia los datos (duplicados, fechas, mayúsculas), explícame qué has cambiado y añade una columna con [cálculo].
+No toques las celdas que ya tienen fórmulas.`}],
+ tags:["excel","powerpoint","google docs","hojas de cálculo"]},
+
+{n:28,part:6,added:true,short:"El tutor",title:"El tutor que te pregunta",
+ tag:"Aprende un tema siendo interrogado en vez de recibiendo un resumen.",
+ body:["Un resumen se lee y se olvida. Con este rol Claude te obliga a razonar: pregunta, espera tu respuesta y corrige solo cuando hace falta."],
+ prompts:[{l:"Prompt de rol",t:`Quiero aprender [tema]. Mi nivel: [principiante / intermedio / avanzado].
+Actúa como un tutor que enseña preguntando:
+- Una pregunta cada vez, empezando por lo básico.
+- No me des la respuesta hasta que lo haya intentado. Si fallo, dame una pista, no la solución.
+- Cuando acierte, sube un poco la dificultad.
+- Al final, hazme un test de 5 preguntas y dime qué lagunas me quedan.`}],
+ tags:["rol","aprender","estudio"]},
+
+{n:29,part:6,added:true,short:"El editor",title:"El editor implacable",
+ tag:"Recorta, aclara y explica cada cambio sin quitarte tu voz.",
+ body:["Para cuando ya tienes un borrador y necesitas que alguien lo apriete. Pídele que explique cada cambio, así aprendes qué se te repite."],
+ prompts:[{l:"Prompt de rol",t:`Edita este texto como un editor exigente.
+Público: [a quién va]
+Objetivo: [qué debe conseguir el lector]
+
+Reglas:
+- Recorta lo que no aporte. Objetivo: un 30% menos.
+- No cambies mi voz ni mis ideas.
+- Enséñame los cambios importantes en dos columnas, antes y después, con el motivo.
+- Termina diciéndome cuál es la frase más floja del texto y por qué.
+
+Texto:
+[pega aquí el texto]`}],
+ tags:["rol","escritura","revisión"]},
+
+{n:30,part:6,added:true,short:"Pre-mortem",title:"El pre-mortem: imagina que ya ha fracasado",
+ tag:"En vez de buscar pegas, parte de que el proyecto salió mal y reconstruye por qué.",
+ body:["Es hermano del abogado del diablo, pero con otro truco: Claude da por hecho que el proyecto ha fracasado y cuenta cómo pasó. Suele sacar riesgos que no salen cuando preguntas «¿qué podría ir mal?»."],
+ prompts:[{l:"Prompt de rol",t:`Estamos dentro de un año y este proyecto ha fracasado: [describe el proyecto].
+Escribe la crónica de ese fracaso:
+- Las 5 causas más probables, ordenadas de más a menos probable.
+- Para cada una, la señal temprana que habría avisado.
+- Qué haría hoy para evitarla, en una frase.
+Sé concreto y no suavices nada.`}],
+ tags:["rol","riesgos","proyectos"]},
+
+{n:31,part:6,added:true,short:"El traductor",title:"El traductor con criterio",
+ tag:"Traduce con el registro adecuado y te explica las decisiones difíciles.",
+ body:["Una traducción literal rara vez sirve. Si le dices el público y el registro, Claude elige y te avisa de lo que ha tenido que decidir."],
+ prompts:[{l:"Prompt de rol",t:`Traduce este texto a [idioma].
+Registro: [formal / neutro / cercano]
+Público: [quién lo va a leer]
+
+Dame la traducción y, debajo, notas breves sobre las decisiones difíciles: términos dudosos, alternativas posibles y falsos amigos. Si el original es ambiguo, dime cómo lo has interpretado.
+
+Texto:
+[pega aquí el texto]`}],
+ tags:["rol","traducción","idiomas"]},
+
+{n:32,part:6,added:true,short:"El divulgador",title:"El divulgador: el mismo tema a tres niveles",
+ tag:"Entiende algo complejo explicado a tres públicos distintos y comprueba que lo has entendido.",
+ body:["Cuando algo no encaja, cambiar el nivel de la explicación ayuda más que repetirla. Con los tres niveles ves el esqueleto de la idea y los matices."],
+ prompts:[{l:"Prompt de rol",t:`Explícame [tema] en tres niveles:
+1. Para un niño de 10 años.
+2. Para un adulto sin formación en el tema.
+3. Para un experto, con los matices y las discusiones abiertas.
+
+Termina con 3 preguntas para comprobar que lo he entendido.`}],
+ tags:["rol","explicar","aprender"]},
+
+{n:33,part:6,added:true,short:"Notas a acta y tareas",title:"De notas desordenadas a acta y tareas",
+ tag:"Convierte tus apuntes de una reunión en un acta, tareas con responsable y dudas abiertas.",
+ body:["Pega tus notas tal como las tomaste. Pídele que marque lo que falta en vez de inventarlo: así sabes qué tienes que confirmar."],
+ prompts:[{l:"Ordenar una reunión",t:`Te pego mis notas de [reunión].
+Conviértelas en:
+1. Un acta breve: asistentes, resumen y decisiones tomadas.
+2. Una lista de tareas con responsable y fecha.
+3. Las dudas que han quedado abiertas.
+
+Si falta un responsable o una fecha, escribe (?) en vez de inventarlo.
+
+Notas:
+[pega aquí las notas]`}],
+ tags:["reuniones","actas","tareas"]},
+
+{n:34,part:6,added:true,short:"Revisión semanal",title:"La revisión semanal con un coach",
+ tag:"Cinco minutos de preguntas para cerrar la semana y decidir las tres prioridades de la siguiente.",
+ body:["Una revisión semanal solo funciona si se hace. Con Claude llevando el ritmo de las preguntas, se hace en cinco minutos."],
+ prompts:[{l:"Prompt de rol",t:`Haz de coach de revisión semanal.
+Te doy mis notas de la semana: [qué ha pasado].
+Pregúntame de una en una: qué ha salido bien, qué se ha atascado y qué decisión estoy posponiendo.
+Termina con las tres prioridades para la semana que viene, en una frase cada una.`}],
+ tags:["rol","planificación","hábitos"]}
+];
+
+/* ====================== PREPARACIÓN ====================== */
+const fold=s=>Array.from(s).map(ch=>{const f=ch.normalize("NFD").replace(/[\u0300-\u036f]/g,"");return (f.length===1?f:ch).toLowerCase();}).join("");
+const flatBody=b=>b.map(x=>Array.isArray(x)?x.join(" "):x).join(" ");
+ITEMS.forEach((it,i)=>{
+  it.idx=i; it.pc="var(--p"+it.part+")";
+  const raw={title:it.title+" "+it.short,tags:(it.tags||[]).join(" "),tag:it.tag,
+    body:flatBody(it.body||[])+" "+(it.how||"")+" "+(it.note||""),
+    prompt:(it.prompts||[]).map(p=>p.l+" "+p.t).join(" ")};
+  it._raw=raw; it._f={}; for(const k in raw) it._f[k]=fold(raw[k]);
+});
+const byN=n=>ITEMS.find(i=>i.n===n);
+const NORIG=ITEMS.filter(i=>!i.added).length, NADD=ITEMS.length-NORIG;
+
+/* ====================== ESTADO ====================== */
+const KEY="guia-claude-v1";
+let S={fav:[],done:[],notes:{},theme:null};
+try{const r=localStorage.getItem(KEY); if(r){const o=JSON.parse(r); S=Object.assign(S,o);}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+const isFav=n=>S.fav.includes(n), isDone=n=>S.done.includes(n);
+const ui={q:"",part:0,prompt:false,todo:false,added:false};
+const fills={}; // pid -> {label:value}
+
+/* ====================== UTILIDADES ====================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const IC={
+ star:'<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8z"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
+ menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
+ moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ shuffle:'<path d="M4 7h3c5 0 5 10 10 10h3M4 17h3c1.6 0 2.7-.8 3.6-2M14.4 9c.9-1.2 2-2 3.6-2h2M17 4l3 3-3 3M17 14l3 3-3 3"/>',
+ ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+ undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>'
+};
+const svg=(k,s=18,cls="")=>`<svg ${cls?`class="${cls}" `:""}viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
+const partLabel=p=>p.id<=5?`Parte ${p.id}: ${p.name}`:p.name;
+const toks=q=>fold(q).trim().split(/\s+/).filter(Boolean);
+
+function hl(text,q){
+  const t=toks(q); if(!t.length) return esc(text);
+  const f=fold(text), rs=[];
+  t.forEach(k=>{let i=0;while((i=f.indexOf(k,i))>-1){rs.push([i,i+k.length]);i+=k.length;}});
+  if(!rs.length) return esc(text);
+  rs.sort((a,b)=>a[0]-b[0]);
+  const m=[]; for(const r of rs){const l=m[m.length-1]; if(l&&r[0]<=l[1]) l[1]=Math.max(l[1],r[1]); else m.push([r[0],r[1]]);}
+  let out="",p=0; for(const [a,b] of m){out+=esc(text.slice(p,a))+"<mark>"+esc(text.slice(a,b))+"</mark>";p=b;}
+  return out+esc(text.slice(p));
+}
+
+let toastT;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),1800);}
+
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true;}
+  catch(e){
+    try{const ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");ta.remove();return ok;}
+    catch(e2){return false;}
+  }
+}
+
+/* ====================== BÚSQUEDA ====================== */
+function snippet(it,t,hit){
+  if(!(hit.has("body")||hit.has("prompt"))) return "";
+  for(const s of [it._raw.body,it._raw.prompt]){
+    const f=fold(s); let pos=-1;
+    for(const k of t){const i=f.indexOf(k); if(i>-1&&(pos<0||i<pos)) pos=i;}
+    if(pos>-1){const a=Math.max(0,pos-60),b=Math.min(s.length,pos+100);
+      return (a>0?"…":"")+s.slice(a,b).replace(/\s+/g," ").trim()+(b<s.length?"…":"");}
+  }
+  return "";
+}
+function runSearch(list,q){
+  const t=toks(q);
+  if(!t.length) return list.map(it=>({it,info:null}));
+  const out=[];
+  for(const it of list){
+    let score=0,ok=true; const hit=new Set();
+    for(const k of t){
+      let found=false;
+      for(const [fl,w] of [["title",6],["tags",4],["tag",3],["body",1],["prompt",1]]){
+        if(it._f[fl].includes(k)){found=true;score+=w;hit.add(fl);}
+      }
+      if(!found){ok=false;break;}
+    }
+    if(ok) out.push({it,score,info:{snip:snippet(it,t,hit)}});
+  }
+  return out.sort((a,b)=>b.score-a.score||a.it.idx-b.it.idx);
+}
+
+/* ====================== SIDEBAR ====================== */
+function buildSide(){
+  const grp=PARTS.map(p=>{
+    const its=ITEMS.filter(i=>i.part===p.id);
+    return `<details class="grp" data-part="${p.id}" style="--pc:var(--p${p.id})"><summary><span class="dot"></span>${esc(p.short)}<span class="cnt">${its.length}</span></summary>
+      <ul class="sub"><li><a class="all" href="#/p/${p.id}">Ver toda la parte</a></li>${its.map(i=>`<li><a href="#/i/${i.n}" data-i="${i.n}"><span class="n">${i.n}</span><span>${esc(i.short)}</span><span class="tick"></span></a></li>`).join("")}</ul></details>`;
+  }).join("");
+  $("#side").innerHTML=`<a class="brand" href="#/"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>Guía de Claude</a>
+   <nav aria-label="Principal">
+    <a class="nav" href="#/" data-r="home">Inicio</a>
+    <a class="nav" href="#/todo" data-r="todo">Biblioteca<span class="cnt">${ITEMS.length}</span></a>
+    <a class="nav" href="#/fav" data-r="fav">Favoritos<span class="cnt" id="cFav"></span></a>
+    <a class="nav" href="#/hechas" data-r="hechas">Probadas<span class="cnt" id="cDone"></span></a>
+   </nav><div class="divider"></div>${grp}`;
+}
+function syncSide(r){
+  $("#cFav").textContent=S.fav.length; $("#cDone").textContent=S.done.length;
+  $$("#side .nav").forEach(a=>{const on=a.dataset.r===r.name;a.classList.toggle("active",on);on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current");});
+  $$("#side .sub a[data-i]").forEach(a=>{
+    const n=+a.dataset.i; a.classList.toggle("done",isDone(n));
+    const on=r.name==="i"&&r.id===n; a.classList.toggle("active",on); on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current");
+  });
+  let open=0; if(r.name==="i"){const it=byN(r.id); if(it) open=it.part;} if(r.name==="p") open=r.id;
+  if(open){const d=$(`#side .grp[data-part="${open}"]`); if(d) d.open=true;}
+}
+
+/* ====================== VISTAS ====================== */
+let pageTitle="Guía de Claude";
+
+function rowHTML(it,q,info){
+  const fl=[];
+  if(it.added) fl.push('<span class="pill">Añadido</span>');
+  if(isFav(it.n)) fl.push(`<span class="fl fav" title="Favorito">${svg("star",16)}</span>`);
+  if(isDone(it.n)) fl.push(`<span class="fl" title="Probada">${svg("check",17)}</span>`);
+  const sn=info&&info.snip?`<span class="snip">${hl(info.snip,q)}</span>`:"";
+  return `<a class="row" href="#/i/${it.n}" style="--pc:${it.pc}"><span class="rn">${it.n}</span><span class="rb"><span class="rt">${hl(it.title,q)}</span><span class="rd">${hl(it.tag,q)}</span>${sn}</span><span class="rf">${fl.join("")}</span></a>`;
+}
+
+function viewHome(){
+  pageTitle="Guía de Claude";
+  const total=ITEMS.length, done=S.done.length;
+  const seg=PARTS.map(p=>{const its=ITEMS.filter(i=>i.part===p.id);const d=its.filter(i=>isDone(i.n)).length;
+    return `<a href="#/p/${p.id}" style="--pc:var(--p${p.id});" title="${esc(p.short)}: ${d} de ${its.length} probadas" aria-label="${esc(p.short)}: ${d} de ${its.length} probadas"><i style="--f:${its.length?Math.round(d/its.length*100):0}%"></i></a>`;}).join("");
+  const segl=PARTS.map(p=>`<span>${esc(p.short)}</span>`).join("");
+  const parts=PARTS.map(p=>{
+    const its=ITEMS.filter(i=>i.part===p.id);
+    return `<section class="part" style="--pc:var(--p${p.id})"><h2>${p.id<=5?`<span class="pnum">Parte ${p.id}</span>`:""}<a href="#/p/${p.id}">${esc(p.name)}</a></h2><p class="blurb">${esc(p.blurb)}</p><div class="rows">${its.map(i=>rowHTML(i,"",null)).join("")}</div></section>`;
+  }).join("");
+  return `<div class="hero">
+    <h1>Elige una.</h1>
+    <p class="sub">${NORIG} funciones de Claude que casi nadie usa, cada una con su <b>prompt listo para copiar</b>. Y ${NADD} extras más. No las montes todas hoy: prueba una.</p>
+    <div class="prog"><span>Has probado <b>${done}</b> de ${total}</span><a href="#/hechas" style="text-underline-offset:3px">Ver probadas</a></div>
+    <div class="seg">${seg}</div><div class="segl">${segl}</div>
+    <div class="roll"><button class="btn" data-act="shuffle">${svg("shuffle",18)}Sorpréndeme</button><a class="btn ghost" href="#/i/1">Empezar por Proyectos</a><div class="ticker idle" aria-live="polite">Te propongo una función que aún no hayas probado.</div></div>
+  </div>${parts}
+  <div class="closing"><h2>Y ahora, elige una</h2><p>Ya sabes más de Claude que la mayoría de gente que lo usa a diario. No intentes montarlo todo hoy. Elige una función de la lista, solo una, y configúrala ahora.</p><p>Saber lo que existe ya es la mitad del trabajo.</p>
+  <div class="roll"><button class="btn" data-act="shuffle">${svg("shuffle",18)}Sorpréndeme</button><div class="ticker idle" aria-live="polite">Te propongo una función que aún no hayas probado.</div></div></div>`;
+}
+
+function filtersHTML(kind){
+  const chips=[`<button class="chip" data-act="part" data-v="0" aria-pressed="${ui.part===0}">Todas</button>`]
+    .concat(PARTS.map(p=>`<button class="chip" data-act="part" data-v="${p.id}" aria-pressed="${ui.part===p.id}"><span class="dot" style="--pc:var(--p${p.id})"></span>${esc(p.short)}</button>`)).join("");
+  const tg=[["prompt","Con prompt"],["todo","Sin probar"],["added","Solo añadidos"]]
+    .filter(x=>!(kind==="hechas"&&x[0]==="todo"))
+    .map(([k,l])=>`<button class="chip" data-act="tog" data-v="${k}" aria-pressed="${ui[k]}">${l}</button>`).join("");
+  return `<div class="filters" role="group" aria-label="Filtros"><div class="chips">${chips}</div><div class="chips">${tg}</div></div>`;
+}
+
+function viewList(kind){
+  const titles={todo:"Biblioteca",fav:"Favoritos",hechas:"Probadas"};
+  pageTitle=titles[kind];
+  let base=ITEMS.slice();
+  if(kind==="fav") base=base.filter(i=>isFav(i.n));
+  if(kind==="hechas") base=base.filter(i=>isDone(i.n));
+  const filtered=base.filter(i=>(!ui.part||i.part===ui.part)&&(!ui.prompt||(i.prompts&&i.prompts.length))&&(!ui.todo||!isDone(i.n))&&(!ui.added||i.added));
+  const res=runSearch(filtered,ui.q);
+  const q=ui.q.trim();
+  const n=res.length;
+  const sub=q?`${n} ${n===1?"resultado":"resultados"} para «${esc(q)}»`:`${n} ${n===1?"función":"funciones"}`;
+  let body;
+  if(n){body=`<div class="rows">${res.map(r=>rowHTML(r.it,q,r.info)).join("")}</div>`;}
+  else if(!base.length&&kind==="fav"){body=`<div class="empty"><h2>Todavía no tienes favoritos</h2><p>Abre una función y pulsa «Favorito». Aparecerá aquí para tenerla a mano.</p><a class="btn" href="#/todo">Ver la biblioteca</a></div>`;}
+  else if(!base.length&&kind==="hechas"){body=`<div class="empty"><h2>Aún no has probado ninguna</h2><p>Elige una, pruébala y márcala como probada. Con una basta para empezar.</p><button class="btn" data-act="shuffle">${svg("shuffle",18)}Sorpréndeme</button></div>`;}
+  else{body=`<div class="empty"><h2>No hay nada que coincida</h2><p>Prueba con una palabra más corta o quita algún filtro.</p><button class="btn ghost" data-act="reset">Quitar búsqueda y filtros</button></div>`;}
+  return `<div class="head"><h1>${titles[kind]}</h1><p>${sub}</p></div>${filtersHTML(kind)}${body}`;
+}
+
+function viewPart(id){
+  const p=PARTS.find(x=>x.id===id); if(!p) return notFound();
+  pageTitle=p.name;
+  const its=ITEMS.filter(i=>i.part===id);
+  const next=PARTS.find(x=>x.id===id+1);
+  return `<section class="part" style="--pc:var(--p${p.id});margin-top:0"><a class="crumb" href="#/">Inicio</a><div class="head"><h1>${esc(p.name)}</h1><p>${p.id<=5?`Parte ${p.id}. `:""}${esc(p.blurb)}</p></div><div class="rows" style="margin-top:24px">${its.map(i=>rowHTML(i,"",null)).join("")}</div>
+  ${next?`<div class="pn" style="--pc:var(--p${next.id})"><span></span><a class="nx" href="#/p/${next.id}"><small>Siguiente parte</small>${esc(next.name)}</a></div>`:""}</section>`;
+}
+
+/* ----- Constructor de prompts ----- */
+const PH=/\[([^\[\]\n]{2,})\]/g;
+function phList(p){
+  const ign=p.ignore||[], seen=[], out=[];
+  for(const m of p.t.matchAll(PH)){
+    const lab=m[1]; if(ign.includes(lab)||seen.includes(lab)) continue; seen.push(lab);
+    const ls=p.t.lastIndexOf("\n",m.index)+1; const before=p.t.slice(ls,m.index).trim();
+    let title=lab.charAt(0).toUpperCase()+lab.slice(1);
+    if(/:$/.test(before)&&before.length<48) title=before.slice(0,-1);
+    let opts=null;
+    if(lab.includes(" / ")){const o=lab.split(" / ").map(s=>s.trim()); if(o.length>=2&&o.every(x=>x.length<=34)) opts=o;}
+    out.push({lab,title,opts});
+  }
+  return out;
+}
+function compose(p,pid,html){
+  const f=fills[pid]||{}, ign=p.ignore||[]; let out="",last=0;
+  const E=s=>html?esc(s):s;
+  for(const m of p.t.matchAll(PH)){
+    out+=E(p.t.slice(last,m.index));
+    const lab=m[1];
+    if(ign.includes(lab)) out+=E(m[0]);
+    else{const v=(f[lab]||"").trim(); out+= v?(html?`<span class="ph on">${esc(v)}</span>`:v):(html?`<span class="ph">${esc(m[0])}</span>`:m[0]);}
+    last=m.index+m[0].length;
+  }
+  return out+E(p.t.slice(last));
+}
+function promptHTML(it,p,k){
+  const pid=it.n+"-"+k, list=phList(p);
+  const fields=list.length?`<div class="fields"><p class="hint">Rellena los huecos y el prompt se actualiza solo.</p>${list.map((h,i)=>`<div class="field"><label for="f-${pid}-${i}">${esc(h.title)}</label><textarea id="f-${pid}-${i}" rows="1" data-pid="${pid}" data-k="${k}" data-i="${i}" placeholder="${esc(h.opts?h.opts.join(" / "):h.lab)}"></textarea>${h.opts?`<div class="chips">${h.opts.map(o=>`<button type="button" class="chip" data-act="opt" data-pid="${pid}" data-i="${i}" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>`:""}</div>`).join("")}</div>`:"";
+  return `<section class="prompt" data-pid="${pid}" data-n="${it.n}" data-k="${k}"><header><h3>${esc(p.l)}</h3>${p.added?'<span class="pill">Ejemplo añadido</span>':""}</header>${fields}<pre class="ptext${p.code?" code":""}" tabindex="0">${compose(p,pid,true)}</pre><div class="pact"><button class="btn sm" data-act="copy">${svg("copy",16)}Copiar prompt</button><button class="btn sm ghost" data-act="copyopen">${svg("ext",16)}Copiar y abrir Claude</button>${list.length?`<button class="btn sm ghost" data-act="reset-fields">${svg("undo",16)}Vaciar huecos</button>`:""}</div></section>`;
+}
+
+function viewItem(n){
+  const it=byN(n); if(!it) return notFound();
+  pageTitle=it.title;
+  const part=PARTS[it.part-1], prev=ITEMS[it.idx-1], next=ITEMS[it.idx+1];
+  const prose=(it.body||[]).map(b=>Array.isArray(b)?`<ul>${b.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<p>${esc(b)}</p>`).join("");
+  const note=it.note?`<aside class="note">${esc(it.note)}</aside>`:"";
+  const pn=(a,cls,lab)=>a?`<a class="${cls}" href="#/i/${a.n}" style="--pc:${a.pc}"><small>${lab}</small>${a.n}. ${esc(a.short)}</a>`:"<span></span>";
+  return `<article class="item reading" style="--pc:${it.pc}">
+   <a class="crumb" href="#/p/${part.id}"><span class="dot"></span>${esc(partLabel(part))}</a>
+   <h1><span class="bign">${it.n}</span><span>${esc(it.title)}</span></h1>
+   <p class="lede">${esc(it.tag)}</p>
+   <div class="acts"><button class="btn ghost sm tog" data-act="fav" data-n="${it.n}" aria-pressed="${isFav(it.n)}"><span class="st">${svg("star",17)}</span>Favorito</button><button class="btn ghost sm tog" data-act="done" data-n="${it.n}" aria-pressed="${isDone(it.n)}">${svg("check",17)}Probada</button>${it.added?'<span class="pill">Añadido: no está en el manual</span>':""}</div>
+   ${it.noteFirst?note:""}
+   <div class="prose" style="margin-top:22px">${prose}</div>
+   ${it.how?`<h2>Cómo activarlo</h2><p class="how">${esc(it.how)}</p>`:""}
+   ${(it.prompts||[]).map((p,k)=>promptHTML(it,p,k)).join("")}
+   ${it.noteFirst?"":note}
+   <div class="mynotes"><h2>Mis notas</h2><label class="sr" for="notes">Mis notas sobre esta función</label><textarea id="notes" data-n="${it.n}" placeholder="Cómo lo has adaptado, qué te ha funcionado…">${esc(S.notes[it.n]||"")}</textarea></div>
+   ${(it.tags&&it.tags.length)?`<div class="tags">${it.tags.map(t=>`<button class="chip" data-act="tag" data-v="${esc(t)}">${esc(t)}</button>`).join("")}</div>`:""}
+   <nav class="pn" aria-label="Funciones contiguas">${pn(prev,"pv","Anterior")}${pn(next,"nx","Siguiente")}</nav>
+  </article>`;
+}
+function notFound(){pageTitle="No encontrada";return `<div class="empty"><h2>Esta página no existe</h2><p>Puede que el enlace esté mal escrito.</p><a class="btn" href="#/">Volver al inicio</a></div>`;}
+
+/* ====================== ROUTER ====================== */
+function parse(){const h=location.hash.replace(/^#\/?/,"");const [a,b]=h.split("/");return {name:a||"home",id:b?parseInt(b,10):null};}
+const isList=n=>n==="todo"||n==="fav"||n==="hechas";
+function render(scroll){
+  const r=parse(); let html;
+  switch(r.name){
+    case "home":html=viewHome();break;
+    case "todo":case "fav":case "hechas":html=viewList(r.name);break;
+    case "p":html=viewPart(r.id);break;
+    case "i":html=viewItem(r.id);break;
+    default:html=notFound();
+  }
+  $("#view").innerHTML=html;
+  document.title=pageTitle==="Guía de Claude"?pageTitle:pageTitle+" | Guía de Claude";
+  syncSide(r);
+  autoGrow();
+  if(scroll!==false) window.scrollTo(0,0);
+  closeMenu();
+}
+function autoGrow(){$$("#view .field textarea").forEach(t=>{t.style.height="auto";t.style.height=Math.max(38,t.scrollHeight+2)+"px";});}
+
+/* ====================== ACCIONES ====================== */
+let busy=false;
+function shuffle(){
+  if(busy) return;
+  const pool=ITEMS.filter(i=>!isDone(i.n)); const src=pool.length?pool:ITEMS;
+  const pick=src[Math.floor(Math.random()*src.length)];
+  const boxes=$$(".ticker");
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches||!boxes.length){location.hash="#/i/"+pick.n;return;}
+  busy=true; let k=0; const total=14;
+  const show=it=>boxes.forEach(b=>{b.classList.remove("idle");b.style.setProperty("--pc",it.pc);b.textContent=it.n+". "+it.short;});
+  (function tick(){
+    if(k<total){show(ITEMS[Math.floor(Math.random()*ITEMS.length)]);k++;setTimeout(tick,45+k*14);}
+    else{show(pick);setTimeout(()=>{busy=false;location.hash="#/i/"+pick.n;},650);}
+  })();
+}
+function openMenu(){ $("#side").classList.add("open"); $("#scrim").style.display="block"; $("#menuBtn").setAttribute("aria-expanded","true"); }
+function closeMenu(){ $("#side").classList.remove("open"); $("#scrim").style.display="none"; $("#menuBtn").setAttribute("aria-expanded","false"); }
+function applyTheme(){
+  const dark=S.theme?S.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  if(S.theme) document.documentElement.setAttribute("data-theme",S.theme); else document.documentElement.removeAttribute("data-theme");
+  $("#themeBtn").innerHTML=svg(dark?"sun":"moon",19);
+}
+function setQ(v){
+  ui.q=v; $("#q").value=v; $("#searchBox").classList.toggle("has",!!v.trim());
+  const r=parse();
+  if(isList(r.name)) render(false);
+  else if(v.trim()) location.hash="#/todo";
+}
+function updatePreview(sec){
+  const it=byN(+sec.dataset.n), k=+sec.dataset.k, p=it.prompts[k];
+  $(".ptext",sec).innerHTML=compose(p,sec.dataset.pid,true);
+}
+
+document.addEventListener("click",async e=>{
+  const el=e.target.closest("[data-act]"); if(!el) return;
+  const a=el.dataset.act;
+  if(a==="menu"){ $("#side").classList.contains("open")?closeMenu():openMenu(); return; }
+  if(a==="theme"){ const cur=S.theme?S.theme:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); S.theme=cur==="dark"?"light":"dark"; save(); applyTheme(); return; }
+  if(a==="clearq"){ setQ(""); $("#q").focus(); return; }
+  if(a==="shuffle"){ shuffle(); return; }
+  if(a==="part"){ const v=+el.dataset.v; ui.part=(ui.part===v)?0:v; render(false); return; }
+  if(a==="tog"){ ui[el.dataset.v]=!ui[el.dataset.v]; render(false); return; }
+  if(a==="reset"){ ui.part=0;ui.prompt=false;ui.todo=false;ui.added=false; setQ(""); render(false); return; }
+  if(a==="tag"){ setQ(el.dataset.v); if(!isList(parse().name)) location.hash="#/todo"; return; }
+  if(a==="fav"||a==="done"){
+    const n=+el.dataset.n, key=a==="fav"?"fav":"done", arr=S[key], i=arr.indexOf(n);
+    if(i>-1){arr.splice(i,1);} else arr.push(n);
+    save(); el.setAttribute("aria-pressed",String(i===-1));
+    toast(a==="fav"?(i===-1?"Añadida a favoritos":"Quitada de favoritos"):(i===-1?"Marcada como probada":"Marca de probada quitada"));
+    syncSide(parse()); return;
+  }
+  if(a==="opt"){
+    const sec=el.closest(".prompt"); const ta=$(`textarea[data-i="${el.dataset.i}"]`,sec);
+    ta.value=el.dataset.v; ta.dispatchEvent(new Event("input",{bubbles:true})); return;
+  }
+  if(a==="reset-fields"){
+    const sec=el.closest(".prompt"); fills[sec.dataset.pid]={};
+    $$("textarea",sec).forEach(t=>t.value=""); updatePreview(sec); autoGrow(); return;
+  }
+  if(a==="copy"||a==="copyopen"){
+    const sec=el.closest(".prompt"), it=byN(+sec.dataset.n), p=it.prompts[+sec.dataset.k];
+    const text=compose(p,sec.dataset.pid,false);
+    if(a==="copyopen") window.open("https://claude.ai/new","_blank","noopener");
+    const ok=await copyText(text);
+    toast(ok?(a==="copyopen"?"Copiado. Pégalo en el chat nuevo":"Prompt copiado"):"No se ha podido copiar. Selecciona el texto a mano.");
+    return;
+  }
+});
+
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.matches(".field textarea")){
+    const sec=t.closest(".prompt"), it=byN(+sec.dataset.n), p=it.prompts[+sec.dataset.k];
+    const lab=phList(p)[+t.dataset.i].lab;
+    (fills[sec.dataset.pid]=fills[sec.dataset.pid]||{})[lab]=t.value;
+    t.style.height="auto"; t.style.height=Math.max(38,t.scrollHeight+2)+"px";
+    updatePreview(sec); return;
+  }
+  if(t.id==="notes"){
+    clearTimeout(t._d); t._d=setTimeout(()=>{ const n=+t.dataset.n; if(t.value.trim()) S.notes[n]=t.value; else delete S.notes[n]; save(); },300); return;
+  }
+  if(t.id==="q") setQ(t.value);
+});
+
+document.addEventListener("keydown",e=>{
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if((e.key==="/"&&!typing)||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k")){e.preventDefault();$("#q").focus();$("#q").select();return;}
+  if(e.key==="Escape"){ if(document.activeElement.id==="q"){ if(ui.q) setQ(""); else $("#q").blur(); } closeMenu(); return; }
+  if(!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    const r=parse();
+    if(r.name==="i"){ const it=byN(r.id); const t=e.key==="ArrowLeft"?ITEMS[it.idx-1]:e.key==="ArrowRight"?ITEMS[it.idx+1]:null; if(t) location.hash="#/i/"+t.n; }
+  }
+});
+
+window.addEventListener("hashchange",()=>render(true));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ if(!S.theme) applyTheme(); });
+
+/* ====================== ARRANQUE ====================== */
+$("#menuBtn").innerHTML=svg("menu",20);
+$("#clrBtn").innerHTML=svg("x",16);
+buildSide(); applyTheme(); render(false);
+})();
+</script>
+</body>
+</html>
