@@ -1,0 +1,20 @@
+{
+ "name": "Litúrgia CMF",
+ "short_name": "Litúrgia CMF",
+ "start_url": "./liturgia_cmf.html",
+ "display": "standalone",
+ "background_color": "#4E111A",
+ "theme_color": "#6E1A26",
+ "icons": [
+  {
+   "src": "liturgia-cmf-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "liturgia-cmf-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}
