@@ -1,7 +1,7 @@
 {
  "name": "Litúrgia CMF",
  "short_name": "Litúrgia CMF",
- "start_url": "./liturgia_cmf.html",
+ "start_url": "./Liturgia_CMF_CAT.html",
  "display": "standalone",
  "background_color": "#4E111A",
  "theme_color": "#6E1A26",
